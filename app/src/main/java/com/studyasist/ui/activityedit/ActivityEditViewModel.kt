@@ -8,6 +8,7 @@ import com.studyasist.data.local.entity.ActivityType
 import com.studyasist.data.repository.ActivityRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.data.repository.TimetableRepository
+import com.studyasist.notification.NotificationScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +45,8 @@ class ActivityEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val activityRepository: ActivityRepository,
     private val timetableRepository: TimetableRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     private val timetableId: Long = checkNotNull(savedStateHandle["timetableId"]) { "timetableId required" }
@@ -161,10 +163,20 @@ class ActivityEditViewModel @Inject constructor(
                 notifyLeadMinutes = state.notifyLeadMinutes,
                 sortOrder = 0
             )
-            if (state.isEdit) {
+            val savedId: Long = if (state.isEdit) {
                 activityRepository.updateActivity(entity)
+                state.activityId
             } else {
                 activityRepository.insertActivity(entity)
+            }
+            val savedEntity = entity.copy(id = savedId)
+            notificationScheduler.cancelActivity(savedEntity.id)
+            val activeId = settingsRepository.activeTimetableIdFlow.first()
+            if (savedEntity.notifyEnabled && activeId == timetableId) {
+                val timetable = timetableRepository.getTimetable(timetableId)
+                if (timetable != null) {
+                    notificationScheduler.scheduleActivity(savedEntity, timetable.name)
+                }
             }
             _uiState.update { it.copy(isSaving = false) }
             onSaved()

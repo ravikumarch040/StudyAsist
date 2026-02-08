@@ -7,6 +7,7 @@ import com.studyasist.data.local.entity.TimetableEntity
 import com.studyasist.data.repository.ActivityRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.data.repository.TimetableRepository
+import com.studyasist.notification.NotificationScheduler
 import com.studyasist.util.currentTimeMinutesFromMidnight
 import com.studyasist.util.todayDayOfWeek
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,8 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val timetableRepository: TimetableRepository,
     private val activityRepository: ActivityRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -73,7 +75,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setActiveTimetableId(id: Long) {
-        viewModelScope.launch { settingsRepository.setActiveTimetableId(id) }
+        viewModelScope.launch {
+            settingsRepository.setActiveTimetableId(id)
+            notificationScheduler.rescheduleAll()
+        }
     }
 
     fun refreshToday() {

@@ -31,7 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.studyasist.R
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.ui.timetablelist.TimetableListScreen
 import com.studyasist.ui.timetablelist.TimetableListViewModel
@@ -56,7 +58,7 @@ fun HomeScreen(
                 title = { Text("StudyAsist") },
                 actions = {
                     IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -75,12 +77,12 @@ fun HomeScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Today") }
+                    text = { Text(stringResource(R.string.today)) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("Timetables") }
+                    text = { Text(stringResource(R.string.timetables)) }
                 )
             }
             when (selectedTab) {
@@ -119,7 +121,7 @@ private fun TodayTabContent(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "No active timetable.\nGo to Timetables tab and set one as active.",
+                stringResource(R.string.no_active_timetable),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -134,7 +136,7 @@ private fun TodayTabContent(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "No activities for today.\nOpen \"${activeTimetable.name}\" and add activities.",
+                stringResource(R.string.no_activities_today) + " (${activeTimetable.name})",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -168,7 +170,7 @@ private fun TodayTabContent(
                 ) {
                     if (isCurrent) {
                         Text(
-                            "Now",
+                            stringResource(R.string.now),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary
                         )
