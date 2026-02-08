@@ -1,0 +1,252 @@
+package com.studyasist.ui.activityedit
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.studyasist.data.local.entity.ActivityType
+import com.studyasist.data.repository.AppSettings
+import com.studyasist.ui.components.NumberPicker
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ActivityEditScreen(
+    viewModel: ActivityEditViewModel,
+    onBack: () -> Unit,
+    onSaved: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(if (uiState.isEdit) "Edit activity" else "Add activity") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text("Day", style = MaterialTheme.typography.labelMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for ((day, label) in listOf(1 to "Mon", 2 to "Tue", 3 to "Wed", 4 to "Thu", 5 to "Fri", 6 to "Sat", 7 to "Sun")) {
+                    androidx.compose.material3.FilterChip(
+                        selected = uiState.dayOfWeek == day,
+                        onClick = { viewModel.updateDay(day) },
+                        label = { Text(label) }
+                    )
+                }
+            }
+
+            if (!uiState.isEdit) {
+                Text("Copy schedule from another day", style = MaterialTheme.typography.labelMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    for ((day, label) in listOf(1 to "Mon", 2 to "Tue", 3 to "Wed", 4 to "Thu", 5 to "Fri", 6 to "Sat", 7 to "Sun")) {
+                        if (day != uiState.dayOfWeek) {
+                            androidx.compose.material3.FilterChip(
+                                selected = false,
+                                onClick = { viewModel.copyScheduleFromDay(day, onDone = onSaved) },
+                                label = { Text("From $label") }
+                            )
+                        }
+                    }
+                }
+            }
+
+            Text("Start time", style = MaterialTheme.typography.labelMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                    Text("Hour", style = MaterialTheme.typography.labelSmall)
+                    NumberPicker(
+                        value = uiState.startHour.coerceIn(0, 23),
+                        onValueChange = { viewModel.updateStartTime(it, uiState.startMinute) },
+                        range = 0..23
+                    )
+                }
+                Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                    Text("Min", style = MaterialTheme.typography.labelSmall)
+                    NumberPicker(
+                        value = uiState.startMinute.coerceIn(0, 59),
+                        onValueChange = { viewModel.updateStartTime(uiState.startHour, it) },
+                        range = 0..59
+                    )
+                }
+            }
+            Text("End time", style = MaterialTheme.typography.labelMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                    Text("Hour", style = MaterialTheme.typography.labelSmall)
+                    NumberPicker(
+                        value = uiState.endHour.coerceIn(0, 23),
+                        onValueChange = { viewModel.updateEndTime(it, uiState.endMinute) },
+                        range = 0..23
+                    )
+                }
+                Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                    Text("Min", style = MaterialTheme.typography.labelSmall)
+                    NumberPicker(
+                        value = uiState.endMinute.coerceIn(0, 59),
+                        onValueChange = { viewModel.updateEndTime(uiState.endHour, it) },
+                        range = 0..59
+                    )
+                }
+            }
+
+            OutlinedTextField(
+                value = uiState.title,
+                onValueChange = viewModel::updateTitle,
+                label = { Text("Title") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            Text("Type", style = MaterialTheme.typography.labelMedium)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for (type in ActivityType.entries) {
+                    androidx.compose.material3.FilterChip(
+                        selected = uiState.type == type,
+                        onClick = { viewModel.updateType(type) },
+                        label = { Text(type.name) }
+                    )
+                }
+            }
+
+            OutlinedTextField(
+                value = uiState.note,
+                onValueChange = viewModel::updateNote,
+                label = { Text("Note (optional)") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 1,
+                maxLines = 2
+            )
+
+            androidx.compose.material3.HorizontalDivider()
+            SwitchRow(
+                checked = uiState.notifyEnabled,
+                onCheckedChange = viewModel::updateNotifyEnabled,
+                label = "Notify me"
+            )
+            if (uiState.notifyEnabled) {
+                Text("Notify before (minutes)", style = MaterialTheme.typography.labelMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    for (mins in AppSettings.LEAD_OPTIONS) {
+                        androidx.compose.material3.FilterChip(
+                            selected = uiState.notifyLeadMinutes == mins,
+                            onClick = { viewModel.updateNotifyLeadMinutes(mins) },
+                            label = { Text("$mins min") }
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                androidx.compose.material3.OutlinedButton(
+                    onClick = onBack,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Cancel")
+                }
+                androidx.compose.material3.Button(
+                    onClick = { viewModel.save(onSaved = onSaved) },
+                    modifier = Modifier.weight(1f),
+                    enabled = uiState.title.isNotBlank() && !uiState.isSaving
+                ) {
+                    Text(if (uiState.isSaving) "Saving…" else "Save")
+                }
+            }
+        }
+    }
+
+    if (uiState.showOverlapDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = viewModel::dismissOverlapDialog,
+            title = { Text("Overlapping activities") },
+            text = {
+                Text("Another activity overlaps this time. Save anyway?")
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = { viewModel.save(saveAnyway = true, onSaved = onSaved) }) {
+                    Text("Save anyway")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = viewModel::dismissOverlapDialog) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun SwitchRow(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    label: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+    ) {
+        Text(label)
+        androidx.compose.material3.Switch(checked = checked, onCheckedChange = onCheckedChange)
+    }
+}
