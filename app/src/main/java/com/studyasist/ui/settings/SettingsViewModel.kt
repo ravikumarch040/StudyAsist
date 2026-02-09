@@ -19,7 +19,7 @@ class SettingsViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, true)
+            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, true, "")
         )
 
     fun setDefaultLeadMinutes(minutes: Int) {
@@ -32,5 +32,9 @@ class SettingsViewModel @Inject constructor(
 
     fun setVibrationEnabled(enabled: Boolean) {
         viewModelScope.launch { settingsRepository.setVibrationEnabled(enabled) }
+    }
+
+    fun setAlarmTtsMessage(message: String) {
+        viewModelScope.launch { settingsRepository.setAlarmTtsMessage(message) }
     }
 }

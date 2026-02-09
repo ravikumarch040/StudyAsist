@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.studyasist.data.repository.AppSettings
@@ -31,7 +32,7 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState(
-        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, true)
+        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, true, "")
     )
 
     Scaffold(
@@ -96,6 +97,19 @@ fun SettingsScreen(
                     onCheckedChange = viewModel::setVibrationEnabled
                 )
             }
+            Text("Alarm sound (text-to-speech)", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Custom message spoken when a reminder fires. Leave empty to use system alarm sound.",
+                style = MaterialTheme.typography.bodySmall
+            )
+            OutlinedTextField(
+                value = settings.alarmTtsMessage,
+                onValueChange = viewModel::setAlarmTtsMessage,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("e.g. Wake up buddy. Its study time.") },
+                singleLine = false,
+                maxLines = 3
+            )
         }
     }
 }

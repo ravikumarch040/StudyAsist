@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,6 +26,7 @@ class SettingsDataStore @Inject constructor(
     val soundEnabled = booleanPreferencesKey("sound_enabled")
     val vibrationEnabled = booleanPreferencesKey("vibration_enabled")
     val activeTimetableId = longPreferencesKey("active_timetable_id")
+    val alarmTtsMessage = stringPreferencesKey("alarm_tts_message")
 
     val dataStore: DataStore<Preferences> get() = prefs
 

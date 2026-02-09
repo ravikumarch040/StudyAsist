@@ -1,10 +1,15 @@
 package com.studyasist.notification
 
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,13 +34,18 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import com.studyasist.R
 import com.studyasist.ui.theme.StudyAsistTheme
+import java.util.Locale
 
 /**
- * Full-screen alarm screen: plays system alarm sound in a loop until the user taps Dismiss.
+ * Full-screen alarm screen: plays custom TTS message or system alarm sound in a loop until the user taps Dismiss.
  */
 class ReminderAlarmActivity : ComponentActivity() {
 
     private var mediaPlayer: MediaPlayer? = null
+    private var textToSpeech: TextToSpeech? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var dismissed = false
+    private var ttsMessageToLoop: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,8 +53,11 @@ class ReminderAlarmActivity : ComponentActivity() {
         val title = intent.getStringExtra(EXTRA_TITLE) ?: ""
         val body = intent.getStringExtra(EXTRA_BODY) ?: ""
         val activityId = intent.getLongExtra(EXTRA_ACTIVITY_ID, 0L)
+        val soundEnabled = intent.getBooleanExtra(EXTRA_SOUND_ENABLED, true)
+        val alarmTtsMessage = intent.getStringExtra(EXTRA_ALARM_TTS_MESSAGE)?.trim() ?: ""
+        val fromTtsService = intent.getBooleanExtra(EXTRA_FROM_TTS_SERVICE, false)
         val notificationId = activityId.toInt().and(0x7FFFFFFF)
-        NotificationManagerCompat.from(this).cancel(notificationId)
+        if (!fromTtsService) NotificationManagerCompat.from(this).cancel(notificationId)
 
         setContent {
             StudyAsistTheme {
@@ -60,7 +73,14 @@ class ReminderAlarmActivity : ComponentActivity() {
                 }
             }
         }
-        startAlarmSound()
+        if (soundEnabled && !fromTtsService) {
+            if (alarmTtsMessage.isNotBlank()) {
+                ttsMessageToLoop = alarmTtsMessage
+                startTtsAlarm(alarmTtsMessage)
+            } else {
+                startAlarmSound()
+            }
+        }
     }
 
     private fun setShowWhenLockedAndTurnScreenOn() {
@@ -78,6 +98,37 @@ class ReminderAlarmActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
+    }
+
+    private fun startTtsAlarm(message: String) {
+        textToSpeech = TextToSpeech(applicationContext) { status ->
+            if (status == TextToSpeech.SUCCESS && !dismissed) {
+                textToSpeech?.apply {
+                    setLanguage(Locale.getDefault())
+                    setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                        override fun onStart(utteranceId: String?) {}
+                        override fun onDone(utteranceId: String?) {
+                            if (!dismissed && !isFinishing && utteranceId == UTTERANCE_ID) {
+                                mainHandler.postDelayed({ speakTtsMessage() }, 500)
+                            }
+                        }
+                        override fun onError(utteranceId: String?) {}
+                    })
+                    speakTtsMessage()
+                }
+            }
+        }
+    }
+
+    private fun speakTtsMessage() {
+        val message = ttsMessageToLoop ?: return
+        if (dismissed || isFinishing) return
+        textToSpeech?.speak(
+            message,
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            UTTERANCE_ID
+        )
     }
 
     private fun startAlarmSound() {
@@ -103,6 +154,7 @@ class ReminderAlarmActivity : ComponentActivity() {
     }
 
     private fun finishAndStopSound() {
+        dismissed = true
         try {
             mediaPlayer?.apply {
                 if (isPlaying) stop()
@@ -111,11 +163,31 @@ class ReminderAlarmActivity : ComponentActivity() {
         } finally {
             mediaPlayer = null
         }
+        try {
+            textToSpeech?.apply {
+                stop()
+                shutdown()
+            }
+        } finally {
+            textToSpeech = null
+        }
+        if (intent.getBooleanExtra(EXTRA_FROM_TTS_SERVICE, false)) {
+            stopService(Intent(this, AlarmTtsService::class.java))
+        }
         finish()
     }
 
+    companion object {
+        private const val UTTERANCE_ID = "study_alarm_tts"
+    }
+
     override fun onDestroy() {
-        finishAndStopSound()
+        dismissed = true
+        mediaPlayer?.apply { try { if (isPlaying) stop(); release() } catch (_: Exception) {} }
+        mediaPlayer = null
+        textToSpeech?.stop()
+        textToSpeech?.shutdown()
+        textToSpeech = null
         super.onDestroy()
     }
 

@@ -37,6 +37,16 @@ object NotificationHelper {
             enableVibration(true)
         }
         nm.createNotificationChannel(alarmChannel)
+        val alarmTtsChannel = NotificationChannel(
+            CHANNEL_ID_ALARM_TTS,
+            CHANNEL_NAME_ALARM_TTS,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Custom spoken message plays when reminder fires; no notification sound"
+            setSound(null, null)
+            enableVibration(true)
+        }
+        nm.createNotificationChannel(alarmTtsChannel)
     }
 
     fun showReminder(
@@ -71,7 +81,9 @@ object NotificationHelper {
 
     /**
      * Shows a high-priority alarm notification with full-screen intent so the alarm activity
-     * can appear over the lock screen. Sound loops in ReminderAlarmActivity until user dismisses.
+     * can appear over the lock screen.
+     * @param useTtsMessage true when user set a custom TTS message: use silent channel so only
+     *                      the activity plays TTS; false uses system alarm sound from the channel.
      */
     fun showReminderAlarm(
         context: Context,
@@ -79,9 +91,11 @@ object NotificationHelper {
         timetableName: String,
         title: String,
         body: String,
-        fullScreenIntent: PendingIntent
+        fullScreenIntent: PendingIntent,
+        useTtsMessage: Boolean = false
     ) {
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID_ALARM)
+        val channelId = if (useTtsMessage) CHANNEL_ID_ALARM_TTS else CHANNEL_ID_ALARM
+        val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(timetableName)
             .setContentText("$title – $body")
