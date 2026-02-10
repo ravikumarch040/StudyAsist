@@ -14,6 +14,7 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.core.app.NotificationCompat
 import com.studyasist.R
+import com.studyasist.util.findVoiceByName
 import java.util.Locale
 
 /**
@@ -41,6 +42,7 @@ class AlarmTtsService : Service() {
         val body = intent.getStringExtra(EXTRA_BODY) ?: ""
         val timetableName = intent.getStringExtra(EXTRA_TIMETABLE_NAME) ?: "StudyAsist"
         val activityId = intent.getLongExtra(EXTRA_ACTIVITY_ID, 0L)
+        val voiceName = intent.getStringExtra(EXTRA_TTS_VOICE_NAME)?.takeIf { it.isNotEmpty() }
         val notificationId = activityId.toInt().and(0x7FFFFFFF)
 
         createChannelIfNeeded()
@@ -86,7 +88,7 @@ class AlarmTtsService : Service() {
         }
 
         ttsMessage = message
-        startTts()
+        startTts(voiceName)
         return START_NOT_STICKY
     }
 
@@ -104,11 +106,12 @@ class AlarmTtsService : Service() {
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
     }
 
-    private fun startTts() {
+    private fun startTts(voiceName: String?) {
         textToSpeech = TextToSpeech(applicationContext) { status ->
             if (status == TextToSpeech.SUCCESS && !stopped) {
                 textToSpeech?.apply {
                     setLanguage(Locale.getDefault())
+                    voiceName?.let { name -> findVoiceByName(voices, name)?.let { setVoice(it) } }
                     setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                         override fun onStart(utteranceId: String?) {}
                         override fun onDone(utteranceId: String?) {

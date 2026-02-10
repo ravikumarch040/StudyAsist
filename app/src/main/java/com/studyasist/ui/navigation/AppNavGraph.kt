@@ -18,6 +18,12 @@ import com.studyasist.ui.timetabledetail.TimetableDetailScreen
 import com.studyasist.ui.timetabledetail.TimetableDetailViewModel
 import com.studyasist.ui.timetablelist.TimetableListScreen
 import com.studyasist.ui.timetablelist.TimetableListViewModel
+import com.studyasist.ui.dictate.DictateScreen
+import com.studyasist.ui.dictate.DictateViewModel
+import com.studyasist.ui.explain.ExplainScreen
+import com.studyasist.ui.explain.ExplainViewModel
+import com.studyasist.ui.solve.SolveScreen
+import com.studyasist.ui.solve.SolveViewModel
 
 @Composable
 fun AppNavGraph(
@@ -44,7 +50,10 @@ fun AppNavGraph(
                     navController.navigate(NavRoutes.timetableDetail(id)) {
                         popUpTo(NavRoutes.HOME) { inclusive = false }
                     }
-                }
+                },
+                onDictate = { navController.navigate(NavRoutes.DICTATE) },
+                onExplain = { navController.navigate(NavRoutes.EXPLAIN) },
+                onSolve = { navController.navigate(NavRoutes.SOLVE) }
             )
         }
 
@@ -115,6 +124,30 @@ fun AppNavGraph(
         composable(NavRoutes.SETTINGS) {
             val viewModel: SettingsViewModel = hiltViewModel()
             SettingsScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.DICTATE) {
+            val viewModel: DictateViewModel = hiltViewModel()
+            DictateScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.EXPLAIN) {
+            val viewModel: ExplainViewModel = hiltViewModel()
+            ExplainScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.SOLVE) {
+            val viewModel: SolveViewModel = hiltViewModel()
+            SolveScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() }
             )

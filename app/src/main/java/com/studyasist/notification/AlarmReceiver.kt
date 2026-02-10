@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import com.studyasist.data.repository.SettingsRepositoryEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import androidx.work.OneTimeWorkRequestBuilder
@@ -22,6 +21,8 @@ class AlarmReceiver : BroadcastReceiver() {
         val activityId = intent.getLongExtra(EXTRA_ACTIVITY_ID, 0L)
         val notificationId = activityId.toInt().and(0x7FFFFFFF)
 
+        val useSpeechSound = intent.getBooleanExtra(EXTRA_USE_SPEECH_SOUND, false)
+        val ttsMessage = intent.getStringExtra(EXTRA_ALARM_TTS_MESSAGE)?.trim() ?: ""
         val settings = runBlocking {
             val entryPoint = EntryPointAccessors.fromApplication(
                 context.applicationContext,
@@ -29,8 +30,7 @@ class AlarmReceiver : BroadcastReceiver() {
             )
             entryPoint.getSettingsRepository().settingsFlow.first()
         }
-        val ttsMessage = settings.alarmTtsMessage
-        val soundEnabled = settings.soundEnabled
+        val ttsVoiceName = settings.ttsVoiceName
 
         val alarmIntent = Intent(context, ReminderAlarmActivity::class.java).apply {
             putExtra(EXTRA_TITLE, title)
@@ -38,7 +38,8 @@ class AlarmReceiver : BroadcastReceiver() {
             putExtra(EXTRA_TIMETABLE_NAME, timetableName)
             putExtra(EXTRA_ACTIVITY_ID, activityId)
             putExtra(EXTRA_ALARM_TTS_MESSAGE, ttsMessage)
-            putExtra(EXTRA_SOUND_ENABLED, soundEnabled)
+            putExtra(EXTRA_SOUND_ENABLED, true)
+            putExtra(EXTRA_TTS_VOICE_NAME, ttsVoiceName ?: "")
             addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or
@@ -55,25 +56,10 @@ class AlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val useTts = ttsMessage.isNotBlank() && soundEnabled
-        if (useTts) {
-            val serviceIntent = Intent(context, AlarmTtsService::class.java).apply {
-                putExtra(EXTRA_ALARM_TTS_MESSAGE, ttsMessage)
-                putExtra(EXTRA_TITLE, title)
-                putExtra(EXTRA_BODY, body)
-                putExtra(EXTRA_TIMETABLE_NAME, timetableName)
-                putExtra(EXTRA_ACTIVITY_ID, activityId)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent)
-            } else {
-                context.startService(serviceIntent)
-            }
-        } else {
-            NotificationHelper.createChannel(context)
-            NotificationHelper.showReminderAlarm(context, notificationId, timetableName, title, body, fullScreenPending, useTtsMessage = false)
-            context.startActivity(alarmIntent)
-        }
+        val useTtsMessage = useSpeechSound && ttsMessage.isNotBlank()
+        NotificationHelper.createChannel(context)
+        NotificationHelper.showReminderAlarm(context, notificationId, timetableName, title, body, fullScreenPending, useTtsMessage = useTtsMessage)
+        context.startActivity(alarmIntent)
 
         if (activityId != 0L) {
             val request = OneTimeWorkRequestBuilder<RescheduleOneActivityWorker>()

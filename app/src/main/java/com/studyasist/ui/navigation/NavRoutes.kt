@@ -7,6 +7,9 @@ object NavRoutes {
     const val ACTIVITY_EDIT = "activity_edit/{timetableId}/{activityId}"
     const val ACTIVITY_ADD = "activity_add/{timetableId}/{dayOfWeek}"
     const val SETTINGS = "settings"
+    const val DICTATE = "dictate"
+    const val EXPLAIN = "explain"
+    const val SOLVE = "solve"
 
     fun timetableDetail(timetableId: Long) = "timetable_detail/$timetableId"
     fun activityEdit(timetableId: Long, activityId: Long) = "activity_edit/$timetableId/$activityId"

@@ -5,25 +5,41 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.studyasist.R
 import com.studyasist.data.repository.AppSettings
+import com.studyasist.util.VoiceOption
+import com.studyasist.util.loadAvailableVoicesIndia
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,8 +48,9 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState(
-        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, true, "")
+        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "")
     )
+    val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
 
     Scaffold(
         topBar = {
@@ -41,7 +58,7 @@ fun SettingsScreen(
                 title = { Text("Settings") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -55,7 +72,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text("Notifications", style = MaterialTheme.typography.titleMedium)
@@ -80,36 +98,129 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Sound")
-                Switch(
-                    checked = settings.soundEnabled,
-                    onCheckedChange = viewModel::setSoundEnabled
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
                 Text("Vibration")
                 Switch(
                     checked = settings.vibrationEnabled,
                     onCheckedChange = viewModel::setVibrationEnabled
                 )
             }
-            Text("Alarm sound (text-to-speech)", style = MaterialTheme.typography.titleMedium)
+            Text("Your name", style = MaterialTheme.typography.titleMedium)
             Text(
-                "Custom message spoken when a reminder fires. Leave empty to use system alarm sound.",
+                "Used in alarm speech: \"Hey {name}, Its time for {activity}\". Optional.",
                 style = MaterialTheme.typography.bodySmall
             )
             OutlinedTextField(
-                value = settings.alarmTtsMessage,
-                onValueChange = viewModel::setAlarmTtsMessage,
+                value = settings.userName,
+                onValueChange = viewModel::setUserName,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("e.g. Wake up buddy. Its study time.") },
-                singleLine = false,
-                maxLines = 3
+                placeholder = { Text("Your name") },
+                singleLine = true
             )
+            Text("Speech (India voices)", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Voice for alarms and reading aloud. Only India voices are listed.",
+                style = MaterialTheme.typography.bodySmall
+            )
+            VoiceDropdown(
+                selectedVoiceName = settings.ttsVoiceName,
+                onVoiceSelected = viewModel::setTtsVoiceName
+            )
+            Text("AI (Explain / Solve)", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Gemini API key from Google AI Studio. Required for Explain and Solve.",
+                style = MaterialTheme.typography.bodySmall
+            )
+            OutlinedTextField(
+                value = settings.geminiApiKey,
+                onValueChange = viewModel::setGeminiApiKey,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("API key") },
+                singleLine = true
+            )
+            androidx.compose.material3.Button(
+                onClick = { viewModel.testApiKey() },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = settings.geminiApiKey.isNotBlank()
+            ) {
+                Text("Test API key")
+            }
+            apiKeyTestMessage?.let { msg ->
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text(
+                        msg,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (msg.startsWith("OK") || msg.contains("success")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        maxLines = Int.MAX_VALUE
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun VoiceDropdown(
+    selectedVoiceName: String?,
+    onVoiceSelected: (String?) -> Unit
+) {
+    val context = LocalContext.current
+    var voices by remember { mutableStateOf<List<VoiceOption>>(emptyList()) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedLabel by remember(selectedVoiceName) {
+        mutableStateOf(
+            if (selectedVoiceName.isNullOrEmpty()) "System default"
+            else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: "System default"
+        )
+    }
+    LaunchedEffect(Unit) {
+        voices = withContext(Dispatchers.Main.immediate) { loadAvailableVoicesIndia(context) }
+        selectedLabel = if (selectedVoiceName.isNullOrEmpty()) "System default"
+        else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: "System default"
+    }
+    LaunchedEffect(selectedVoiceName, voices) {
+        selectedLabel = if (selectedVoiceName.isNullOrEmpty()) "System default"
+        else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: "System default"
+    }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        OutlinedTextField(
+            value = selectedLabel,
+            onValueChange = {},
+            readOnly = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("System default") },
+                onClick = {
+                    onVoiceSelected(null)
+                    selectedLabel = "System default"
+                    expanded = false
+                }
+            )
+            voices.forEach { opt ->
+                DropdownMenuItem(
+                    text = { Text(opt.displayName) },
+                    onClick = {
+                        onVoiceSelected(opt.voiceName)
+                        selectedLabel = opt.displayName
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }

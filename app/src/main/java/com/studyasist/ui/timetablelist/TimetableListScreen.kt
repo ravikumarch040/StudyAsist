@@ -34,7 +34,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.studyasist.R
 import com.studyasist.data.local.entity.TimetableEntity
 import com.studyasist.data.local.entity.WeekType
 
@@ -59,7 +61,7 @@ fun TimetableListScreen(
                     title = { Text("StudyAsist") },
                     actions = {
                         IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -75,7 +77,7 @@ fun TimetableListScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "New timetable")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.new_timetable))
             }
         }
     ) { paddingValues ->
@@ -199,7 +201,7 @@ private fun TimetableCard(
                 }
                 Box {
                     IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Options")
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.options))
                     }
                     androidx.compose.material3.DropdownMenu(
                         expanded = menuExpanded,

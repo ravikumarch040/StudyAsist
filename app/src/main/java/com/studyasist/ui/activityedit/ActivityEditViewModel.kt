@@ -32,6 +32,8 @@ data class ActivityEditUiState(
     val note: String = "",
     val notifyEnabled: Boolean = false,
     val notifyLeadMinutes: Int = 5,
+    val useSpeechSound: Boolean = false,
+    val alarmTtsMessage: String = "",
     val overlapWarning: List<ActivityEntity> = emptyList(),
     val showOverlapDialog: Boolean = false,
     val isSaving: Boolean = false
@@ -78,7 +80,9 @@ class ActivityEditViewModel @Inject constructor(
                             type = act.type,
                             note = act.note ?: "",
                             notifyEnabled = act.notifyEnabled,
-                            notifyLeadMinutes = act.notifyLeadMinutes
+                            notifyLeadMinutes = act.notifyLeadMinutes,
+                            useSpeechSound = act.useSpeechSound,
+                            alarmTtsMessage = act.alarmTtsMessage ?: ""
                         )
                     }
                 }
@@ -118,6 +122,23 @@ class ActivityEditViewModel @Inject constructor(
     fun updateNote(s: String) { _uiState.update { it.copy(note = s) } }
     fun updateNotifyEnabled(b: Boolean) { _uiState.update { it.copy(notifyEnabled = b) } }
     fun updateNotifyLeadMinutes(m: Int) { _uiState.update { it.copy(notifyLeadMinutes = m) } }
+    fun updateUseSpeechSound(use: Boolean) {
+        if (!use) {
+            _uiState.update { it.copy(useSpeechSound = false) }
+            return
+        }
+        _uiState.update { it.copy(useSpeechSound = true) }
+        val state = _uiState.value
+        if (state.alarmTtsMessage.isBlank()) {
+            viewModelScope.launch {
+                val userName = settingsRepository.settingsFlow.first().userName
+                val name = userName.ifBlank { "there" }
+                val title = state.title.ifBlank { "your activity" }
+                _uiState.update { it.copy(alarmTtsMessage = "Hey $name, Its time for $title") }
+            }
+        }
+    }
+    fun updateAlarmTtsMessage(msg: String) { _uiState.update { it.copy(alarmTtsMessage = msg) } }
     fun dismissOverlapDialog() { _uiState.update { it.copy(showOverlapDialog = false) } }
 
     fun copyScheduleFromDay(sourceDay: Int, onDone: () -> Unit) {
@@ -161,6 +182,8 @@ class ActivityEditViewModel @Inject constructor(
                 note = state.note.ifBlank { null },
                 notifyEnabled = state.notifyEnabled,
                 notifyLeadMinutes = state.notifyLeadMinutes,
+                useSpeechSound = state.useSpeechSound,
+                alarmTtsMessage = state.alarmTtsMessage.ifBlank { null },
                 sortOrder = 0
             )
             val savedId: Long = if (state.isEdit) {

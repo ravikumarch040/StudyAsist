@@ -32,5 +32,7 @@ data class ActivityEntity(
     val note: String? = null,
     val notifyEnabled: Boolean = false,
     val notifyLeadMinutes: Int = 0,
+    val useSpeechSound: Boolean = false,
+    val alarmTtsMessage: String? = null,
     val sortOrder: Int = 0
 )

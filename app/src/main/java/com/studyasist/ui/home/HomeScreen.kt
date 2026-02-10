@@ -1,5 +1,6 @@
 package com.studyasist.ui.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,7 +48,10 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
     onTimetableClick: (Long) -> Unit,
     onAddActivity: (Long) -> Unit,
-    onNavigateAfterCreate: (Long) -> Unit
+    onNavigateAfterCreate: (Long) -> Unit,
+    onDictate: () -> Unit = {},
+    onExplain: () -> Unit = {},
+    onSolve: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -84,6 +88,11 @@ fun HomeScreen(
                     onClick = { selectedTab = 1 },
                     text = { Text(stringResource(R.string.timetables)) }
                 )
+                Tab(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    text = { Text(stringResource(R.string.study_tools)) }
+                )
             }
             when (selectedTab) {
                 0 -> TodayTabContent(
@@ -101,6 +110,66 @@ fun HomeScreen(
                     onSetActive = viewModel::setActiveTimetableId,
                     showTopBar = false
                 )
+                2 -> StudyToolsTabContent(
+                    onDictate = onDictate,
+                    onExplain = onExplain,
+                    onSolve = onSolve
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StudyToolsTabContent(
+    onDictate: () -> Unit,
+    onExplain: () -> Unit,
+    onSolve: () -> Unit
+) {
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            Text(
+                stringResource(R.string.study_tools),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onDictate),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.dictate), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.dictate_subtitle), style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onExplain),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.explain), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.explain_subtitle), style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onSolve),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.solve), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.solve_subtitle), style = MaterialTheme.typography.bodySmall)
+                }
             }
         }
     }

@@ -23,10 +23,11 @@ class SettingsDataStore @Inject constructor(
     private val prefs = context.dataStore
 
     val defaultLeadMinutes = intPreferencesKey("default_lead_minutes")
-    val soundEnabled = booleanPreferencesKey("sound_enabled")
     val vibrationEnabled = booleanPreferencesKey("vibration_enabled")
     val activeTimetableId = longPreferencesKey("active_timetable_id")
-    val alarmTtsMessage = stringPreferencesKey("alarm_tts_message")
+    val userName = stringPreferencesKey("user_name")
+    val ttsVoiceName = stringPreferencesKey("tts_voice_name")
+    val geminiApiKey = stringPreferencesKey("gemini_api_key")
 
     val dataStore: DataStore<Preferences> get() = prefs
 

@@ -28,4 +28,15 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 - **Print:** PDF of timetable and system Print dialog (PrintManager).
 - Optional: color per type, simple analytics, backup/restore.
 
+## Phase 3 – Study tools (planned)
+
+- **Change Voice:** Settings option to choose TTS voice for alarms and reading.
+- **Dictate:** Capture/upload image → OCR (ML Kit) → read aloud in chosen language.
+- **Explain:** Text or image input → AI explanation in chosen language (Gemini/OpenAI).
+- **Solve:** Problem as text or image → AI step-by-step solution.
+
+See [docs/PLAN-STUDY-TOOLS.md](docs/PLAN-STUDY-TOOLS.md) for plan and design.
+
+---
+
 See [docs/DESIGN.md](docs/DESIGN.md) for full design and data model.

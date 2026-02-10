@@ -22,7 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.studyasist.R
 import com.studyasist.data.local.entity.ActivityType
 import com.studyasist.data.repository.AppSettings
 import com.studyasist.ui.components.NumberPicker
@@ -44,7 +46,7 @@ fun ActivityEditScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -190,6 +192,22 @@ fun ActivityEditScreen(
                             label = { Text("$mins min") }
                         )
                     }
+                }
+                SwitchRow(
+                    checked = uiState.useSpeechSound,
+                    onCheckedChange = viewModel::updateUseSpeechSound,
+                    label = "Use speech sound"
+                )
+                if (uiState.useSpeechSound) {
+                    OutlinedTextField(
+                        value = uiState.alarmTtsMessage,
+                        onValueChange = viewModel::updateAlarmTtsMessage,
+                        label = { Text("Alarm message (spoken when reminder fires)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("Hey there, Its time for your activity") },
+                        singleLine = false,
+                        maxLines = 3
+                    )
                 }
             }
 

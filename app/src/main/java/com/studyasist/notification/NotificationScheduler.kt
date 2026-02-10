@@ -55,6 +55,8 @@ class NotificationScheduler @Inject constructor(
             putExtra(EXTRA_TITLE, activity.title)
             putExtra(EXTRA_BODY, "${formatTimeMinutes(activity.startTimeMinutes)}–${formatTimeMinutes(activity.endTimeMinutes)} ${activity.title}" + (activity.note?.let { " ($it)" } ?: ""))
             putExtra(EXTRA_DAY_OF_WEEK, activity.dayOfWeek)
+            putExtra(EXTRA_USE_SPEECH_SOUND, activity.useSpeechSound)
+            putExtra(EXTRA_ALARM_TTS_MESSAGE, activity.alarmTtsMessage ?: "")
         }
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0

@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import com.studyasist.R
 import com.studyasist.ui.theme.StudyAsistTheme
+import com.studyasist.util.findVoiceByName
 import java.util.Locale
 
 /**
@@ -73,10 +74,11 @@ class ReminderAlarmActivity : ComponentActivity() {
                 }
             }
         }
+        val ttsVoiceName = intent.getStringExtra(EXTRA_TTS_VOICE_NAME)?.takeIf { it.isNotEmpty() }
         if (soundEnabled && !fromTtsService) {
             if (alarmTtsMessage.isNotBlank()) {
                 ttsMessageToLoop = alarmTtsMessage
-                startTtsAlarm(alarmTtsMessage)
+                startTtsAlarm(alarmTtsMessage, ttsVoiceName)
             } else {
                 startAlarmSound()
             }
@@ -100,11 +102,12 @@ class ReminderAlarmActivity : ComponentActivity() {
         }
     }
 
-    private fun startTtsAlarm(message: String) {
+    private fun startTtsAlarm(message: String, voiceName: String?) {
         textToSpeech = TextToSpeech(applicationContext) { status ->
             if (status == TextToSpeech.SUCCESS && !dismissed) {
                 textToSpeech?.apply {
                     setLanguage(Locale.getDefault())
+                    voiceName?.let { name -> findVoiceByName(voices, name)?.let { setVoice(it) } }
                     setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                         override fun onStart(utteranceId: String?) {}
                         override fun onDone(utteranceId: String?) {

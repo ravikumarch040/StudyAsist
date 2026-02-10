@@ -11,9 +11,10 @@ import javax.inject.Singleton
 
 data class AppSettings(
     val defaultLeadMinutes: Int,
-    val soundEnabled: Boolean,
     val vibrationEnabled: Boolean,
-    val alarmTtsMessage: String
+    val userName: String,
+    val ttsVoiceName: String?,
+    val geminiApiKey: String
 ) {
     companion object {
         const val DEFAULT_LEAD_MINUTES = 5
@@ -29,18 +30,15 @@ class SettingsRepository @Inject constructor(
     val settingsFlow: Flow<AppSettings> = dataStore.getPreferencesFlow().map { prefs ->
         AppSettings(
             defaultLeadMinutes = prefs[dataStore.defaultLeadMinutes] ?: AppSettings.DEFAULT_LEAD_MINUTES,
-            soundEnabled = prefs[dataStore.soundEnabled] ?: true,
             vibrationEnabled = prefs[dataStore.vibrationEnabled] ?: true,
-            alarmTtsMessage = prefs[dataStore.alarmTtsMessage] ?: ""
+            userName = prefs[dataStore.userName] ?: "",
+            ttsVoiceName = prefs[dataStore.ttsVoiceName]?.takeIf { it.isNotEmpty() },
+            geminiApiKey = prefs[dataStore.geminiApiKey] ?: ""
         )
     }
 
     suspend fun setDefaultLeadMinutes(minutes: Int) {
         dataStore.dataStore.edit { it[dataStore.defaultLeadMinutes] = minutes }
-    }
-
-    suspend fun setSoundEnabled(enabled: Boolean) {
-        dataStore.dataStore.edit { it[dataStore.soundEnabled] = enabled }
     }
 
     suspend fun setVibrationEnabled(enabled: Boolean) {
@@ -56,9 +54,15 @@ class SettingsRepository @Inject constructor(
         dataStore.dataStore.edit { it[dataStore.activeTimetableId] = id ?: -1L }
     }
 
-    suspend fun getAlarmTtsMessage(): String = settingsFlow.first().alarmTtsMessage
+    suspend fun setUserName(name: String) {
+        dataStore.dataStore.edit { it[dataStore.userName] = name }
+    }
 
-    suspend fun setAlarmTtsMessage(message: String) {
-        dataStore.dataStore.edit { it[dataStore.alarmTtsMessage] = message }
+    suspend fun setTtsVoiceName(name: String?) {
+        dataStore.dataStore.edit { it[dataStore.ttsVoiceName] = name ?: "" }
+    }
+
+    suspend fun setGeminiApiKey(key: String) {
+        dataStore.dataStore.edit { it[dataStore.geminiApiKey] = key }
     }
 }
