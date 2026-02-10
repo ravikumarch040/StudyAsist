@@ -21,3 +21,11 @@ const val EXTRA_SOUND_ENABLED = "sound_enabled"
 const val EXTRA_USE_SPEECH_SOUND = "use_speech_sound"
 const val EXTRA_FROM_TTS_SERVICE = "from_tts_service"
 const val EXTRA_TTS_VOICE_NAME = "tts_voice_name"
+
+const val ACTION_START_STUDY_GUARD = "com.studyasist.START_STUDY_GUARD"
+const val EXTRA_END_TIME = "end_time"
+const val EXTRA_ACTIVITY_TITLE = "activity_title"
+const val CHANNEL_ID_FOCUS_GUARD = "focus_guard"
+const val CHANNEL_NAME_FOCUS_GUARD = "Focus guard"
+const val NOTIFICATION_ID_FOCUS_GUARD = 9000
+const val NOTIFICATION_ID_FOCUS_ALERT = 9001

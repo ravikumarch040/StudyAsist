@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.studyasist.data.repository.AppSettings
 import com.studyasist.data.repository.GeminiRepository
 import com.studyasist.data.repository.SettingsRepository
+import com.studyasist.notification.NotificationScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,14 +18,15 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-    private val geminiRepository: GeminiRepository
+    private val geminiRepository: GeminiRepository,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     val settings: StateFlow<AppSettings> = settingsRepository.settingsFlow
         .stateIn(
             viewModelScope,
             kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "")
+            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false)
         )
 
     private val _apiKeyTestMessage = MutableStateFlow<String?>(null)
@@ -36,6 +38,13 @@ class SettingsViewModel @Inject constructor(
 
     fun setVibrationEnabled(enabled: Boolean) {
         viewModelScope.launch { settingsRepository.setVibrationEnabled(enabled) }
+    }
+
+    fun setFocusGuardEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setFocusGuardEnabled(enabled)
+            notificationScheduler.rescheduleAll()
+        }
     }
 
     fun setUserName(name: String) {

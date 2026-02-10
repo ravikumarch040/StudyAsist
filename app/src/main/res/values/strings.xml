@@ -58,4 +58,13 @@
     <string name="add_image_first">Add an image first</string>
     <string name="gemini_api_key">Gemini API key</string>
     <string name="gemini_api_key_hint">Paste your API key from Google AI Studio</string>
+    <string name="focus_guard_notification_title">Study time</string>
+    <string name="focus_guard_notification_text">StudyAsist is monitoring: %1$s</string>
+    <string name="focus_guard_alert_title">Study time – consider going back</string>
+    <string name="focus_guard_alert_text">You\'re using %1$s during \"%2$s\". Consider going back to studying.</string>
+    <string name="focus_guard_channel_description">Notifications when you open other apps during study blocks.</string>
+    <string name="focus_guard">Focus guard</string>
+    <string name="focus_guard_summary">Alert when you open games, YouTube, or social apps during study time</string>
+    <string name="focus_guard_usage_hint">Enable Usage access for StudyAsist in the next screen so we can detect which app you\'re using.</string>
+    <string name="focus_guard_foreground_service_justification">Runs during scheduled study blocks to detect when the user opens other apps (e.g. games, social media) and show a gentle reminder notification. Does not block any apps.</string>
 </resources>

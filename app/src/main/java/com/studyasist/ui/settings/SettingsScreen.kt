@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
 import com.studyasist.data.repository.AppSettings
+import com.studyasist.notification.openUsageAccessSettings
 import com.studyasist.util.VoiceOption
 import com.studyasist.util.loadAvailableVoicesIndia
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +49,10 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState(
-        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "")
+        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false)
     )
     val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -102,6 +104,33 @@ fun SettingsScreen(
                 Switch(
                     checked = settings.vibrationEnabled,
                     onCheckedChange = viewModel::setVibrationEnabled
+                )
+            }
+            Text(stringResource(R.string.focus_guard), style = MaterialTheme.typography.titleMedium)
+            Text(
+                stringResource(R.string.focus_guard_summary),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.focus_guard)) // label for switch
+                Switch(
+                    checked = settings.focusGuardEnabled,
+                    onCheckedChange = { enabled ->
+                        viewModel.setFocusGuardEnabled(enabled)
+                        if (enabled) {
+                            openUsageAccessSettings(context)
+                        }
+                    }
+                )
+            }
+            if (settings.focusGuardEnabled) {
+                Text(
+                    stringResource(R.string.focus_guard_usage_hint),
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
             Text("Your name", style = MaterialTheme.typography.titleMedium)

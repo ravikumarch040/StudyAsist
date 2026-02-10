@@ -14,7 +14,8 @@ data class AppSettings(
     val vibrationEnabled: Boolean,
     val userName: String,
     val ttsVoiceName: String?,
-    val geminiApiKey: String
+    val geminiApiKey: String,
+    val focusGuardEnabled: Boolean
 ) {
     companion object {
         const val DEFAULT_LEAD_MINUTES = 5
@@ -33,7 +34,8 @@ class SettingsRepository @Inject constructor(
             vibrationEnabled = prefs[dataStore.vibrationEnabled] ?: true,
             userName = prefs[dataStore.userName] ?: "",
             ttsVoiceName = prefs[dataStore.ttsVoiceName]?.takeIf { it.isNotEmpty() },
-            geminiApiKey = prefs[dataStore.geminiApiKey] ?: ""
+            geminiApiKey = prefs[dataStore.geminiApiKey] ?: "",
+            focusGuardEnabled = prefs[dataStore.focusGuardEnabled] ?: false
         )
     }
 
@@ -44,6 +46,8 @@ class SettingsRepository @Inject constructor(
     suspend fun setVibrationEnabled(enabled: Boolean) {
         dataStore.dataStore.edit { it[dataStore.vibrationEnabled] = enabled }
     }
+
+    val focusGuardEnabledFlow: Flow<Boolean> = settingsFlow.map { it.focusGuardEnabled }
 
     val activeTimetableIdFlow: Flow<Long?> = dataStore.getPreferencesFlow().map { prefs ->
         val id = prefs[dataStore.activeTimetableId] ?: -1L
@@ -64,5 +68,9 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setGeminiApiKey(key: String) {
         dataStore.dataStore.edit { it[dataStore.geminiApiKey] = key }
+    }
+
+    suspend fun setFocusGuardEnabled(enabled: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.focusGuardEnabled] = enabled }
     }
 }

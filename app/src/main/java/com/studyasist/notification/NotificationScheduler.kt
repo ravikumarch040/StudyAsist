@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Build.VERSION_CODES
 import androidx.core.app.NotificationManagerCompat
 import com.studyasist.data.local.entity.ActivityEntity
+import com.studyasist.data.local.entity.ActivityType
 import com.studyasist.data.repository.ActivityRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.data.repository.TimetableRepository
@@ -32,14 +33,21 @@ class NotificationScheduler @Inject constructor(
         NotificationHelper.createChannel(context)
     }
 
+    private val guardRequestCodeBase = 100000
+
     suspend fun rescheduleAll() {
         createChannelIfNeeded()
         val activeId = settingsRepository.activeTimetableIdFlow.first() ?: return
         if (activeId < 0) return
         val timetable = timetableRepository.getTimetable(activeId) ?: return
+        val focusGuardEnabled = settingsRepository.focusGuardEnabledFlow.first()
         val activities = activityRepository.getActivitiesForTimetable(activeId).first()
             .filter { it.notifyEnabled }
         activities.forEach { scheduleActivity(it, timetable.name) }
+        activities.filter { it.type == ActivityType.STUDY }.forEach { activity ->
+            cancelGuardAlarm(activity.id)
+            if (focusGuardEnabled) scheduleGuardAlarm(activity, timetable.name)
+        }
     }
 
     /** Schedules the next occurrence of one activity (one-shot exact alarm). When it fires, AlarmReceiver shows the notification and enqueues work to schedule the following week. */
@@ -85,6 +93,50 @@ class NotificationScheduler @Inject constructor(
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
         val pending = PendingIntent.getBroadcast(context, activityId.toInt().and(0x7FFFFFFF), intent, flags)
+        alarmManager.cancel(pending)
+        cancelGuardAlarm(activityId)
+    }
+
+    /** Schedules an alarm at the study block start that starts StudyGuardService until the block end. */
+    fun scheduleGuardAlarm(activity: ActivityEntity, timetableName: String) {
+        if (activity.type != ActivityType.STUDY || !activity.notifyEnabled) return
+        val triggerTime = nextTriggerTime(activity.dayOfWeek, activity.startTimeMinutes)
+        val durationMs = (activity.endTimeMinutes - activity.startTimeMinutes).toLong() * 60_000L
+        val endTimeMillis = triggerTime + durationMs
+        val intent = Intent(context, StudyGuardService::class.java).apply {
+            action = ACTION_START_STUDY_GUARD
+            putExtra(EXTRA_END_TIME, endTimeMillis)
+            putExtra(EXTRA_ACTIVITY_TITLE, activity.title)
+        }
+        val requestCode = activity.id.toInt().and(0x7FFFFFFF) + guardRequestCodeBase
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        val pending = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PendingIntent.getForegroundService(context, requestCode, intent, flags)
+        } else {
+            PendingIntent.getService(context, requestCode, intent, flags)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pending)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pending)
+        } else if (Build.VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pending)
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pending)
+        }
+    }
+
+    fun cancelGuardAlarm(activityId: Long) {
+        val intent = Intent(context, StudyGuardService::class.java).apply { action = ACTION_START_STUDY_GUARD }
+        val requestCode = activityId.toInt().and(0x7FFFFFFF) + guardRequestCodeBase
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        val pending = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PendingIntent.getForegroundService(context, requestCode, intent, flags)
+        } else {
+            PendingIntent.getService(context, requestCode, intent, flags)
+        }
         alarmManager.cancel(pending)
     }
 
