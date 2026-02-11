@@ -5,6 +5,7 @@ import com.studyasist.data.local.dao.AssessmentQuestionDao
 import com.studyasist.data.local.dao.QADao
 import com.studyasist.data.local.entity.Assessment
 import com.studyasist.data.local.entity.AssessmentQuestion
+import com.studyasist.data.local.entity.QA
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,7 +14,8 @@ import javax.inject.Singleton
 class AssessmentRepository @Inject constructor(
     private val assessmentDao: AssessmentDao,
     private val assessmentQuestionDao: AssessmentQuestionDao,
-    private val qaDao: QADao
+    private val qaDao: QADao,
+    private val goalRepository: com.studyasist.data.repository.GoalRepository
 ) {
 
     fun getAllAssessments(): Flow<List<Assessment>> = assessmentDao.getAll()
@@ -88,10 +90,47 @@ class AssessmentRepository @Inject constructor(
         )
     }
 
+    suspend fun createAssessmentFromGoal(
+        title: String,
+        goalId: Long,
+        totalTimeSeconds: Int,
+        randomizeQuestions: Boolean,
+        count: Int
+    ): Long {
+        val items = goalRepository.getGoalItems(goalId)
+        val allQas = mutableListOf<QA>()
+        val perItem = if (items.isEmpty()) count else (count / items.size).coerceAtLeast(1)
+        for (item in items) {
+            val chapters = item.chapterList.split(",").map { it.trim() }.filter { it.isNotBlank() }
+            val pairs = if (chapters.isEmpty()) listOf(item.subject to null) else chapters.map { item.subject to it }
+            for ((subj, ch) in pairs) {
+                val qs = qaDao.getRandomBySubjectChapter(subj, ch, perItem)
+                allQas.addAll(qs)
+            }
+        }
+        val qaIds = allQas.distinctBy { it.id }.shuffled().take(count).map { it.id }
+        return createAssessment(
+            title = title,
+            goalId = goalId,
+            subject = null,
+            chapter = null,
+            totalTimeSeconds = totalTimeSeconds,
+            randomizeQuestions = randomizeQuestions,
+            qaIds = qaIds
+        )
+    }
+
+    suspend fun updateAssessment(assessment: Assessment) {
+        assessmentDao.update(assessment)
+    }
+
     suspend fun deleteAssessment(id: Long) {
         assessmentQuestionDao.deleteByAssessmentId(id)
         assessmentDao.deleteById(id)
     }
+
+    suspend fun getQuestionCount(assessmentId: Long): Int =
+        assessmentQuestionDao.getByAssessmentId(assessmentId).size
 
     data class AssessmentWithQuestions(
         val assessment: Assessment,

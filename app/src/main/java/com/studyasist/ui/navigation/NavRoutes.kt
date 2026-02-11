@@ -19,9 +19,21 @@ object NavRoutes {
     const val QA_BANK = "qa_bank"
     const val QA_SCAN = "qa_scan"
 
+    const val ASSESSMENT_CREATE = "assessment_create"
+    const val ASSESSMENT_CREATE_FOR_GOAL = "assessment_create/{goalId}"
+    const val ASSESSMENT_LIST = "assessment_list"
+    const val ASSESSMENT_EDIT = "assessment_edit/{assessmentId}"
+    const val ASSESSMENT_RUN = "assessment_run/{assessmentId}"
+    const val ASSESSMENT_RESULT = "assessment_result/{attemptId}"
+    const val RESULT_LIST = "result_list"
+
     fun timetableDetail(timetableId: Long) = "timetable_detail/$timetableId"
     fun activityEdit(timetableId: Long, activityId: Long) = "activity_edit/$timetableId/$activityId"
     fun activityAdd(timetableId: Long, dayOfWeek: Int = 1) = "activity_add/$timetableId/$dayOfWeek"
     fun goalDetail(goalId: Long) = "goal_detail/$goalId"
     fun goalEdit(goalId: Long) = "goal_edit/$goalId"
+    fun assessmentCreateForGoal(goalId: Long) = "assessment_create/$goalId"
+    fun assessmentEdit(assessmentId: Long) = "assessment_edit/$assessmentId"
+    fun assessmentRun(assessmentId: Long) = "assessment_run/$assessmentId"
+    fun assessmentResult(attemptId: Long) = "assessment_result/$attemptId"
 }

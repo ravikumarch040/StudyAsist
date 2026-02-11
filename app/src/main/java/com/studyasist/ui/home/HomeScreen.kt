@@ -53,7 +53,9 @@ fun HomeScreen(
     onExplain: () -> Unit = {},
     onSolve: () -> Unit = {},
     onExamGoals: () -> Unit = {},
-    onQABank: () -> Unit = {}
+    onQABank: () -> Unit = {},
+    onAssessments: () -> Unit = {},
+    onResults: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -117,7 +119,9 @@ fun HomeScreen(
                     onExplain = onExplain,
                     onSolve = onSolve,
                     onExamGoals = onExamGoals,
-                    onQABank = onQABank
+                    onQABank = onQABank,
+                    onAssessments = onAssessments,
+                    onResults = onResults
                 )
             }
         }
@@ -130,7 +134,9 @@ private fun StudyToolsTabContent(
     onExplain: () -> Unit,
     onSolve: () -> Unit,
     onExamGoals: () -> Unit,
-    onQABank: () -> Unit
+    onQABank: () -> Unit,
+    onAssessments: () -> Unit = {},
+    onResults: () -> Unit = {}
 ) {
     LazyColumn(
         Modifier
@@ -164,6 +170,28 @@ private fun StudyToolsTabContent(
                 Column(Modifier.padding(16.dp)) {
                     Text(stringResource(R.string.qa_bank), style = MaterialTheme.typography.titleSmall)
                     Text(stringResource(R.string.qa_bank_subtitle), style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onAssessments),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.assessments), style = MaterialTheme.typography.titleSmall)
+                    Text("Create and take practice tests", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onResults),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.results), style = MaterialTheme.typography.titleSmall)
+                    Text("View your attempt history and scores", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

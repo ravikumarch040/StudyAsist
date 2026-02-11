@@ -12,7 +12,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Score
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -46,7 +49,10 @@ import com.studyasist.data.local.entity.QA
 fun QABankScreen(
     viewModel: QABankViewModel,
     onBack: () -> Unit,
-    onScanClick: () -> Unit
+    onScanClick: () -> Unit,
+    onCreateAssessment: () -> Unit = {},
+    onViewAssessments: () -> Unit = {},
+    onViewResults: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var subjectExpanded by remember { mutableStateOf(false) }
@@ -59,6 +65,17 @@ fun QABankScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onViewAssessments) {
+                        Icon(Icons.Default.Assignment, contentDescription = stringResource(R.string.assessments))
+                    }
+                    IconButton(onClick = onViewResults) {
+                        Icon(Icons.Default.Score, contentDescription = stringResource(R.string.results))
+                    }
+                    IconButton(onClick = onCreateAssessment) {
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.create_assessment))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

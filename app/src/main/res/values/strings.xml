@@ -94,4 +94,17 @@
     <string name="extract_questions">Extract questions</string>
     <string name="select_image">Select image</string>
     <string name="add_row">Add row</string>
+    <string name="create_assessment">Create assessment</string>
+    <string name="assessment_title">Assessment title</string>
+    <string name="questions">Questions</string>
+    <string name="minutes">Minutes</string>
+    <string name="source">Source</string>
+    <string name="goal">Goal</string>
+    <string name="submit">Submit</string>
+    <string name="start">Start</string>
+    <string name="result">Result</string>
+    <string name="details">Details</string>
+    <string name="assessments">Assessments</string>
+    <string name="results">Results</string>
+    <string name="edit_assessment">Edit assessment</string>
 </resources>

@@ -34,6 +34,18 @@ import com.studyasist.ui.qabank.QABankScreen
 import com.studyasist.ui.qabank.QABankViewModel
 import com.studyasist.ui.qascan.QAScanScreen
 import com.studyasist.ui.qascan.QAScanViewModel
+import com.studyasist.ui.assessmentcreate.AssessmentCreateScreen
+import com.studyasist.ui.assessmentcreate.AssessmentCreateViewModel
+import com.studyasist.ui.assessmentrun.AssessmentRunScreen
+import com.studyasist.ui.assessmentrun.AssessmentRunViewModel
+import com.studyasist.ui.assessmentresult.AssessmentResultScreen
+import com.studyasist.ui.assessmentresult.AssessmentResultViewModel
+import com.studyasist.ui.assessmentlist.AssessmentListScreen
+import com.studyasist.ui.assessmentlist.AssessmentListViewModel
+import com.studyasist.ui.assessmentedit.AssessmentEditScreen
+import com.studyasist.ui.assessmentedit.AssessmentEditViewModel
+import com.studyasist.ui.resultlist.ResultListScreen
+import com.studyasist.ui.resultlist.ResultListViewModel
 
 @Composable
 fun AppNavGraph(
@@ -65,7 +77,9 @@ fun AppNavGraph(
                 onExplain = { navController.navigate(NavRoutes.EXPLAIN) },
                 onSolve = { navController.navigate(NavRoutes.SOLVE) },
                 onExamGoals = { navController.navigate(NavRoutes.GOAL_LIST) },
-                onQABank = { navController.navigate(NavRoutes.QA_BANK) }
+                onQABank = { navController.navigate(NavRoutes.QA_BANK) },
+                onAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
+                onResults = { navController.navigate(NavRoutes.RESULT_LIST) }
             )
         }
 
@@ -184,7 +198,10 @@ fun AppNavGraph(
             GoalDetailScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
-                onEditGoal = { id -> navController.navigate(NavRoutes.goalEdit(id)) }
+                onEditGoal = { id -> navController.navigate(NavRoutes.goalEdit(id)) },
+                onCreateAssessment = { goalId -> navController.navigate(NavRoutes.assessmentCreateForGoal(goalId)) },
+                onViewAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
+                onViewResults = { navController.navigate(NavRoutes.RESULT_LIST) }
             )
         }
 
@@ -222,7 +239,10 @@ fun AppNavGraph(
             QABankScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
-                onScanClick = { navController.navigate(NavRoutes.QA_SCAN) }
+                onScanClick = { navController.navigate(NavRoutes.QA_SCAN) },
+                onCreateAssessment = { navController.navigate(NavRoutes.ASSESSMENT_CREATE) },
+                onViewAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
+                onViewResults = { navController.navigate(NavRoutes.RESULT_LIST) }
             )
         }
 
@@ -232,6 +252,90 @@ fun AppNavGraph(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onSaved = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.ASSESSMENT_CREATE) {
+            val viewModel: AssessmentCreateViewModel = hiltViewModel()
+            AssessmentCreateScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onCreated = { id ->
+                    navController.popBackStack()
+                    navController.navigate(NavRoutes.assessmentRun(id))
+                }
+            )
+        }
+
+        composable(
+            route = NavRoutes.ASSESSMENT_CREATE_FOR_GOAL,
+            arguments = listOf(navArgument("goalId") { type = NavType.LongType })
+        ) {
+            val viewModel: AssessmentCreateViewModel = hiltViewModel()
+            AssessmentCreateScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onCreated = { id ->
+                    navController.popBackStack()
+                    navController.navigate(NavRoutes.assessmentRun(id))
+                }
+            )
+        }
+
+        composable(
+            route = NavRoutes.ASSESSMENT_RUN,
+            arguments = listOf(navArgument("assessmentId") { type = NavType.LongType })
+        ) {
+            val viewModel: AssessmentRunViewModel = hiltViewModel()
+            AssessmentRunScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onSubmitted = { attemptId ->
+                    navController.popBackStack()
+                    navController.navigate(NavRoutes.assessmentResult(attemptId))
+                }
+            )
+        }
+
+        composable(
+            route = NavRoutes.ASSESSMENT_RESULT,
+            arguments = listOf(navArgument("attemptId") { type = NavType.LongType })
+        ) {
+            val viewModel: AssessmentResultViewModel = hiltViewModel()
+            AssessmentResultScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.ASSESSMENT_LIST) {
+            val viewModel: AssessmentListViewModel = hiltViewModel()
+            AssessmentListScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onAssessmentClick = { id -> navController.navigate(NavRoutes.assessmentRun(id)) },
+                onEditAssessment = { id -> navController.navigate(NavRoutes.assessmentEdit(id)) }
+            )
+        }
+
+        composable(
+            route = NavRoutes.ASSESSMENT_EDIT,
+            arguments = listOf(navArgument("assessmentId") { type = NavType.LongType })
+        ) {
+            val viewModel: AssessmentEditViewModel = hiltViewModel()
+            AssessmentEditScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.RESULT_LIST) {
+            val viewModel: ResultListViewModel = hiltViewModel()
+            ResultListScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onResultClick = { attemptId -> navController.navigate(NavRoutes.assessmentResult(attemptId)) }
             )
         }
     }

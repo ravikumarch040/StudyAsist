@@ -2,14 +2,17 @@ package com.studyasist.ui.goaldetail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Button
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,7 +37,10 @@ import com.studyasist.util.formatExamDate
 fun GoalDetailScreen(
     viewModel: GoalDetailViewModel,
     onBack: () -> Unit,
-    onEditGoal: (Long) -> Unit
+    onEditGoal: (Long) -> Unit,
+    onCreateAssessment: (Long) -> Unit = {},
+    onViewAssessments: () -> Unit = {},
+    onViewResults: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -101,6 +107,27 @@ fun GoalDetailScreen(
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
+                }
+            }
+            Button(
+                onClick = { onCreateAssessment(goal.id) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                Text(stringResource(R.string.create_assessment))
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = onViewAssessments,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.assessments))
+                }
+                Button(
+                    onClick = onViewResults,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.results))
                 }
             }
             Text(

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.studyasist.data.local.entity.Result
+import com.studyasist.data.local.entity.ResultWithAttempt
 
 @Dao
 interface ResultDao {
@@ -14,6 +15,15 @@ interface ResultDao {
 
     @Query("SELECT * FROM results WHERE attemptId IN (:attemptIds)")
     suspend fun getByAttemptIds(attemptIds: List<Long>): List<Result>
+
+    @Query("""
+        SELECT r.id as resultId, r.attemptId, r.score, r.maxScore, r.percent,
+               att.assessmentId, att.startedAt
+        FROM results r
+        JOIN attempts att ON r.attemptId = att.id
+        ORDER BY r.id DESC
+    """)
+    suspend fun getAllResultsWithAttempt(): List<ResultWithAttempt>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: Result): Long
