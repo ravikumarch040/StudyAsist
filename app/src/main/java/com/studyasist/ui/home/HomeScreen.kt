@@ -51,7 +51,9 @@ fun HomeScreen(
     onNavigateAfterCreate: (Long) -> Unit,
     onDictate: () -> Unit = {},
     onExplain: () -> Unit = {},
-    onSolve: () -> Unit = {}
+    onSolve: () -> Unit = {},
+    onExamGoals: () -> Unit = {},
+    onQABank: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -113,7 +115,9 @@ fun HomeScreen(
                 2 -> StudyToolsTabContent(
                     onDictate = onDictate,
                     onExplain = onExplain,
-                    onSolve = onSolve
+                    onSolve = onSolve,
+                    onExamGoals = onExamGoals,
+                    onQABank = onQABank
                 )
             }
         }
@@ -124,7 +128,9 @@ fun HomeScreen(
 private fun StudyToolsTabContent(
     onDictate: () -> Unit,
     onExplain: () -> Unit,
-    onSolve: () -> Unit
+    onSolve: () -> Unit,
+    onExamGoals: () -> Unit,
+    onQABank: () -> Unit
 ) {
     LazyColumn(
         Modifier
@@ -138,6 +144,28 @@ private fun StudyToolsTabContent(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
+        }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onExamGoals),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.exam_goals), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.exam_goals_subtitle), style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onQABank),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.qa_bank), style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.qa_bank_subtitle), style = MaterialTheme.typography.bodySmall)
+                }
+            }
         }
         item {
             Card(

@@ -24,6 +24,16 @@ import com.studyasist.ui.explain.ExplainScreen
 import com.studyasist.ui.explain.ExplainViewModel
 import com.studyasist.ui.solve.SolveScreen
 import com.studyasist.ui.solve.SolveViewModel
+import com.studyasist.ui.goallist.GoalListScreen
+import com.studyasist.ui.goallist.GoalListViewModel
+import com.studyasist.ui.goaldetail.GoalDetailScreen
+import com.studyasist.ui.goaldetail.GoalDetailViewModel
+import com.studyasist.ui.goaledit.GoalEditScreen
+import com.studyasist.ui.goaledit.GoalEditViewModel
+import com.studyasist.ui.qabank.QABankScreen
+import com.studyasist.ui.qabank.QABankViewModel
+import com.studyasist.ui.qascan.QAScanScreen
+import com.studyasist.ui.qascan.QAScanViewModel
 
 @Composable
 fun AppNavGraph(
@@ -53,7 +63,9 @@ fun AppNavGraph(
                 },
                 onDictate = { navController.navigate(NavRoutes.DICTATE) },
                 onExplain = { navController.navigate(NavRoutes.EXPLAIN) },
-                onSolve = { navController.navigate(NavRoutes.SOLVE) }
+                onSolve = { navController.navigate(NavRoutes.SOLVE) },
+                onExamGoals = { navController.navigate(NavRoutes.GOAL_LIST) },
+                onQABank = { navController.navigate(NavRoutes.QA_BANK) }
             )
         }
 
@@ -150,6 +162,76 @@ fun AppNavGraph(
             SolveScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(NavRoutes.GOAL_LIST) {
+            val viewModel: GoalListViewModel = hiltViewModel()
+            GoalListScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onAddGoal = { navController.navigate(NavRoutes.GOAL_ADD) },
+                onGoalClick = { id -> navController.navigate(NavRoutes.goalDetail(id)) },
+                onQABank = { navController.navigate(NavRoutes.QA_BANK) }
+            )
+        }
+
+        composable(
+            route = NavRoutes.GOAL_DETAIL,
+            arguments = listOf(navArgument("goalId") { type = NavType.LongType })
+        ) {
+            val viewModel: GoalDetailViewModel = hiltViewModel()
+            GoalDetailScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onEditGoal = { id -> navController.navigate(NavRoutes.goalEdit(id)) }
+            )
+        }
+
+        composable(NavRoutes.GOAL_ADD) {
+            val viewModel: GoalEditViewModel = hiltViewModel()
+            GoalEditScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onSaved = { id ->
+                    navController.navigate(NavRoutes.goalDetail(id)) {
+                        popUpTo(NavRoutes.GOAL_LIST) { inclusive = false }
+                    }
+                }
+            )
+        }
+
+        composable(
+            route = NavRoutes.GOAL_EDIT,
+            arguments = listOf(navArgument("goalId") { type = NavType.LongType })
+        ) {
+            val viewModel: GoalEditViewModel = hiltViewModel()
+            GoalEditScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onSaved = { id ->
+                    navController.navigate(NavRoutes.goalDetail(id)) {
+                        popUpTo(NavRoutes.GOAL_LIST) { inclusive = false }
+                    }
+                }
+            )
+        }
+
+        composable(NavRoutes.QA_BANK) {
+            val viewModel: QABankViewModel = hiltViewModel()
+            QABankScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onScanClick = { navController.navigate(NavRoutes.QA_SCAN) }
+            )
+        }
+
+        composable(NavRoutes.QA_SCAN) {
+            val viewModel: QAScanViewModel = hiltViewModel()
+            QAScanScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() }
             )
         }
     }

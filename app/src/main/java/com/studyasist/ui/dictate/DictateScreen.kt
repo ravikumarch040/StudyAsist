@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.studyasist.R
+import com.studyasist.ui.components.ImageCropSelector
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,15 +62,16 @@ fun DictateScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
+    var pendingCropUri by remember { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) cameraUri?.let { viewModel.setImageUri(it) }
+        if (success) cameraUri?.let { pendingCropUri = it }
     }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) cameraUri?.let { cameraLauncher.launch(it) }
     }
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { viewModel.setImageUri(it) }
+        uri?.let { pendingCropUri = it }
     }
 
     Scaffold(
@@ -87,14 +90,14 @@ fun DictateScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
             Text(
                 stringResource(R.string.dictate_subtitle),
                 style = MaterialTheme.typography.bodyMedium
@@ -170,6 +173,18 @@ fun DictateScreen(
                 ) {
                     Text(if (uiState.isSpeaking) stringResource(R.string.stop) else stringResource(R.string.read_aloud))
                 }
+            }
+        }
+            if (pendingCropUri != null) {
+                ImageCropSelector(
+                    imageUri = pendingCropUri,
+                    onCropped = { uri ->
+                        viewModel.setImageUri(uri)
+                        pendingCropUri = null
+                    },
+                    onCancel = { pendingCropUri = null },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }

@@ -2,10 +2,12 @@ package com.studyasist.data.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import android.util.Base64
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -32,6 +34,57 @@ class GeminiRepository @Inject constructor() {
                         put("parts", org.json.JSONArray().apply {
                             put(JSONObject().apply { put("text", prompt) })
                         })
+                    })
+                })
+            }.toString()
+            val request = Request.Builder()
+                .url("https://generativelanguage.googleapis.com/v1beta/models/$modelId:generateContent")
+                .header("x-goog-api-key", apiKey)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .post(body.toRequestBody(jsonType))
+                .build()
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string() ?: ""
+            if (!response.isSuccessful) {
+                val userMessage = parseGeminiError(responseBody) ?: "API error: ${response.code}"
+                return@withContext Result.failure(Exception(userMessage))
+            }
+            val json = JSONObject(responseBody)
+            val candidates = json.optJSONArray("candidates")
+            val text = candidates?.optJSONObject(0)?.optJSONObject("content")?.optJSONArray("parts")?.optJSONObject(0)?.optString("text")?.trim()
+                ?: return@withContext Result.failure(Exception("No response from API"))
+            Result.success(text)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Sends image + prompt to Gemini Vision API and returns the text response.
+     * Use for extracting Q&A from scanned images (math, multiple questions, etc.).
+     */
+    suspend fun generateContentFromImage(
+        apiKey: String,
+        imageBytes: ByteArray,
+        mimeType: String = "image/jpeg",
+        prompt: String
+    ): Result<String> = withContext(Dispatchers.IO) {
+        if (apiKey.isBlank()) return@withContext Result.failure(IllegalStateException("API key not set. Add your Gemini API key in Settings."))
+        try {
+            val base64 = Base64.encodeToString(imageBytes, Base64.NO_WRAP)
+            val partsArray = org.json.JSONArray().apply {
+                put(JSONObject().apply { put("text", prompt) })
+                put(JSONObject().apply {
+                    put("inlineData", JSONObject().apply {
+                        put("mimeType", mimeType)
+                        put("data", base64)
+                    })
+                })
+            }
+            val body = JSONObject().apply {
+                put("contents", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("parts", partsArray)
                     })
                 })
             }.toString()
