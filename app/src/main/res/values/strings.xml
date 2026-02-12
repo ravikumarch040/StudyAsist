@@ -117,4 +117,7 @@
     <string name="score_trend">Score trend</string>
     <string name="suggested_practice">Suggested practice</string>
     <string name="suggested_practice_hint">Topics with wrong or partial answers in recent attempts</string>
+    <string name="export_results">Export results</string>
+    <string name="add_revision_block">Add revision block</string>
+    <string name="add_to_timetable">Add to timetable</string>
 </resources>

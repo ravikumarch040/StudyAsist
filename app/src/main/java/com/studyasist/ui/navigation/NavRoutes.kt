@@ -27,11 +27,14 @@ object NavRoutes {
     const val ASSESSMENT_RUN = "assessment_run/{assessmentId}"
     const val ASSESSMENT_RESULT = "assessment_result/{attemptId}"
     const val RESULT_LIST = "result_list"
+    const val ADD_REVISION = "add_revision/{subject}/{chapter}"
 
     fun timetableDetail(timetableId: Long) = "timetable_detail/$timetableId"
     fun activityEdit(timetableId: Long, activityId: Long) = "activity_edit/$timetableId/$activityId"
     fun activityAdd(timetableId: Long, dayOfWeek: Int = 1) = "activity_add/$timetableId/$dayOfWeek"
     fun goalDetail(goalId: Long) = "goal_detail/$goalId"
+    fun addRevision(subject: String, chapter: String?): String =
+        "add_revision/${java.net.URLEncoder.encode(subject, "UTF-8")}/${java.net.URLEncoder.encode(chapter ?: "", "UTF-8")}"
     fun qaBankRevise(subject: String?, chapter: String?): String =
         "qa_bank_revise/${java.net.URLEncoder.encode(subject ?: "", "UTF-8")}/${java.net.URLEncoder.encode(chapter ?: "", "UTF-8")}"
     fun goalEdit(goalId: Long) = "goal_edit/$goalId"

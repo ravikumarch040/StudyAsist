@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
@@ -55,7 +56,8 @@ fun GoalDetailScreen(
     onViewAssessments: () -> Unit = {},
     onViewResults: () -> Unit = {},
     onResultClick: (Long) -> Unit = {},
-    onPracticeTopic: (subject: String?, chapter: String?) -> Unit = { _, _ -> }
+    onPracticeTopic: (subject: String?, chapter: String?) -> Unit = { _, _ -> },
+    onAddToTimetable: (subject: String, chapter: String?) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -202,12 +204,23 @@ fun GoalDetailScreen(
                                         color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
                                     )
                                 }
-                                Button(
-                                    onClick = { onPracticeTopic(area.subject, area.chapter) },
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-                                ) {
-                                    Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
-                                    Text(stringResource(R.string.revise))
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    IconButton(
+                                        onClick = { onAddToTimetable(area.subject, area.chapter) },
+                                        modifier = Modifier.padding(0.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.CalendarMonth,
+                                            contentDescription = stringResource(R.string.add_to_timetable)
+                                        )
+                                    }
+                                    Button(
+                                        onClick = { onPracticeTopic(area.subject, area.chapter) },
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                                        Text(stringResource(R.string.revise))
+                                    }
                                 }
                             }
                         }

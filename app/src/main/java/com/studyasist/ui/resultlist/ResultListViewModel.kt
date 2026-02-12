@@ -30,6 +30,8 @@ class ResultListViewModel @Inject constructor(
         loadResults()
     }
 
+    suspend fun getExportCsv(): String = resultRepository.getExportCsv()
+
     fun loadResults() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }

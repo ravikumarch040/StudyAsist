@@ -80,4 +80,30 @@ class ResultRepository @Inject constructor(
             chapter = assessment.chapter?.takeIf { it.isNotBlank() }
         )
     }
+
+    /**
+     * Returns CSV content of all results for export.
+     * Columns: Assessment,Attempt,Date,Score,Max Score,Percent
+     */
+    suspend fun getExportCsv(): String {
+        val rows = resultDao.getAllResultsWithAttempt()
+        val header = "Assessment,Attempt,Date,Score,Max Score,Percent"
+        val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US)
+        val lines = mutableListOf(header)
+        for (row in rows) {
+            val assessment = assessmentDao.getById(row.assessmentId)
+            val attempts = attemptDao.getByAssessmentIdOnce(row.assessmentId).sortedBy { it.startedAt }
+            val attemptNum = attempts.indexOfFirst { it.id == row.attemptId }.let { if (it >= 0) it + 1 else 1 }
+            val title = assessment?.title?.escapeCsv() ?: "Assessment"
+            val dateStr = dateFormat.format(java.util.Date(row.startedAt))
+            lines.add("$title,Attempt $attemptNum,$dateStr,${row.score},${row.maxScore},${row.percent}")
+        }
+        return lines.joinToString("\n")
+    }
+
+    private fun String.escapeCsv(): String {
+        return if (contains(',') || contains('"') || contains('\n')) {
+            "\"" + replace("\"", "\"\"") + "\""
+        } else this
+    }
 }

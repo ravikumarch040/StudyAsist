@@ -34,6 +34,8 @@ import com.studyasist.ui.qabank.QABankScreen
 import com.studyasist.ui.qabank.QABankViewModel
 import com.studyasist.ui.qascan.QAScanScreen
 import com.studyasist.ui.qascan.QAScanViewModel
+import com.studyasist.ui.addrevision.AddRevisionScreen
+import com.studyasist.ui.addrevision.AddRevisionViewModel
 import com.studyasist.ui.assessmentcreate.AssessmentCreateScreen
 import com.studyasist.ui.assessmentcreate.AssessmentCreateViewModel
 import com.studyasist.ui.assessmentrun.AssessmentRunScreen
@@ -205,6 +207,9 @@ fun AppNavGraph(
                 onResultClick = { attemptId -> navController.navigate(NavRoutes.assessmentResult(attemptId)) },
                 onPracticeTopic = { subject, chapter ->
                     navController.navigate(NavRoutes.qaBankRevise(subject, chapter))
+                },
+                onAddToTimetable = { subject, chapter ->
+                    navController.navigate(NavRoutes.addRevision(subject, chapter))
                 }
             )
         }
@@ -274,6 +279,25 @@ fun AppNavGraph(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onSaved = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = NavRoutes.ADD_REVISION,
+            arguments = listOf(
+                navArgument("subject") { type = NavType.StringType; defaultValue = "" },
+                navArgument("chapter") { type = NavType.StringType; defaultValue = "" }
+            )
+        ) {
+            val viewModel: AddRevisionViewModel = hiltViewModel()
+            AddRevisionScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() },
+                onOpenTimetables = {
+                    navController.popBackStack()
+                    navController.navigate(NavRoutes.TIMETABLE_LIST)
+                }
             )
         }
 

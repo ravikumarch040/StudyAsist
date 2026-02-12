@@ -11,6 +11,7 @@ import com.studyasist.data.local.entity.QA
 import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.AttemptRepository
 import com.studyasist.data.repository.ResultRepository
+import com.studyasist.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,8 +19,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import com.studyasist.util.speakText
+import java.util.Locale
 import javax.inject.Inject
 
 data class AssessmentRunUiState(
@@ -49,6 +55,7 @@ class AssessmentRunViewModel @Inject constructor(
     private val assessmentRepository: AssessmentRepository,
     private val attemptRepository: AttemptRepository,
     private val resultRepository: ResultRepository,
+    private val settingsRepository: SettingsRepository,
     private val gradingService: ObjectiveGradingService
 ) : ViewModel() {
 
@@ -141,6 +148,16 @@ class AssessmentRunViewModel @Inject constructor(
     fun prevQuestion() {
         _uiState.update { state ->
             state.copy(currentIndex = (state.currentIndex - 1).coerceAtLeast(0))
+        }
+    }
+
+    fun readQuestionAloud(text: String) {
+        if (text.isBlank()) return
+        viewModelScope.launch {
+            val voiceName = settingsRepository.settingsFlow.first().ttsVoiceName
+            withContext(Dispatchers.Main) {
+                speakText(context, text, Locale.getDefault(), voiceName)
+            }
         }
     }
 

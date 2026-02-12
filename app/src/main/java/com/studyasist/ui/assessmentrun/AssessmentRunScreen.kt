@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -214,6 +215,7 @@ fun AssessmentRunScreen(
                     qa = current.qa,
                     userAnswer = current.userAnswer,
                     onAnswerChange = { viewModel.updateAnswer(uiState.currentIndex, it) },
+                    onReadAloudClick = { viewModel.readQuestionAloud(current.qa.questionText) },
                     showVoiceImageButtons = current.qa.questionType in listOf(QuestionType.SHORT, QuestionType.ESSAY, QuestionType.NUMERIC, QuestionType.FILL_BLANK),
                     onRecordClick = {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
@@ -303,6 +305,7 @@ private fun QuestionCard(
     qa: QA,
     userAnswer: String,
     onAnswerChange: (String) -> Unit,
+    onReadAloudClick: () -> Unit = {},
     showVoiceImageButtons: Boolean = false,
     onRecordClick: () -> Unit = {},
     onUploadImageClick: () -> Unit = {},
@@ -316,11 +319,27 @@ private fun QuestionCard(
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text(
-                qa.questionText,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    qa.questionText,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(
+                    onClick = onReadAloudClick,
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Icon(
+                        Icons.Default.VolumeUp,
+                        contentDescription = stringResource(R.string.read_aloud)
+                    )
+                }
+            }
             when (qa.questionType) {
                 QuestionType.MCQ -> McqOptions(
                     options = parseOptions(qa.optionsJson),
