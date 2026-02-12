@@ -35,7 +35,9 @@ class ObjectiveGradingService @Inject constructor() {
                     gradeLevel = level,
                     userAnswer = userAnswer,
                     modelAnswer = qa.answerText,
-                    feedback = feedback
+                    feedback = feedback,
+                    subject = qa.subject,
+                    chapter = qa.chapter
                 )
             )
         }
@@ -51,6 +53,8 @@ class ObjectiveGradingService @Inject constructor() {
                     put("userAnswer", d.userAnswer)
                     put("modelAnswer", d.modelAnswer)
                     put("feedback", d.feedback)
+                    put("subject", d.subject)
+                    put("chapter", d.chapter)
                 })
             }
         }.toString()
@@ -180,6 +184,8 @@ class ObjectiveGradingService @Inject constructor() {
         val gradeLevel: GradeLevel,
         val userAnswer: String?,
         val modelAnswer: String,
-        val feedback: String
+        val feedback: String,
+        val subject: String?,
+        val chapter: String?
     )
 }

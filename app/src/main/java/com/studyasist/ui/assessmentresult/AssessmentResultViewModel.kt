@@ -29,9 +29,12 @@ data class ResultDetailItem(
     val questionText: String,
     val correct: Boolean,
     val partialCredit: Boolean,
+    val questionScore: Float,
     val userAnswer: String?,
     val modelAnswer: String,
-    val feedback: String
+    val feedback: String,
+    val subject: String?,
+    val chapter: String?
 )
 
 @HiltViewModel
@@ -81,14 +84,22 @@ class AssessmentResultViewModel @Inject constructor(
                 val gradeLevel = obj.optString("gradeLevel", "").lowercase()
                 val correct = obj.optBoolean("correct")
                 val partialCredit = gradeLevel == "partial"
+                val questionScore = when (gradeLevel) {
+                    "full" -> 1f
+                    "partial" -> 0.5f
+                    else -> 0f
+                }
                 ResultDetailItem(
                     qaId = obj.optLong("qaId"),
                     questionText = obj.optString("questionText", ""),
                     correct = correct,
                     partialCredit = partialCredit,
+                    questionScore = questionScore,
                     userAnswer = obj.optString("userAnswer").takeIf { it.isNotBlank() },
                     modelAnswer = obj.optString("modelAnswer", ""),
-                    feedback = obj.optString("feedback", "")
+                    feedback = obj.optString("feedback", ""),
+                    subject = obj.optString("subject").takeIf { it.isNotBlank() },
+                    chapter = obj.optString("chapter").takeIf { it.isNotBlank() }
                 )
             }
         } catch (_: Exception) {

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -120,6 +121,7 @@ fun AssessmentResultScreen(
                     item.partialCredit -> Triple("~", MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f))
                     else -> Triple("✗", MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f))
                 }
+                val canRevise = !item.correct && (item.subject != null || item.chapter != null)
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = cardColor)
@@ -134,31 +136,61 @@ fun AssessmentResultScreen(
                                 style = MaterialTheme.typography.titleMedium,
                                 color = iconColor
                             )
-                            Text(
-                                "#${index + 1}",
-                                style = MaterialTheme.typography.labelSmall
-                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "%.1f/1".format(item.questionScore),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    "#${index + 1}",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
                         }
                         if (item.questionText.isNotBlank()) {
                             Text(
                                 item.questionText,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(top = 4.dp)
                             )
                         }
                         if (item.userAnswer != null) {
                             Text(
                                 "Your answer: ${item.userAnswer}",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 4.dp)
                             )
                         }
                         Text(
                             "Correct: ${item.modelAnswer}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 2.dp)
                         )
+                        if (item.feedback.isNotBlank()) {
+                            Text(
+                                item.feedback,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                        if (canRevise) {
+                            Button(
+                                onClick = { onRevise(item.subject, item.chapter) },
+                                modifier = Modifier.padding(top = 8.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                            ) {
+                                Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                                Text(stringResource(R.string.revise))
+                            }
+                        }
                     }
                 }
             }
