@@ -20,6 +20,9 @@ interface QADao {
     @Query("SELECT * FROM qa_bank WHERE (:subject IS NULL OR subject = :subject) AND (:chapter IS NULL OR chapter = :chapter) ORDER BY createdAt DESC")
     fun getBySubjectChapter(subject: String?, chapter: String?): Flow<List<QA>>
 
+    @Query("SELECT * FROM qa_bank WHERE (:subject IS NULL OR subject = :subject) AND (:chapter IS NULL OR chapter = :chapter) ORDER BY createdAt DESC")
+    suspend fun getBySubjectChapterOnce(subject: String?, chapter: String?): List<QA>
+
     @Query("SELECT * FROM qa_bank WHERE (:subject IS NULL OR subject = :subject) AND (:chapter IS NULL OR chapter = :chapter) ORDER BY RANDOM() LIMIT :limit")
     suspend fun getRandomBySubjectChapter(subject: String?, chapter: String?, limit: Int): List<QA>
 

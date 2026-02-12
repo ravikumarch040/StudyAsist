@@ -30,10 +30,18 @@ data class AssessmentCreateUiState(
     val availableCount: Int = 0,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val createdAssessmentId: Long? = null
+    val createdAssessmentId: Long? = null,
+    // Manual selection
+    val showQaSelector: Boolean = false,
+    val selectorSubject: String = "",
+    val selectorChapter: String = "",
+    val selectorQas: List<com.studyasist.data.local.entity.QA> = emptyList(),
+    val selectedQaIds: Set<Long> = emptySet(),
+    val selectedQas: List<com.studyasist.data.local.entity.QA> = emptyList(),
+    val selectorDistinctChapters: List<String> = emptyList()
 )
 
-enum class SourceMode { BY_GOAL, BY_SUBJECT_CHAPTER }
+enum class SourceMode { BY_GOAL, BY_SUBJECT_CHAPTER, MANUAL }
 
 @HiltViewModel
 class AssessmentCreateViewModel @Inject constructor(
@@ -58,9 +66,18 @@ class AssessmentCreateViewModel @Inject constructor(
     }
 
     fun setSourceMode(mode: SourceMode) {
-        _uiState.update { it.copy(sourceMode = mode, errorMessage = null) }
-        if (mode == SourceMode.BY_GOAL) loadGoals()
-        else loadDistinctValues()
+        _uiState.update {
+            it.copy(
+                sourceMode = mode,
+                errorMessage = null,
+                showQaSelector = if (mode == SourceMode.MANUAL) it.showQaSelector else false
+            )
+        }
+        when (mode) {
+            SourceMode.BY_GOAL -> loadGoals()
+            SourceMode.BY_SUBJECT_CHAPTER -> loadDistinctValues()
+            SourceMode.MANUAL -> loadDistinctValues()
+        }
         refreshAvailableCount()
     }
 
@@ -151,9 +168,104 @@ class AssessmentCreateViewModel @Inject constructor(
                         state.chapter.takeIf { it.isNotBlank() }
                     )
                 }
+                SourceMode.MANUAL -> state.selectedQaIds.size
             }
             _uiState.update { it.copy(availableCount = count) }
         }
+    }
+
+    fun openQaSelector() {
+        viewModelScope.launch {
+            val state = _uiState.value
+            val chapters = if (state.selectorSubject.isNotBlank()) {
+                qaBankRepository.getDistinctChaptersForSubject(state.selectorSubject)
+            } else {
+                qaBankRepository.getDistinctChapters()
+            }
+            _uiState.update {
+                it.copy(
+                    showQaSelector = true,
+                    selectorDistinctChapters = chapters
+                )
+            }
+            loadSelectorQas()
+        }
+    }
+
+    fun closeQaSelector() {
+        _uiState.update { it.copy(showQaSelector = false) }
+    }
+
+    fun setSelectorSubject(subject: String) {
+        _uiState.update {
+            it.copy(
+                selectorSubject = subject,
+                selectorChapter = if (subject == it.selectorSubject) it.selectorChapter else ""
+            )
+        }
+        viewModelScope.launch {
+            val chapters = if (subject.isNotBlank()) {
+                qaBankRepository.getDistinctChaptersForSubject(subject)
+            } else {
+                qaBankRepository.getDistinctChapters()
+            }
+            _uiState.update { it.copy(selectorDistinctChapters = chapters) }
+            loadSelectorQas()
+        }
+    }
+
+    fun setSelectorChapter(chapter: String) {
+        _uiState.update { it.copy(selectorChapter = chapter) }
+        loadSelectorQas()
+    }
+
+    private fun loadSelectorQas() {
+        viewModelScope.launch {
+            val state = _uiState.value
+            val qas = qaBankRepository.getQAListBySubjectChapter(
+                state.selectorSubject.takeIf { it.isNotBlank() },
+                state.selectorChapter.takeIf { it.isNotBlank() }
+            )
+            _uiState.update { it.copy(selectorQas = qas) }
+        }
+    }
+
+    fun toggleQaSelection(qaId: Long) {
+        _uiState.update {
+            val newSet = if (qaId in it.selectedQaIds) {
+                it.selectedQaIds - qaId
+            } else {
+                it.selectedQaIds + qaId
+            }
+            it.copy(selectedQaIds = newSet)
+        }
+        refreshAvailableCount()
+    }
+
+    fun confirmQaSelection() {
+        viewModelScope.launch {
+            val state = _uiState.value
+            val qas = if (state.selectedQaIds.isEmpty()) emptyList()
+            else qaBankRepository.getQAByIds(state.selectedQaIds.toList())
+            _uiState.update {
+                it.copy(
+                    showQaSelector = false,
+                    selectedQas = qas,
+                    availableCount = qas.size
+                )
+            }
+        }
+    }
+
+    fun clearManualSelection() {
+        _uiState.update {
+            it.copy(
+                selectedQaIds = emptySet(),
+                selectedQas = emptyList(),
+                availableCount = 0
+            )
+        }
+        refreshAvailableCount()
     }
 
     fun createAssessment(onCreated: (Long) -> Unit) {
@@ -166,7 +278,6 @@ class AssessmentCreateViewModel @Inject constructor(
             _uiState.update { it.copy(errorMessage = "No questions available for selected criteria") }
             return
         }
-        val count = state.questionCount.coerceAtMost(state.availableCount)
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
@@ -178,6 +289,7 @@ class AssessmentCreateViewModel @Inject constructor(
                                 _uiState.update { it.copy(isLoading = false, errorMessage = "Select a goal") }
                                 return@launch
                             }
+                        val count = state.questionCount.coerceAtMost(state.availableCount)
                         assessmentRepository.createAssessmentFromGoal(
                             title = state.title,
                             goalId = goalId,
@@ -187,6 +299,7 @@ class AssessmentCreateViewModel @Inject constructor(
                         )
                     }
                     SourceMode.BY_SUBJECT_CHAPTER -> {
+                        val count = state.questionCount.coerceAtMost(state.availableCount)
                         assessmentRepository.createAssessmentFromRandom(
                             title = state.title,
                             goalId = null,
@@ -195,6 +308,22 @@ class AssessmentCreateViewModel @Inject constructor(
                             totalTimeSeconds = state.timeLimitMinutes * 60,
                             randomizeQuestions = state.randomize,
                             count = count
+                        )
+                    }
+                    SourceMode.MANUAL -> {
+                        val qaIds = state.selectedQas.map { it.id }
+                        if (qaIds.isEmpty()) {
+                            _uiState.update { it.copy(isLoading = false, errorMessage = "Select at least one question") }
+                            return@launch
+                        }
+                        assessmentRepository.createAssessment(
+                            title = state.title,
+                            goalId = null,
+                            subject = null,
+                            chapter = null,
+                            totalTimeSeconds = state.timeLimitMinutes * 60,
+                            randomizeQuestions = state.randomize,
+                            qaIds = if (state.randomize) qaIds.shuffled() else qaIds
                         )
                     }
                 }

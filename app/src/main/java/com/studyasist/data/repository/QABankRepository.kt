@@ -17,6 +17,9 @@ class QABankRepository @Inject constructor(
     fun getQABySubjectChapter(subject: String?, chapter: String?): Flow<List<QA>> =
         qaDao.getBySubjectChapter(subject, chapter)
 
+    suspend fun getQAListBySubjectChapter(subject: String?, chapter: String?): List<QA> =
+        qaDao.getBySubjectChapterOnce(subject, chapter)
+
     suspend fun getQAById(id: Long): QA? = qaDao.getById(id)
 
     suspend fun getQAByIds(ids: List<Long>): List<QA> = qaDao.getByIds(ids)
