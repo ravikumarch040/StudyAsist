@@ -193,13 +193,25 @@ fun ExplainScreen(
                 Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
             }
             Text(stringResource(R.string.explanation), style = MaterialTheme.typography.titleSmall)
-            OutlinedTextField(
-                value = uiState.explanation,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth().height(160.dp),
-                minLines = 6
-            )
+            if (uiState.explanation.isNotBlank()) {
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                ) {
+                    androidx.compose.foundation.layout.Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(12.dp)
+                    ) {
+                        com.studyasist.ui.components.MarkdownText(
+                            text = uiState.explanation,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
             if (uiState.explanation.isNotBlank()) {
                 Button(
                     onClick = { if (uiState.isSpeaking) viewModel.stopSpeaking() else viewModel.speakExplanation() },

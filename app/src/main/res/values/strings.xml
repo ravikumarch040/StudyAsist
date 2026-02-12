@@ -141,4 +141,6 @@
     <string name="restore_import_hint">Import from a backup file</string>
     <string name="recent">Recent</string>
     <string name="study_tool_history">History</string>
+    <string name="block_overlap">Block overlapping activities</string>
+    <string name="block_overlap_summary">Prevent saving when another activity overlaps this time</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -175,15 +176,25 @@ fun DictateScreen(
                 Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
             }
             Text(stringResource(R.string.extracted_text), style = MaterialTheme.typography.titleSmall)
-            OutlinedTextField(
-                value = uiState.extractedText,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                minLines = 4
-            )
+            if (uiState.sentences.isNotEmpty()) {
+                HighlightedText(
+                    sentences = uiState.sentences,
+                    highlightedIndex = uiState.highlightedSentenceIndex,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                )
+            } else {
+                OutlinedTextField(
+                    value = uiState.extractedText,
+                    onValueChange = {},
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
+                    minLines = 4
+                )
+            }
             if (uiState.extractedText.isNotBlank()) {
                 Button(
                     onClick = { if (uiState.isSpeaking) viewModel.stopSpeaking() else viewModel.speak() },
@@ -204,6 +215,42 @@ fun DictateScreen(
                     modifier = Modifier.fillMaxSize()
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun HighlightedText(
+    sentences: List<String>,
+    highlightedIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    val scrollState = rememberScrollState()
+    Card(
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant),
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+                .padding(12.dp)
+        ) {
+        sentences.forEachIndexed { index, sentence ->
+            Text(
+                text = sentence + if (index < sentences.size - 1) " " else "",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (index == highlightedIndex)
+                            Modifier.background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f))
+                        else
+                            Modifier
+                    )
+            )
+        }
         }
     }
 }

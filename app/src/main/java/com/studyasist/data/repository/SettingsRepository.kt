@@ -15,7 +15,8 @@ data class AppSettings(
     val userName: String,
     val ttsVoiceName: String?,
     val geminiApiKey: String,
-    val focusGuardEnabled: Boolean
+    val focusGuardEnabled: Boolean,
+    val blockOverlap: Boolean = false
 ) {
     companion object {
         const val DEFAULT_LEAD_MINUTES = 5
@@ -35,7 +36,8 @@ class SettingsRepository @Inject constructor(
             userName = prefs[dataStore.userName] ?: "",
             ttsVoiceName = prefs[dataStore.ttsVoiceName]?.takeIf { it.isNotEmpty() },
             geminiApiKey = prefs[dataStore.geminiApiKey] ?: "",
-            focusGuardEnabled = prefs[dataStore.focusGuardEnabled] ?: false
+            focusGuardEnabled = prefs[dataStore.focusGuardEnabled] ?: false,
+            blockOverlap = prefs[dataStore.blockOverlap] ?: false
         )
     }
 
@@ -72,5 +74,9 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setFocusGuardEnabled(enabled: Boolean) {
         dataStore.dataStore.edit { it[dataStore.focusGuardEnabled] = enabled }
+    }
+
+    suspend fun setBlockOverlap(block: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.blockOverlap] = block }
     }
 }

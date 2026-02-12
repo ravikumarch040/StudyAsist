@@ -55,7 +55,7 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState(
-        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false)
+        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false)
     )
     val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
     val backupExportJson by viewModel.backupExportJson.collectAsState(initial = null)
@@ -139,6 +139,17 @@ fun SettingsScreen(
                 Switch(
                     checked = settings.vibrationEnabled,
                     onCheckedChange = viewModel::setVibrationEnabled
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.block_overlap))
+                Switch(
+                    checked = settings.blockOverlap,
+                    onCheckedChange = viewModel::setBlockOverlap
                 )
             }
             Text(stringResource(R.string.focus_guard), style = MaterialTheme.typography.titleMedium)

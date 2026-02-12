@@ -27,7 +27,7 @@ class SettingsViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false)
+            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false)
         )
 
     private val _apiKeyTestMessage = MutableStateFlow<String?>(null)
@@ -39,6 +39,10 @@ class SettingsViewModel @Inject constructor(
 
     fun setVibrationEnabled(enabled: Boolean) {
         viewModelScope.launch { settingsRepository.setVibrationEnabled(enabled) }
+    }
+
+    fun setBlockOverlap(block: Boolean) {
+        viewModelScope.launch { settingsRepository.setBlockOverlap(block) }
     }
 
     fun setFocusGuardEnabled(enabled: Boolean) {

@@ -8,6 +8,7 @@ import com.studyasist.data.local.entity.StudyToolHistoryEntity
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.util.extractTextFromImage
 import com.studyasist.util.speakText
+import com.studyasist.util.speakTextWithProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
@@ -29,7 +30,9 @@ data class DictateUiState(
     val isSpeaking: Boolean = false,
     val errorMessage: String? = null,
     val selectedLanguageCode: String = "en",
-    val recentItems: List<StudyToolHistoryEntity> = emptyList()
+    val recentItems: List<StudyToolHistoryEntity> = emptyList(),
+    val highlightedSentenceIndex: Int = -1,
+    val sentences: List<String> = emptyList()
 )
 
 @HiltViewModel
@@ -80,13 +83,25 @@ class DictateViewModel @Inject constructor(
                     StudyToolHistoryEntity(toolType = "dictate", inputText = text.take(2000), usedAt = System.currentTimeMillis())
                 )
                 val recent = studyToolHistoryDao.getRecentByTool("dictate")
-                _uiState.update { it.copy(recentItems = recent) }
-                _uiState.update { it.copy(isSpeaking = true) }
+                val sentences = text.trim().split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
+                _uiState.update {
+                    it.copy(recentItems = recent, isSpeaking = true, sentences = sentences, highlightedSentenceIndex = -1)
+                }
                 val voiceName = settingsRepository.settingsFlow.first().ttsVoiceName
                 val locale = Locale.forLanguageTag(_uiState.value.selectedLanguageCode)
                 withContext(Dispatchers.Main) {
-                    speakText(context, text, locale, voiceName) {
-                        viewModelScope.launch { _uiState.update { it.copy(isSpeaking = false) } }
+                    speakTextWithProgress(
+                        context = context,
+                        text = text,
+                        locale = locale,
+                        voiceName = voiceName,
+                        onSentenceProgress = { idx, _ ->
+                            viewModelScope.launch { _uiState.update { it.copy(highlightedSentenceIndex = idx) } }
+                        }
+                    ) {
+                        viewModelScope.launch {
+                            _uiState.update { it.copy(isSpeaking = false, highlightedSentenceIndex = -1) }
+                        }
                     }
                 }
             }
@@ -99,13 +114,32 @@ class DictateViewModel @Inject constructor(
             _uiState.update { it.copy(errorMessage = "No text to read. Extract text first.") }
             return
         }
-        _uiState.update { it.copy(isSpeaking = true) }
+        val sentences = text.trim().split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
+        _uiState.update {
+            it.copy(
+                isSpeaking = true,
+                sentences = sentences,
+                highlightedSentenceIndex = -1
+            )
+        }
         viewModelScope.launch {
             val voiceName = settingsRepository.settingsFlow.first().ttsVoiceName
             val locale = Locale.forLanguageTag(_uiState.value.selectedLanguageCode)
             withContext(Dispatchers.Main) {
-                speakText(context, text, locale, voiceName) {
-                    viewModelScope.launch { _uiState.update { it.copy(isSpeaking = false) } }
+                speakTextWithProgress(
+                    context = context,
+                    text = text,
+                    locale = locale,
+                    voiceName = voiceName,
+                    onSentenceProgress = { idx, _ ->
+                        viewModelScope.launch { _uiState.update { it.copy(highlightedSentenceIndex = idx) } }
+                    }
+                ) {
+                    viewModelScope.launch {
+                        _uiState.update {
+                            it.copy(isSpeaking = false, highlightedSentenceIndex = -1)
+                        }
+                    }
                 }
             }
         }

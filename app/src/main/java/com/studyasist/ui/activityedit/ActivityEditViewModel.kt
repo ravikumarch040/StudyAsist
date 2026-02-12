@@ -36,6 +36,7 @@ data class ActivityEditUiState(
     val alarmTtsMessage: String = "",
     val overlapWarning: List<ActivityEntity> = emptyList(),
     val showOverlapDialog: Boolean = false,
+    val overlapBlockedMessage: String? = null,
     val isSaving: Boolean = false
 ) {
     val startTimeMinutes: Int get() = startHour * 60 + startMinute
@@ -114,9 +115,9 @@ class ActivityEditViewModel @Inject constructor(
         }
     }
 
-    fun updateDay(day: Int) { _uiState.update { it.copy(dayOfWeek = day) } }
-    fun updateStartTime(h: Int, m: Int) { _uiState.update { it.copy(startHour = h, startMinute = m) } }
-    fun updateEndTime(h: Int, m: Int) { _uiState.update { it.copy(endHour = h, endMinute = m) } }
+    fun updateDay(day: Int) { _uiState.update { it.copy(dayOfWeek = day, overlapBlockedMessage = null) } }
+    fun updateStartTime(h: Int, m: Int) { _uiState.update { it.copy(startHour = h, startMinute = m, overlapBlockedMessage = null) } }
+    fun updateEndTime(h: Int, m: Int) { _uiState.update { it.copy(endHour = h, endMinute = m, overlapBlockedMessage = null) } }
     fun updateTitle(s: String) { _uiState.update { it.copy(title = s) } }
     fun updateType(t: ActivityType) { _uiState.update { it.copy(type = t) } }
     fun updateNote(s: String) { _uiState.update { it.copy(note = s) } }
@@ -140,6 +141,7 @@ class ActivityEditViewModel @Inject constructor(
     }
     fun updateAlarmTtsMessage(msg: String) { _uiState.update { it.copy(alarmTtsMessage = msg) } }
     fun dismissOverlapDialog() { _uiState.update { it.copy(showOverlapDialog = false) } }
+    fun clearOverlapBlocked() { _uiState.update { it.copy(overlapBlockedMessage = null) } }
 
     fun copyScheduleFromDay(sourceDay: Int, onDone: () -> Unit) {
         if (sourceDay == _uiState.value.dayOfWeek) return
@@ -164,8 +166,17 @@ class ActivityEditViewModel @Inject constructor(
                 excludeActivityId = state.activityId
             )
             if (overlapping.isNotEmpty() && !saveAnyway) {
-                _uiState.update {
-                    it.copy(overlapWarning = overlapping, showOverlapDialog = true)
+                val blockOverlap = settingsRepository.settingsFlow.first().blockOverlap
+                if (blockOverlap) {
+                    _uiState.update {
+                        it.copy(
+                            overlapBlockedMessage = "Another activity overlaps this time. Reschedule or disable \"Block overlapping\" in Settings."
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(overlapWarning = overlapping, showOverlapDialog = true)
+                    }
                 }
                 return@launch
             }
@@ -201,7 +212,7 @@ class ActivityEditViewModel @Inject constructor(
                     notificationScheduler.scheduleActivity(savedEntity, timetable.name)
                 }
             }
-            _uiState.update { it.copy(isSaving = false) }
+            _uiState.update { it.copy(isSaving = false, overlapBlockedMessage = null) }
             onSaved()
         }
     }

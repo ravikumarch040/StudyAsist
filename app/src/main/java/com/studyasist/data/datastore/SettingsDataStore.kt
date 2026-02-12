@@ -29,6 +29,7 @@ class SettingsDataStore @Inject constructor(
     val ttsVoiceName = stringPreferencesKey("tts_voice_name")
     val geminiApiKey = stringPreferencesKey("gemini_api_key")
     val focusGuardEnabled = booleanPreferencesKey("focus_guard_enabled")
+    val blockOverlap = booleanPreferencesKey("block_overlap")
 
     val dataStore: DataStore<Preferences> get() = prefs
 

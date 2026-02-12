@@ -194,13 +194,25 @@ fun SolveScreen(
                 Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)
             }
             Text(stringResource(R.string.solution), style = MaterialTheme.typography.titleSmall)
-            OutlinedTextField(
-                value = uiState.solution,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth().height(200.dp),
-                minLines = 8
-            )
+            if (uiState.solution.isNotBlank()) {
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                ) {
+                    androidx.compose.foundation.layout.Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(12.dp)
+                    ) {
+                        com.studyasist.ui.components.MarkdownText(
+                            text = uiState.solution,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
             if (uiState.solution.isNotBlank()) {
                 Button(
                     onClick = { if (uiState.isSpeaking) viewModel.stopSpeaking() else viewModel.speakSolution() },
