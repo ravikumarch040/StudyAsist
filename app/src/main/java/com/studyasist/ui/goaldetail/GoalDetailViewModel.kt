@@ -9,6 +9,7 @@ import com.studyasist.data.repository.GoalDashboardMetrics
 import com.studyasist.data.repository.GoalDashboardRepository
 import com.studyasist.data.repository.GoalRepository
 import com.studyasist.data.repository.RecentAttemptSummary
+import com.studyasist.data.repository.SubjectChapterProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,6 +27,7 @@ data class GoalDetailUiState(
     val questionsPracticed: Int = 0,
     val percentComplete: Float = 0f,
     val recentAttempts: List<RecentAttemptSummary> = emptyList(),
+    val subjectProgress: List<SubjectChapterProgress> = emptyList(),
     val isLoading: Boolean = true
 )
 
@@ -54,6 +56,7 @@ class GoalDetailViewModel @Inject constructor(
             questionsPracticed = metrics?.questionsPracticed ?: 0,
             percentComplete = metrics?.percentComplete ?: 0f,
             recentAttempts = metrics?.recentAttempts ?: emptyList(),
+            subjectProgress = metrics?.subjectProgress ?: emptyList(),
             isLoading = false
         )
     }.stateIn(
