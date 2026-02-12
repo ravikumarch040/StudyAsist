@@ -28,6 +28,7 @@ data class ResultDetailItem(
     val qaId: Long,
     val questionText: String,
     val correct: Boolean,
+    val partialCredit: Boolean,
     val userAnswer: String?,
     val modelAnswer: String,
     val feedback: String
@@ -77,10 +78,14 @@ class AssessmentResultViewModel @Inject constructor(
             val arr = org.json.JSONArray(json)
             (0 until arr.length()).mapNotNull { i ->
                 val obj = arr.getJSONObject(i)
+                val gradeLevel = obj.optString("gradeLevel", "").lowercase()
+                val correct = obj.optBoolean("correct")
+                val partialCredit = gradeLevel == "partial"
                 ResultDetailItem(
                     qaId = obj.optLong("qaId"),
                     questionText = obj.optString("questionText", ""),
-                    correct = obj.optBoolean("correct"),
+                    correct = correct,
+                    partialCredit = partialCredit,
                     userAnswer = obj.optString("userAnswer").takeIf { it.isNotBlank() },
                     modelAnswer = obj.optString("modelAnswer", ""),
                     feedback = obj.optString("feedback", "")

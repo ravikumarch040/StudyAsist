@@ -115,15 +115,14 @@ fun AssessmentResultScreen(
             )
 
             uiState.details.forEachIndexed { index, item ->
+                val (icon, iconColor, cardColor) = when {
+                    item.correct -> Triple("✓", MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
+                    item.partialCredit -> Triple("~", MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f))
+                    else -> Triple("✗", MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f))
+                }
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (item.correct) {
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                        } else {
-                            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
-                        }
-                    )
+                    colors = CardDefaults.cardColors(containerColor = cardColor)
                 ) {
                     Column(Modifier.padding(12.dp)) {
                         Row(
@@ -131,9 +130,9 @@ fun AssessmentResultScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                if (item.correct) "✓" else "✗",
+                                icon,
                                 style = MaterialTheme.typography.titleMedium,
-                                color = if (item.correct) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                color = iconColor
                             )
                             Text(
                                 "#${index + 1}",

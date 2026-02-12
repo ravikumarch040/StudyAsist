@@ -7,9 +7,8 @@ import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Objective-only grading for MCQ, True/False, Numeric, Fill-in, Short answer.
- */
+enum class GradeLevel { FULL, PARTIAL, WRONG }
+
 @Singleton
 class ObjectiveGradingService @Inject constructor() {
 
@@ -23,13 +22,17 @@ class ObjectiveGradingService @Inject constructor() {
 
         for ((qaId, userAnswer) in answers) {
             val qa = qaMap[qaId] ?: continue
-            val (correct, feedback) = gradeOne(qa, userAnswer?.trim()?.takeIf { it.isNotBlank() } ?: "")
-            if (correct) score += 1f
+            val (level, feedback) = gradeOne(qa, userAnswer?.trim()?.takeIf { it.isNotBlank() } ?: "")
+            score += when (level) {
+                GradeLevel.FULL -> 1f
+                GradeLevel.PARTIAL -> 0.5f
+                GradeLevel.WRONG -> 0f
+            }
             details.add(
                 QuestionGrade(
                     qaId = qaId,
                     questionText = qa.questionText.take(100),
-                    correct = correct,
+                    gradeLevel = level,
                     userAnswer = userAnswer,
                     modelAnswer = qa.answerText,
                     feedback = feedback
@@ -43,7 +46,8 @@ class ObjectiveGradingService @Inject constructor() {
                 put(JSONObject().apply {
                     put("qaId", d.qaId)
                     put("questionText", d.questionText)
-                    put("correct", d.correct)
+                    put("correct", d.gradeLevel == GradeLevel.FULL)
+                    put("gradeLevel", d.gradeLevel.name.lowercase())
                     put("userAnswer", d.userAnswer)
                     put("modelAnswer", d.modelAnswer)
                     put("feedback", d.feedback)
@@ -59,25 +63,25 @@ class ObjectiveGradingService @Inject constructor() {
         )
     }
 
-    private fun gradeOne(qa: QA, userAnswer: String): Pair<Boolean, String> {
+    private fun gradeOne(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
         return when (qa.questionType) {
             QuestionType.MCQ -> gradeMcq(qa, userAnswer)
             QuestionType.TRUE_FALSE -> gradeTrueFalse(qa, userAnswer)
             QuestionType.NUMERIC -> gradeNumeric(qa, userAnswer)
-            QuestionType.FILL_BLANK, QuestionType.SHORT -> gradeText(qa, userAnswer)
+            QuestionType.FILL_BLANK, QuestionType.SHORT, QuestionType.ESSAY -> gradeText(qa, userAnswer)
             else -> gradeText(qa, userAnswer)
         }
     }
 
-    private fun gradeMcq(qa: QA, userAnswer: String): Pair<Boolean, String> {
+    private fun gradeMcq(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
         val model = qa.answerText.trim()
         val user = userAnswer.trim()
-        if (model.equals(user, ignoreCase = true)) return true to "Correct"
+        if (model.equals(user, ignoreCase = true)) return GradeLevel.FULL to "Correct"
 
         val modelLetter = model.lowercase().take(1)
         val userLetter = user.lowercase().take(1)
         if (modelLetter in listOf("a", "b", "c", "d") && userLetter in listOf("a", "b", "c", "d")) {
-            return (modelLetter == userLetter) to if (modelLetter == userLetter) "Correct" else "Incorrect"
+            return if (modelLetter == userLetter) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Incorrect"
         }
 
         val options = parseOptions(qa.optionsJson)
@@ -85,54 +89,58 @@ class ObjectiveGradingService @Inject constructor() {
             val userIdx = "abcd".indexOf(userLetter)
             val userOpt = options.getOrNull(userIdx)
             if (userOpt != null && (normalize(userOpt) == normalize(model) || userOpt.equals(model, ignoreCase = true))) {
-                return true to "Correct"
+                return GradeLevel.FULL to "Correct"
             }
         }
         if (options.isNotEmpty() && modelLetter in listOf("a", "b", "c", "d")) {
             val modelIdx = "abcd".indexOf(modelLetter)
             val modelOpt = options.getOrNull(modelIdx)
             if (modelOpt != null && (normalize(user) == normalize(modelOpt) || user.equals(modelOpt, ignoreCase = true))) {
-                return true to "Correct"
+                return GradeLevel.FULL to "Correct"
             }
         }
 
-        return false to "Incorrect"
+        return GradeLevel.WRONG to "Incorrect"
     }
 
-    private fun gradeTrueFalse(qa: QA, userAnswer: String): Pair<Boolean, String> {
+    private fun gradeTrueFalse(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
         val model = normalize(qa.answerText).lowercase()
         val user = normalize(userAnswer).lowercase()
         val modelBool = model == "true" || model == "t" || model == "yes"
         val userBool = user == "true" || user == "t" || user == "yes" || user == "1"
         val correct = modelBool == userBool
-        return (correct) to if (correct) "Correct" else "Incorrect"
+        return if (correct) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Incorrect"
     }
 
-    private fun gradeNumeric(qa: QA, userAnswer: String): Pair<Boolean, String> {
+    private fun gradeNumeric(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
         val modelNum = parseNumber(qa.answerText)
         val userNum = parseNumber(userAnswer)
         if (modelNum == null || userNum == null) {
             val norm = normalize(qa.answerText) == normalize(userAnswer)
-            return norm to if (norm) "Correct" else "Incorrect"
+            return if (norm) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Incorrect"
         }
         val tolerance = 0.01
         val diff = kotlin.math.abs(modelNum - userNum)
         val correct = diff <= tolerance
-        return correct to if (correct) "Correct" else "Expected $modelNum"
+        return if (correct) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Expected $modelNum"
     }
 
-    private fun gradeText(qa: QA, userAnswer: String): Pair<Boolean, String> {
+    /** Token overlap thresholds: >=0.86 full credit, 0.68–0.86 partial, <0.68 wrong */
+    private fun gradeText(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
         val model = normalize(qa.answerText)
         val user = normalize(userAnswer)
-        if (model == user) return true to "Correct"
-        if (model.equals(user, ignoreCase = true)) return true to "Correct"
+        if (model == user) return GradeLevel.FULL to "Correct"
+        if (model.equals(user, ignoreCase = true)) return GradeLevel.FULL to "Correct"
         val modelTokens = tokenize(model)
         val userTokens = tokenize(user)
-        if (modelTokens.isEmpty()) return (user.isBlank()) to "Correct"
+        if (modelTokens.isEmpty()) return if (user.isBlank()) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Expected: ${qa.answerText.take(80)}"
         val overlap = userTokens.intersect(modelTokens.toSet()).size.toFloat()
         val ratio = overlap / modelTokens.size
-        val correct = ratio >= 0.85f
-        return correct to if (correct) "Correct" else "Expected: ${qa.answerText.take(80)}"
+        return when {
+            ratio >= 0.86f -> GradeLevel.FULL to "Correct"
+            ratio >= 0.68f -> GradeLevel.PARTIAL to "Partial credit"
+            else -> GradeLevel.WRONG to "Expected: ${qa.answerText.take(80)}"
+        }
     }
 
     private fun normalize(s: String): String =
@@ -169,7 +177,7 @@ class ObjectiveGradingService @Inject constructor() {
     private data class QuestionGrade(
         val qaId: Long,
         val questionText: String,
-        val correct: Boolean,
+        val gradeLevel: GradeLevel,
         val userAnswer: String?,
         val modelAnswer: String,
         val feedback: String
