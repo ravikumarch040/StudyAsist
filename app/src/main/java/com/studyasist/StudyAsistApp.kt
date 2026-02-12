@@ -3,9 +3,12 @@ package com.studyasist
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.studyasist.notification.DeferredGradingWorker
 import com.studyasist.notification.ExamGoalAlertWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
@@ -25,6 +28,7 @@ class StudyAsistApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         scheduleExamGoalAlert()
+        scheduleDeferredGrading()
     }
 
     private fun scheduleExamGoalAlert() {
@@ -32,6 +36,20 @@ class StudyAsistApp : Application(), Configuration.Provider {
             .build()
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "exam_goal_alert",
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
+    }
+
+    private fun scheduleDeferredGrading() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val request = PeriodicWorkRequestBuilder<DeferredGradingWorker>(24, TimeUnit.HOURS)
+            .setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "deferred_grading",
             ExistingPeriodicWorkPolicy.KEEP,
             request
         )
