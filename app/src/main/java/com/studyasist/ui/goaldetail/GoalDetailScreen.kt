@@ -39,6 +39,7 @@ import com.studyasist.data.repository.RecentAttemptSummary
 import com.studyasist.data.repository.SubjectChapterProgress
 import com.studyasist.data.repository.TrackPrediction
 import com.studyasist.data.repository.TrackStatus
+import com.studyasist.ui.components.ScoreSparkline
 import com.studyasist.util.formatExamDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -159,6 +160,25 @@ fun GoalDetailScreen(
             }
             uiState.trackPrediction?.let { prediction ->
                 TrackPredictionCard(prediction = prediction)
+            }
+            if (uiState.recentAttempts.size >= 2) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(
+                            stringResource(R.string.score_trend),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        ScoreSparkline(
+                            scores = uiState.recentAttempts.reversed().map { it.percent },
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
             }
             if (uiState.recentAttempts.isNotEmpty()) {
                 Text(

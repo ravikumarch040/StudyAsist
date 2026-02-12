@@ -114,4 +114,5 @@
     <string name="track_not_enough_data">Complete an assessment to see your pace</string>
     <string name="track_behind_message">At current pace: ~%.0f%% by exam (%.0f%% short)</string>
     <string name="edit_assessment">Edit assessment</string>
+    <string name="score_trend">Score trend</string>
 </resources>
