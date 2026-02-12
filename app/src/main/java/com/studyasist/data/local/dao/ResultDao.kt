@@ -25,6 +25,17 @@ interface ResultDao {
     """)
     suspend fun getAllResultsWithAttempt(): List<ResultWithAttempt>
 
+    @Query("""
+        SELECT r.id as resultId, r.attemptId, r.score, r.maxScore, r.percent,
+               att.assessmentId, att.startedAt
+        FROM results r
+        JOIN attempts att ON r.attemptId = att.id
+        WHERE att.assessmentId IN (:assessmentIds)
+        ORDER BY r.id DESC
+        LIMIT :limit
+    """)
+    suspend fun getResultsForAssessments(assessmentIds: List<Long>, limit: Int = 10): List<ResultWithAttempt>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: Result): Long
 }

@@ -201,7 +201,8 @@ fun AppNavGraph(
                 onEditGoal = { id -> navController.navigate(NavRoutes.goalEdit(id)) },
                 onCreateAssessment = { goalId -> navController.navigate(NavRoutes.assessmentCreateForGoal(goalId)) },
                 onViewAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
-                onViewResults = { navController.navigate(NavRoutes.RESULT_LIST) }
+                onViewResults = { navController.navigate(NavRoutes.RESULT_LIST) },
+                onResultClick = { attemptId -> navController.navigate(NavRoutes.assessmentResult(attemptId)) }
             )
         }
 

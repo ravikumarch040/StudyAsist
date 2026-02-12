@@ -1,5 +1,6 @@
 package com.studyasist.ui.goaldetail
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
+import com.studyasist.data.repository.RecentAttemptSummary
 import com.studyasist.util.formatExamDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +42,8 @@ fun GoalDetailScreen(
     onEditGoal: (Long) -> Unit,
     onCreateAssessment: (Long) -> Unit = {},
     onViewAssessments: () -> Unit = {},
-    onViewResults: () -> Unit = {}
+    onViewResults: () -> Unit = {},
+    onResultClick: (Long) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -128,6 +131,63 @@ fun GoalDetailScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(stringResource(R.string.results))
+                }
+            }
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer)
+            ) {
+                Column(Modifier.padding(16.dp)) {
+                    Text(
+                        "${uiState.questionsPracticed} / ${uiState.totalQuestions} questions practiced",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                    Text(
+                        "%.0f%% complete".format(uiState.percentComplete),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
+            if (uiState.recentAttempts.isNotEmpty()) {
+                Text(
+                    "Recent attempts",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                uiState.recentAttempts.forEach { attempt: RecentAttemptSummary ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = { onResultClick(attempt.attemptId) }),
+                        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+                    ) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    attempt.assessmentTitle,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    attempt.attemptLabel,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Text(
+                                "%.0f%%".format(attempt.percent),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                 }
             }
             Text(

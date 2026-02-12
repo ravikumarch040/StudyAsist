@@ -12,6 +12,9 @@ interface AttemptAnswerDao {
     @Query("SELECT * FROM attempt_answers WHERE attemptId = :attemptId ORDER BY id")
     suspend fun getByAttemptId(attemptId: Long): List<AttemptAnswer>
 
+    @Query("SELECT * FROM attempt_answers WHERE attemptId IN (:attemptIds)")
+    suspend fun getByAttemptIds(attemptIds: List<Long>): List<AttemptAnswer>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: AttemptAnswer): Long
 

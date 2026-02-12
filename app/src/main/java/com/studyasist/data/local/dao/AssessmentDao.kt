@@ -17,6 +17,9 @@ interface AssessmentDao {
     @Query("SELECT * FROM assessments WHERE goalId = :goalId ORDER BY createdAt DESC")
     fun getByGoalId(goalId: Long): Flow<List<Assessment>>
 
+    @Query("SELECT * FROM assessments WHERE goalId = :goalId ORDER BY createdAt DESC")
+    suspend fun getByGoalIdOnce(goalId: Long): List<Assessment>
+
     @Query("SELECT * FROM assessments WHERE id = :id")
     suspend fun getById(id: Long): Assessment?
 
