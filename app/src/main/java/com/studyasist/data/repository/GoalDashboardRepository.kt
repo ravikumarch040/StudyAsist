@@ -17,13 +17,20 @@ data class TrackPrediction(
     val deficitPercent: Float? = null
 )
 
+data class SuggestedPracticeArea(
+    val subject: String,
+    val chapter: String?,
+    val weakCount: Int
+)
+
 data class GoalDashboardMetrics(
     val totalQuestions: Int,
     val questionsPracticed: Int,
     val percentComplete: Float,
     val recentAttempts: List<RecentAttemptSummary>,
     val subjectProgress: List<SubjectChapterProgress> = emptyList(),
-    val trackPrediction: TrackPrediction = TrackPrediction(TrackStatus.NOT_ENOUGH_DATA)
+    val trackPrediction: TrackPrediction = TrackPrediction(TrackStatus.NOT_ENOUGH_DATA),
+    val suggestedPractice: List<SuggestedPracticeArea> = emptyList()
 )
 
 data class SubjectChapterProgress(
@@ -78,9 +85,9 @@ class GoalDashboardRepository @Inject constructor(
         } else 0f
 
         val assessmentIds = assessments.map { it.id }
-        val recentAttempts = if (assessmentIds.isEmpty()) emptyList() else {
-            val resultRows = resultDao.getResultsForAssessments(assessmentIds, 10)
-            resultRows.map { row ->
+        val resultRows = if (assessmentIds.isEmpty()) emptyList() else resultDao.getResultsForAssessments(assessmentIds, 15)
+        val recentAttempts = if (resultRows.isEmpty()) emptyList() else {
+            resultRows.take(10).map { row ->
                 val assessment = assessmentDao.getById(row.assessmentId)
                 val attempts = attemptDao.getByAssessmentIdOnce(row.assessmentId).sortedBy { it.startedAt }
                 val attemptNum = attempts.indexOfFirst { it.id == row.attemptId }.let { if (it >= 0) it + 1 else 1 }
@@ -129,14 +136,57 @@ class GoalDashboardRepository @Inject constructor(
             attemptDao = attemptDao
         )
 
+        val suggestedPractice = computeSuggestedPractice(resultRows = resultRows, resultDao = resultDao)
+
         return GoalDashboardMetrics(
             totalQuestions = totalQuestions,
             questionsPracticed = qaAttempted,
             percentComplete = percentComplete,
             recentAttempts = recentAttempts,
             subjectProgress = subjectProgress,
-            trackPrediction = trackPrediction
+            trackPrediction = trackPrediction,
+            suggestedPractice = suggestedPractice
         )
+    }
+
+    private suspend fun computeSuggestedPractice(
+        resultRows: List<com.studyasist.data.local.entity.ResultWithAttempt>,
+        resultDao: ResultDao
+    ): List<SuggestedPracticeArea> {
+        val weakByArea = mutableMapOf<Pair<String, String?>, Int>()
+        for (row in resultRows) {
+            val result = resultDao.getByAttemptId(row.attemptId) ?: continue
+            parseWeakAreasFromDetails(result.detailsJson).forEach { (subj, ch) ->
+                weakByArea[subj to ch] = (weakByArea[subj to ch] ?: 0) + 1
+            }
+        }
+        return weakByArea.entries
+            .sortedByDescending { it.value }
+            .take(5)
+            .map { (pair, count) ->
+                SuggestedPracticeArea(
+                    subject = pair.first,
+                    chapter = pair.second?.takeIf { it.isNotBlank() },
+                    weakCount = count
+                )
+            }
+    }
+
+    private fun parseWeakAreasFromDetails(detailsJson: String): List<Pair<String, String?>> {
+        return try {
+            val arr = org.json.JSONArray(detailsJson)
+            (0 until arr.length()).mapNotNull { i ->
+                val obj = arr.getJSONObject(i)
+                val gradeLevel = obj.optString("gradeLevel", "").lowercase()
+                if (gradeLevel != "wrong" && gradeLevel != "partial") return@mapNotNull null
+                val subject = obj.optString("subject", "").trim()
+                if (subject.isBlank()) return@mapNotNull null
+                val chapter = obj.optString("chapter", "").trim().takeIf { it.isNotBlank() }
+                subject to chapter
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
     }
 
     private suspend fun computeTrackPrediction(

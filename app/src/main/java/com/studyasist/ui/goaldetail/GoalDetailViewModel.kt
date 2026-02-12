@@ -9,6 +9,7 @@ import com.studyasist.data.repository.GoalDashboardMetrics
 import com.studyasist.data.repository.GoalDashboardRepository
 import com.studyasist.data.repository.GoalRepository
 import com.studyasist.data.repository.RecentAttemptSummary
+import com.studyasist.data.repository.SuggestedPracticeArea
 import com.studyasist.data.repository.TrackPrediction
 import com.studyasist.data.repository.SubjectChapterProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +31,7 @@ data class GoalDetailUiState(
     val recentAttempts: List<RecentAttemptSummary> = emptyList(),
     val subjectProgress: List<SubjectChapterProgress> = emptyList(),
     val trackPrediction: TrackPrediction? = null,
+    val suggestedPractice: List<SuggestedPracticeArea> = emptyList(),
     val isLoading: Boolean = true
 )
 
@@ -60,6 +62,7 @@ class GoalDetailViewModel @Inject constructor(
             recentAttempts = metrics?.recentAttempts ?: emptyList(),
             subjectProgress = metrics?.subjectProgress ?: emptyList(),
             trackPrediction = metrics?.trackPrediction,
+            suggestedPractice = metrics?.suggestedPractice ?: emptyList(),
             isLoading = false
         )
     }.stateIn(

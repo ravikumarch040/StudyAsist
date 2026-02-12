@@ -115,4 +115,6 @@
     <string name="track_behind_message">At current pace: ~%.0f%% by exam (%.0f%% short)</string>
     <string name="edit_assessment">Edit assessment</string>
     <string name="score_trend">Score trend</string>
+    <string name="suggested_practice">Suggested practice</string>
+    <string name="suggested_practice_hint">Topics with wrong or partial answers in recent attempts</string>
 </resources>

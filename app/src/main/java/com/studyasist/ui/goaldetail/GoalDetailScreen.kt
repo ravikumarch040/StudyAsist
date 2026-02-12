@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Card
@@ -36,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
 import com.studyasist.data.repository.RecentAttemptSummary
+import com.studyasist.data.repository.SuggestedPracticeArea
 import com.studyasist.data.repository.SubjectChapterProgress
 import com.studyasist.data.repository.TrackPrediction
 import com.studyasist.data.repository.TrackStatus
@@ -51,7 +54,8 @@ fun GoalDetailScreen(
     onCreateAssessment: (Long) -> Unit = {},
     onViewAssessments: () -> Unit = {},
     onViewResults: () -> Unit = {},
-    onResultClick: (Long) -> Unit = {}
+    onResultClick: (Long) -> Unit = {},
+    onPracticeTopic: (subject: String?, chapter: String?) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -160,6 +164,55 @@ fun GoalDetailScreen(
             }
             uiState.trackPrediction?.let { prediction ->
                 TrackPredictionCard(prediction = prediction)
+            }
+            if (uiState.suggestedPractice.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.tertiaryContainer)
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(
+                            stringResource(R.string.suggested_practice),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                        Text(
+                            stringResource(R.string.suggested_practice_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        uiState.suggestedPractice.forEach { area ->
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        area.subject,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                    Text(
+                                        area.chapter ?: stringResource(R.string.filter_all_subjects),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                                    )
+                                }
+                                Button(
+                                    onClick = { onPracticeTopic(area.subject, area.chapter) },
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                ) {
+                                    Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                                    Text(stringResource(R.string.revise))
+                                }
+                            }
+                        }
+                    }
+                }
             }
             if (uiState.recentAttempts.size >= 2) {
                 Card(
