@@ -367,7 +367,11 @@ fun AppNavGraph(
                         }
                     }
                 },
-                onManualReview = { navController.navigate(NavRoutes.manualOverride(attemptId)) }
+                onManualReview = { navController.navigate(NavRoutes.manualOverride(attemptId)) },
+                onRetry = { newAssessmentId ->
+                    navController.popBackStack()
+                    navController.navigate(NavRoutes.assessmentRun(newAssessmentId))
+                }
             )
         }
 

@@ -132,6 +132,30 @@ class AssessmentRepository @Inject constructor(
     suspend fun getQuestionCount(assessmentId: Long): Int =
         assessmentQuestionDao.getByAssessmentId(assessmentId).size
 
+    /**
+     * Creates a new assessment for retry, using the same settings as the original
+     * but with the specified QA IDs (e.g. all questions or only wrong/partial).
+     * @return New assessment ID, or null if original not found or qaIds empty
+     */
+    suspend fun createRetryAssessment(
+        originalAssessmentId: Long,
+        qaIds: List<Long>,
+        titleSuffix: String = " (Retry)"
+    ): Long? {
+        if (qaIds.isEmpty()) return null
+        val original = assessmentDao.getById(originalAssessmentId) ?: return null
+        val title = original.title + titleSuffix
+        return createAssessment(
+            title = title,
+            goalId = original.goalId,
+            subject = original.subject,
+            chapter = original.chapter,
+            totalTimeSeconds = original.totalTimeSeconds,
+            randomizeQuestions = original.randomizeQuestions,
+            qaIds = qaIds
+        )
+    }
+
     data class AssessmentWithQuestions(
         val assessment: Assessment,
         val questions: List<AssessmentQuestionWithQA>

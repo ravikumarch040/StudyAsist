@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -28,7 +29,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -40,9 +43,18 @@ fun AssessmentResultScreen(
     viewModel: AssessmentResultViewModel,
     onBack: () -> Unit,
     onRevise: (subject: String?, chapter: String?) -> Unit = { _, _ -> },
-    onManualReview: () -> Unit = {}
+    onManualReview: () -> Unit = {},
+    onRetry: (Long) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    fun launchRetry(onlyWrongPartial: Boolean) {
+        coroutineScope.launch {
+            val newAssessmentId = viewModel.createRetryAssessment(onlyWrongPartial)
+            newAssessmentId?.let { onRetry(it) }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -112,6 +124,20 @@ fun AssessmentResultScreen(
                         modifier = Modifier.padding(top = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        Button(
+                            onClick = { launchRetry(onlyWrongPartial = false) }
+                        ) {
+                            Icon(Icons.Default.Replay, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                            Text(stringResource(R.string.retry_all))
+                        }
+                        if (uiState.details.any { !it.correct }) {
+                            Button(
+                                onClick = { launchRetry(onlyWrongPartial = true) },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                            ) {
+                                Text(stringResource(R.string.retry_weak))
+                            }
+                        }
                         Button(
                             onClick = {
                                 val sc = uiState.subjectChapter

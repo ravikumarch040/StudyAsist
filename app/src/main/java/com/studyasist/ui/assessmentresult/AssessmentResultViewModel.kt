@@ -3,6 +3,7 @@ package com.studyasist.ui.assessmentresult
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.AttemptRepository
 import com.studyasist.data.repository.ResultRepository
 import com.studyasist.data.repository.SubjectChapter
@@ -44,7 +45,8 @@ data class ResultDetailItem(
 class AssessmentResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val resultRepository: ResultRepository,
-    private val attemptRepository: AttemptRepository
+    private val attemptRepository: AttemptRepository,
+    private val assessmentRepository: AssessmentRepository
 ) : ViewModel() {
 
     private val attemptId: Long = checkNotNull(savedStateHandle["attemptId"]) { "attemptId required" }
@@ -54,6 +56,26 @@ class AssessmentResultViewModel @Inject constructor(
 
     init {
         loadResult()
+    }
+
+    /**
+     * Creates a retry assessment and returns the new assessment ID.
+     * @param onlyWrongPartial If true, only include questions that were wrong or partial. If false, include all.
+     * @return New assessment ID to run, or null if creation failed
+     */
+    suspend fun createRetryAssessment(onlyWrongPartial: Boolean): Long? {
+        val attempt = attemptRepository.getAttempt(attemptId) ?: return null
+        val qaIds = if (onlyWrongPartial) {
+            _uiState.value.details
+                .filter { !it.correct }
+                .map { it.qaId }
+                .distinct()
+        } else {
+            _uiState.value.details.map { it.qaId }.distinct()
+        }
+        if (qaIds.isEmpty()) return null
+        val suffix = if (onlyWrongPartial) " (Retry weak)" else " (Retry)"
+        return assessmentRepository.createRetryAssessment(attempt.assessmentId, qaIds, suffix)
     }
 
     fun toggleFlagForReview() {

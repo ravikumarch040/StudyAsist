@@ -129,4 +129,7 @@
     <string name="manual_feedback">Feedback</string>
     <string name="export_pdf">Export PDF</string>
     <string name="export_csv">Export CSV</string>
+    <string name="retry">Retry</string>
+    <string name="retry_all">Retry all</string>
+    <string name="retry_weak">Retry weak only</string>
 </resources>
