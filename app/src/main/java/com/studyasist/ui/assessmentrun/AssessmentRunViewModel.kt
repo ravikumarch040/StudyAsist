@@ -1,7 +1,10 @@
 package com.studyasist.ui.assessmentrun
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import com.studyasist.util.extractTextFromImage
+import dagger.hilt.android.qualifiers.ApplicationContext
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.grading.ObjectiveGradingService
 import com.studyasist.data.local.entity.QA
@@ -30,7 +33,8 @@ data class AssessmentRunUiState(
     val attemptId: Long? = null,
     val resultId: Long? = null,
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isExtractingFromImage: Boolean = false
 )
 
 data class QuestionWithAnswer(
@@ -40,6 +44,7 @@ data class QuestionWithAnswer(
 
 @HiltViewModel
 class AssessmentRunViewModel @Inject constructor(
+    @ApplicationContext private val context: android.content.Context,
     savedStateHandle: SavedStateHandle,
     private val assessmentRepository: AssessmentRepository,
     private val attemptRepository: AttemptRepository,
@@ -136,6 +141,24 @@ class AssessmentRunViewModel @Inject constructor(
     fun prevQuestion() {
         _uiState.update { state ->
             state.copy(currentIndex = (state.currentIndex - 1).coerceAtLeast(0))
+        }
+    }
+
+    fun extractFromImageAndUpdateAnswer(uri: Uri) {
+        val index = _uiState.value.currentIndex
+        if (index !in _uiState.value.questions.indices) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isExtractingFromImage = true, errorMessage = null) }
+            extractTextFromImage(context, uri)
+                .onSuccess { text ->
+                    updateAnswer(index, text.trim())
+                }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(errorMessage = e.message ?: "Could not read image")
+                    }
+                }
+            _uiState.update { it.copy(isExtractingFromImage = false) }
         }
     }
 

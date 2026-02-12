@@ -1,6 +1,13 @@
 package com.studyasist.ui.assessmentrun
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +19,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.NavigateBefore
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.NavigateNext
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,17 +37,28 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
+import androidx.core.content.FileProvider
 import com.studyasist.data.local.entity.QuestionType
 import com.studyasist.data.local.entity.QA
+import com.studyasist.ui.components.ImageCropSelector
+import com.studyasist.util.SpeechToTextHelper
 import org.json.JSONArray
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,13 +147,59 @@ fun AssessmentRunScreen(
 
         val current = uiState.questions.getOrNull(uiState.currentIndex) ?: return@Scaffold
         val scrollState = rememberScrollState()
+        val context = LocalContext.current
+        var cameraUri by remember { mutableStateOf<Uri?>(null) }
+        var pendingCropUri by remember { mutableStateOf<Uri?>(null) }
+        var speechHelper by remember { mutableStateOf<SpeechToTextHelper?>(null) }
 
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
+        val currentIndex = uiState.currentIndex
+        val onAnswerFromVoice by rememberUpdatedState { text: String -> viewModel.updateAnswer(currentIndex, text) }
+
+        val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) cameraUri?.let { pendingCropUri = it }
+        }
+        val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) cameraUri?.let { cameraLauncher.launch(it) }
+        }
+        val recordPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) speechHelper?.startListening(onResult = { onAnswerFromVoice(it) }, onError = {})
+        }
+        val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let { pendingCropUri = it }
+        }
+
+        DisposableEffect(Unit) {
+            speechHelper = SpeechToTextHelper(context)
+            onDispose { speechHelper?.destroy() }
+        }
+
+        if (pendingCropUri != null) {
+            ImageCropSelector(
+                imageUri = pendingCropUri,
+                onCropped = { uri ->
+                    viewModel.extractFromImageAndUpdateAnswer(uri)
+                    pendingCropUri = null
+                },
+                onCancel = { pendingCropUri = null },
+                modifier = Modifier.fillMaxSize()
+            )
+            return@Scaffold
+        }
+
+        Box(Modifier.fillMaxSize().padding(paddingValues)) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+            uiState.errorMessage?.let { msg ->
+                Text(
+                    msg,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
             Text(
                 "Question ${uiState.currentIndex + 1} of ${uiState.questions.size}",
                 style = MaterialTheme.typography.labelMedium,
@@ -146,7 +213,29 @@ fun AssessmentRunScreen(
                 QuestionCard(
                     qa = current.qa,
                     userAnswer = current.userAnswer,
-                    onAnswerChange = { viewModel.updateAnswer(uiState.currentIndex, it) }
+                    onAnswerChange = { viewModel.updateAnswer(uiState.currentIndex, it) },
+                    showVoiceImageButtons = current.qa.questionType in listOf(QuestionType.SHORT, QuestionType.ESSAY, QuestionType.NUMERIC, QuestionType.FILL_BLANK),
+                    onRecordClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                            context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                            recordPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        } else {
+                            speechHelper?.startListening(onResult = { onAnswerFromVoice(it) }, onError = {})
+                        }
+                    },
+                    onUploadImageClick = {
+                        val dir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES)
+                        val file = File(dir, "answer_${System.currentTimeMillis()}.jpg")
+                        cameraUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                            context.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        } else {
+                            cameraUri?.let { cameraLauncher.launch(it) }
+                        }
+                    },
+                    onGalleryClick = { galleryLauncher.launch("image/*") },
+                    isExtracting = uiState.isExtractingFromImage
                 )
             }
             Row(
@@ -169,6 +258,7 @@ fun AssessmentRunScreen(
                     }
                 }
             }
+        }
         }
     }
 }
@@ -212,7 +302,12 @@ private fun StartScreen(
 private fun QuestionCard(
     qa: QA,
     userAnswer: String,
-    onAnswerChange: (String) -> Unit
+    onAnswerChange: (String) -> Unit,
+    showVoiceImageButtons: Boolean = false,
+    onRecordClick: () -> Unit = {},
+    onUploadImageClick: () -> Unit = {},
+    onGalleryClick: () -> Unit = {},
+    isExtracting: Boolean = false
 ) {
     Card(
         modifier = Modifier
@@ -237,15 +332,48 @@ private fun QuestionCard(
                     selected = userAnswer,
                     onSelect = onAnswerChange
                 )
-                else -> OutlinedTextField(
-                    value = userAnswer,
-                    onValueChange = onAnswerChange,
-                    label = { Text(stringResource(R.string.answer)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp),
-                    maxLines = if (qa.questionType == QuestionType.SHORT || qa.questionType == QuestionType.ESSAY) 4 else 1
-                )
+                else -> {
+                    OutlinedTextField(
+                        value = userAnswer,
+                        onValueChange = onAnswerChange,
+                        label = { Text(stringResource(R.string.answer)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                        maxLines = if (qa.questionType == QuestionType.SHORT || qa.questionType == QuestionType.ESSAY) 4 else 1
+                    )
+                    if (showVoiceImageButtons) {
+                        Row(
+                            Modifier.fillMaxWidth().padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = onRecordClick,
+                                modifier = Modifier.weight(1f),
+                                enabled = !isExtracting
+                            ) {
+                                Icon(Icons.Default.Mic, contentDescription = null, Modifier.padding(end = 4.dp))
+                                Text("Record")
+                            }
+                            Button(
+                                onClick = onUploadImageClick,
+                                modifier = Modifier.weight(1f),
+                                enabled = !isExtracting
+                            ) {
+                                Icon(Icons.Default.PhotoCamera, contentDescription = null, Modifier.padding(end = 4.dp))
+                                Text("Photo")
+                            }
+                            Button(
+                                onClick = onGalleryClick,
+                                modifier = Modifier.weight(1f),
+                                enabled = !isExtracting
+                            ) {
+                                Icon(Icons.Default.PhotoLibrary, contentDescription = null, Modifier.padding(end = 4.dp))
+                                Text("Gallery")
+                            }
+                        }
+                    }
+                }
             }
         }
     }

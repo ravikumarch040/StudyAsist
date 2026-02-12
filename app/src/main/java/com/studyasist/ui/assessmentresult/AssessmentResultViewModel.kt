@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.repository.ResultRepository
+import com.studyasist.data.repository.SubjectChapter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ data class AssessmentResultUiState(
     val percent: Float = 0f,
     val details: List<ResultDetailItem> = emptyList(),
     val assessmentTitle: String = "",
+    val subjectChapter: SubjectChapter? = null,
     val isLoading: Boolean = true,
     val errorMessage: String? = null
 )
@@ -56,12 +58,14 @@ class AssessmentResultViewModel @Inject constructor(
                 return@launch
             }
             val details = parseDetails(result.detailsJson)
+            val subjectChapter = resultRepository.getSubjectChapterForAttempt(attemptId)
             _uiState.update {
                 it.copy(
                     score = result.score,
                     maxScore = result.maxScore,
                     percent = result.percent,
                     details = details,
+                    subjectChapter = subjectChapter,
                     isLoading = false
                 )
             }

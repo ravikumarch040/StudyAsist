@@ -247,6 +247,24 @@ fun AppNavGraph(
             )
         }
 
+        composable(
+            route = NavRoutes.QA_BANK_REVISE,
+            arguments = listOf(
+                navArgument("subject") { type = NavType.StringType; defaultValue = "" },
+                navArgument("chapter") { type = NavType.StringType; defaultValue = "" }
+            )
+        ) {
+            val viewModel: QABankViewModel = hiltViewModel()
+            QABankScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onScanClick = { navController.navigate(NavRoutes.QA_SCAN) },
+                onCreateAssessment = { navController.navigate(NavRoutes.ASSESSMENT_CREATE) },
+                onViewAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
+                onViewResults = { navController.navigate(NavRoutes.RESULT_LIST) }
+            )
+        }
+
         composable(NavRoutes.QA_SCAN) {
             val viewModel: QAScanViewModel = hiltViewModel()
             QAScanScreen(
@@ -305,7 +323,18 @@ fun AppNavGraph(
             val viewModel: AssessmentResultViewModel = hiltViewModel()
             AssessmentResultScreen(
                 viewModel = viewModel,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onRevise = { subject, chapter ->
+                    if (subject.isNullOrBlank() && chapter.isNullOrBlank()) {
+                        navController.navigate(NavRoutes.QA_BANK) {
+                            popUpTo(NavRoutes.ASSESSMENT_RESULT) { inclusive = false }
+                        }
+                    } else {
+                        navController.navigate(NavRoutes.qaBankRevise(subject, chapter)) {
+                            popUpTo(NavRoutes.ASSESSMENT_RESULT) { inclusive = false }
+                        }
+                    }
+                }
             )
         }
 

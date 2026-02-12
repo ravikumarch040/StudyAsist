@@ -164,7 +164,7 @@ private val MIGRATION_2_3 = object : Migration(2, 3) {
         Result::class
     ],
     version = 3,
-    exportSchema = true
+    exportSchema = false
 )
 @TypeConverters(
     WeekTypeConverter::class,

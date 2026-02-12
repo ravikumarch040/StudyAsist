@@ -10,6 +10,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,7 +35,8 @@ import com.studyasist.R
 @Composable
 fun AssessmentResultScreen(
     viewModel: AssessmentResultViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onRevise: (subject: String?, chapter: String?) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -92,6 +95,16 @@ fun AssessmentResultScreen(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
+                    Button(
+                        onClick = {
+                            val sc = uiState.subjectChapter
+                            onRevise(sc?.subject, sc?.chapter)
+                        },
+                        modifier = Modifier.padding(top = 16.dp)
+                    ) {
+                        Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                        Text(stringResource(R.string.revise))
+                    }
                 }
             }
 

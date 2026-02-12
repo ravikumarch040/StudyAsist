@@ -1,5 +1,6 @@
 package com.studyasist.ui.qabank
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.local.entity.QA
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.net.URLDecoder
 import javax.inject.Inject
 
 data class QABankUiState(
@@ -28,13 +30,26 @@ data class QABankUiState(
 
 @HiltViewModel
 class QABankViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val qaBankRepository: QABankRepository
 ) : ViewModel() {
 
     private val _filterSubject = MutableStateFlow<String?>(null)
     private val _filterChapter = MutableStateFlow<String?>(null)
+
     private val _distinctSubjects = MutableStateFlow<List<String>>(emptyList())
     private val _distinctChapters = MutableStateFlow<List<String>>(emptyList())
+
+    init {
+        val subject = savedStateHandle.get<String>("subject")?.let {
+            URLDecoder.decode(it, "UTF-8").takeIf { s -> s.isNotBlank() }
+        }
+        val chapter = savedStateHandle.get<String>("chapter")?.let {
+            URLDecoder.decode(it, "UTF-8").takeIf { s -> s.isNotBlank() }
+        }
+        if (subject != null) _filterSubject.value = subject
+        if (chapter != null) _filterChapter.value = chapter
+    }
 
     private val itemsFlow = combine(_filterSubject, _filterChapter) { subj, ch ->
         Pair(subj, ch)
@@ -66,13 +81,15 @@ class QABankViewModel @Inject constructor(
     )
 
     init {
-        loadDistinctValues()
+        loadDistinctValues(_filterSubject.value)
     }
 
-    private fun loadDistinctValues() {
+    private fun loadDistinctValues(subjectFilter: String? = null) {
         viewModelScope.launch {
             _distinctSubjects.value = qaBankRepository.getDistinctSubjects()
-            _distinctChapters.value = qaBankRepository.getDistinctChapters()
+            _distinctChapters.value = subjectFilter?.let {
+                qaBankRepository.getDistinctChaptersForSubject(it)
+            } ?: qaBankRepository.getDistinctChapters()
         }
     }
 

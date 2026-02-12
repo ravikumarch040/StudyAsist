@@ -7,6 +7,11 @@ import com.studyasist.data.local.entity.Result
 import javax.inject.Inject
 import javax.inject.Singleton
 
+data class SubjectChapter(
+    val subject: String?,
+    val chapter: String?
+)
+
 data class ResultListItem(
     val resultId: Long,
     val attemptId: Long,
@@ -66,4 +71,13 @@ class ResultRepository @Inject constructor(
 
     suspend fun getResultsForAttempts(attemptIds: List<Long>): List<Result> =
         resultDao.getByAttemptIds(attemptIds)
+
+    suspend fun getSubjectChapterForAttempt(attemptId: Long): SubjectChapter? {
+        val attempt = attemptDao.getById(attemptId) ?: return null
+        val assessment = assessmentDao.getById(attempt.assessmentId) ?: return null
+        return SubjectChapter(
+            subject = assessment.subject?.takeIf { it.isNotBlank() },
+            chapter = assessment.chapter?.takeIf { it.isNotBlank() }
+        )
+    }
 }
