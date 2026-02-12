@@ -16,6 +16,8 @@ class GoalRepository @Inject constructor(
 
     fun getAllActiveGoals(): Flow<List<Goal>> = goalDao.getAllActive()
 
+    suspend fun getActiveGoalsOnce(): List<Goal> = goalDao.getAllActiveOnce()
+
     fun getAllGoals(): Flow<List<Goal>> = goalDao.getAll()
 
     fun getGoalFlow(id: Long): Flow<Goal?> = goalDao.getByIdFlow(id)

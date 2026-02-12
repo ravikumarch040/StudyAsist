@@ -14,6 +14,9 @@ interface GoalDao {
     @Query("SELECT * FROM goals WHERE isActive = 1 ORDER BY examDate ASC")
     fun getAllActive(): Flow<List<Goal>>
 
+    @Query("SELECT * FROM goals WHERE isActive = 1 ORDER BY examDate ASC")
+    suspend fun getAllActiveOnce(): List<Goal>
+
     @Query("SELECT * FROM goals ORDER BY examDate ASC")
     fun getAll(): Flow<List<Goal>>
 

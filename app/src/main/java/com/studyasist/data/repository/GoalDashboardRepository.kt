@@ -5,16 +5,25 @@ import com.studyasist.data.local.dao.AttemptAnswerDao
 import com.studyasist.data.local.dao.AttemptDao
 import com.studyasist.data.local.dao.QADao
 import com.studyasist.data.local.dao.ResultDao
+import com.studyasist.util.daysUntil
 import javax.inject.Inject
 import javax.inject.Singleton
 
+enum class TrackStatus { ON_TRACK, BEHIND, NOT_ENOUGH_DATA, COMPLETE, EXAM_PASSED }
+
+data class TrackPrediction(
+    val status: TrackStatus,
+    val projectedPercent: Float? = null,
+    val deficitPercent: Float? = null
+)
 
 data class GoalDashboardMetrics(
     val totalQuestions: Int,
     val questionsPracticed: Int,
     val percentComplete: Float,
     val recentAttempts: List<RecentAttemptSummary>,
-    val subjectProgress: List<SubjectChapterProgress> = emptyList()
+    val subjectProgress: List<SubjectChapterProgress> = emptyList(),
+    val trackPrediction: TrackPrediction = TrackPrediction(TrackStatus.NOT_ENOUGH_DATA)
 )
 
 data class SubjectChapterProgress(
@@ -44,6 +53,10 @@ class GoalDashboardRepository @Inject constructor(
 ) {
 
     suspend fun getDashboardMetrics(goalId: Long): GoalDashboardMetrics {
+        val goal = goalRepository.getGoal(goalId) ?: return GoalDashboardMetrics(
+            totalQuestions = 0, questionsPracticed = 0, percentComplete = 0f,
+            recentAttempts = emptyList(), subjectProgress = emptyList()
+        )
         val items = goalRepository.getGoalItems(goalId)
         val totalQuestions = items.sumOf { item ->
             val chapters = item.chapterList.split(",").map { it.trim() }.filter { it.isNotBlank() }
@@ -109,12 +122,52 @@ class GoalDashboardRepository @Inject constructor(
             )
         }
 
+        val trackPrediction = computeTrackPrediction(
+            goal = goal,
+            percentComplete = percentComplete,
+            assessments = assessments,
+            attemptDao = attemptDao
+        )
+
         return GoalDashboardMetrics(
             totalQuestions = totalQuestions,
             questionsPracticed = qaAttempted,
             percentComplete = percentComplete,
             recentAttempts = recentAttempts,
-            subjectProgress = subjectProgress
+            subjectProgress = subjectProgress,
+            trackPrediction = trackPrediction
         )
+    }
+
+    private suspend fun computeTrackPrediction(
+        goal: com.studyasist.data.local.entity.Goal,
+        percentComplete: Float,
+        assessments: List<com.studyasist.data.local.entity.Assessment>,
+        attemptDao: AttemptDao
+    ): TrackPrediction {
+        val daysRemaining = daysUntil(goal.examDate).toInt()
+        if (daysRemaining <= 0) return TrackPrediction(TrackStatus.EXAM_PASSED)
+        if (percentComplete >= 100f) return TrackPrediction(TrackStatus.COMPLETE)
+
+        val allAttempts = assessments.flatMap { attemptDao.getByAssessmentIdOnce(it.id) }
+        if (allAttempts.isEmpty()) return TrackPrediction(TrackStatus.NOT_ENOUGH_DATA)
+        val firstActivityMillis = allAttempts.minOfOrNull { it.startedAt } ?: goal.createdAt
+        val now = System.currentTimeMillis()
+        val daysSinceStart = ((now - firstActivityMillis) / (24 * 60 * 60 * 1000L)).coerceAtLeast(0)
+
+        if (daysSinceStart < 1) return TrackPrediction(TrackStatus.NOT_ENOUGH_DATA)
+
+        val velocity = percentComplete / daysSinceStart
+        val projectedPercent = (percentComplete + velocity * daysRemaining).coerceIn(0f, 100f)
+
+        return if (projectedPercent >= 100f) {
+            TrackPrediction(TrackStatus.ON_TRACK, projectedPercent = projectedPercent)
+        } else {
+            TrackPrediction(
+                TrackStatus.BEHIND,
+                projectedPercent = projectedPercent,
+                deficitPercent = 100f - projectedPercent
+            )
+        }
     }
 }

@@ -13,8 +13,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.studyasist.R
 import com.studyasist.data.repository.RecentAttemptSummary
 import com.studyasist.data.repository.SubjectChapterProgress
+import com.studyasist.data.repository.TrackPrediction
+import com.studyasist.data.repository.TrackStatus
 import com.studyasist.util.formatExamDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -152,6 +157,9 @@ fun GoalDetailScreen(
                     )
                 }
             }
+            uiState.trackPrediction?.let { prediction ->
+                TrackPredictionCard(prediction = prediction)
+            }
             if (uiState.recentAttempts.isNotEmpty()) {
                 Text(
                     "Recent attempts",
@@ -240,6 +248,75 @@ fun GoalDetailScreen(
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrackPredictionCard(prediction: TrackPrediction) {
+    val titleRes = when (prediction.status) {
+        TrackStatus.ON_TRACK -> R.string.track_on_track
+        TrackStatus.BEHIND -> R.string.track_behind
+        TrackStatus.COMPLETE -> R.string.track_complete
+        TrackStatus.EXAM_PASSED -> R.string.track_exam_passed
+        TrackStatus.NOT_ENOUGH_DATA -> R.string.track_not_enough_data
+    }
+    val subText = when (prediction.status) {
+        TrackStatus.BEHIND -> prediction.projectedPercent?.let { p ->
+            prediction.deficitPercent?.let { d ->
+                stringResource(R.string.track_behind_message, p, d)
+            }
+        }
+        else -> null
+    }
+    val icon = when (prediction.status) {
+        TrackStatus.ON_TRACK, TrackStatus.COMPLETE, TrackStatus.EXAM_PASSED -> Icons.Default.CheckCircle
+        TrackStatus.BEHIND -> Icons.Default.Warning
+        TrackStatus.NOT_ENOUGH_DATA -> Icons.Default.Schedule
+    }
+    val containerColor = when (prediction.status) {
+        TrackStatus.ON_TRACK, TrackStatus.COMPLETE -> MaterialTheme.colorScheme.primaryContainer
+        TrackStatus.BEHIND -> MaterialTheme.colorScheme.errorContainer
+        TrackStatus.EXAM_PASSED, TrackStatus.NOT_ENOUGH_DATA -> MaterialTheme.colorScheme.surfaceVariant
+    }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor)
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = when (prediction.status) {
+                    TrackStatus.ON_TRACK, TrackStatus.COMPLETE -> MaterialTheme.colorScheme.primary
+                    TrackStatus.BEHIND -> MaterialTheme.colorScheme.onErrorContainer
+                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            )
+            Column {
+                Text(
+                    stringResource(titleRes),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = when (prediction.status) {
+                        TrackStatus.BEHIND -> MaterialTheme.colorScheme.onErrorContainer
+                        else -> MaterialTheme.colorScheme.onSurface
+                    }
+                )
+                subText?.let { text ->
+                    Text(
+                        text,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
             }
         }

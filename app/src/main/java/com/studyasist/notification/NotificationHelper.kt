@@ -47,6 +47,45 @@ object NotificationHelper {
             enableVibration(true)
         }
         nm.createNotificationChannel(alarmTtsChannel)
+        val examGoalChannel = NotificationChannel(
+            CHANNEL_ID_EXAM_GOAL_ALERT,
+            CHANNEL_NAME_EXAM_GOAL_ALERT,
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Reminders when an exam is approaching and coverage is low"
+            enableVibration(true)
+        }
+        nm.createNotificationChannel(examGoalChannel)
+    }
+
+    fun showExamGoalAlert(
+        context: Context,
+        notificationId: Int,
+        goalName: String,
+        daysRemaining: Int,
+        percentComplete: Int
+    ) {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pending = PendingIntent.getActivity(
+            context,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val title = "Exam in $daysRemaining days"
+        val body = "$goalName: coverage at $percentComplete%"
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID_EXAM_GOAL_ALERT)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setContentIntent(pending)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+        NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 
     fun showReminder(

@@ -107,5 +107,11 @@
     <string name="details">Details</string>
     <string name="assessments">Assessments</string>
     <string name="results">Results</string>
+    <string name="track_on_track">On track</string>
+    <string name="track_behind">Behind</string>
+    <string name="track_complete">Complete</string>
+    <string name="track_exam_passed">Exam passed</string>
+    <string name="track_not_enough_data">Complete an assessment to see your pace</string>
+    <string name="track_behind_message">At current pace: ~%.0f%% by exam (%.0f%% short)</string>
     <string name="edit_assessment">Edit assessment</string>
 </resources>
