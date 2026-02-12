@@ -3,6 +3,8 @@ package com.studyasist.ui.solve
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.studyasist.data.local.dao.StudyToolHistoryDao
+import com.studyasist.data.local.entity.StudyToolHistoryEntity
 import com.studyasist.data.repository.GeminiRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.util.LanguageOptions
@@ -29,20 +31,29 @@ data class SolveUiState(
     val isLoading: Boolean = false,
     val isSpeaking: Boolean = false,
     val errorMessage: String? = null,
-    val selectedLanguageCode: String = "en"
+    val selectedLanguageCode: String = "en",
+    val recentItems: List<StudyToolHistoryEntity> = emptyList()
 )
 
 @HiltViewModel
 class SolveViewModel @Inject constructor(
     @ApplicationContext private val context: android.content.Context,
     private val geminiRepository: GeminiRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val studyToolHistoryDao: StudyToolHistoryDao
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SolveUiState())
     val uiState: StateFlow<SolveUiState> = _uiState.asStateFlow()
 
     val languageOptions = LanguageOptions.LIST
+
+    init {
+        viewModelScope.launch {
+            val recent = studyToolHistoryDao.getRecentByTool("solve")
+            _uiState.update { it.copy(recentItems = recent) }
+        }
+    }
 
     fun setProblemText(text: String) {
         _uiState.update { it.copy(problemText = text, errorMessage = null) }
@@ -106,14 +117,26 @@ Do not add any preamble before the quick steps.
 Problem:
 $text"""
             )
+            val solution = result.getOrElse { "" }
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    solution = result.getOrElse { "" },
+                    solution = solution,
                     errorMessage = result.exceptionOrNull()?.message
                 )
             }
+            if (solution.isNotBlank()) {
+                studyToolHistoryDao.insert(
+                    StudyToolHistoryEntity(toolType = "solve", inputText = text.take(2000), usedAt = System.currentTimeMillis())
+                )
+                val recent = studyToolHistoryDao.getRecentByTool("solve")
+                _uiState.update { it.copy(recentItems = recent) }
+            }
         }
+    }
+
+    fun selectRecent(text: String) {
+        _uiState.update { it.copy(problemText = text) }
     }
 
     fun speakSolution() {

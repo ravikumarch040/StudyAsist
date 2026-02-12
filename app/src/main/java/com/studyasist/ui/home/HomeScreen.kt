@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -115,6 +116,7 @@ fun HomeScreen(
                     showTopBar = false
                 )
                 2 -> StudyToolsTabContent(
+                    studyStreak = uiState.studyStreak,
                     onDictate = onDictate,
                     onExplain = onExplain,
                     onSolve = onSolve,
@@ -130,6 +132,7 @@ fun HomeScreen(
 
 @Composable
 private fun StudyToolsTabContent(
+    studyStreak: Int = 0,
     onDictate: () -> Unit,
     onExplain: () -> Unit,
     onSolve: () -> Unit,
@@ -145,11 +148,34 @@ private fun StudyToolsTabContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Text(
-                stringResource(R.string.study_tools),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    stringResource(R.string.study_tools),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (studyStreak > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.LocalFireDepartment,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.tertiary
+                        )
+                        Text(
+                            "${studyStreak}${stringResource(R.string.streak_days)}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
+                }
+            }
         }
         item {
             Card(

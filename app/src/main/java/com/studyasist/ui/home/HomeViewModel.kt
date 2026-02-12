@@ -6,6 +6,7 @@ import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.TimetableEntity
 import com.studyasist.data.repository.ActivityRepository
 import com.studyasist.data.repository.SettingsRepository
+import com.studyasist.data.repository.StreakRepository
 import com.studyasist.data.repository.TimetableRepository
 import com.studyasist.notification.NotificationScheduler
 import com.studyasist.util.currentTimeMinutesFromMidnight
@@ -27,7 +28,8 @@ data class HomeUiState(
     val todayActivities: List<ActivityEntity> = emptyList(),
     val currentActivityId: Long? = null,
     val timetables: List<TimetableEntity> = emptyList(),
-    val activeTimetableId: Long? = null
+    val activeTimetableId: Long? = null,
+    val studyStreak: Int = 0
 )
 
 @HiltViewModel
@@ -35,13 +37,19 @@ class HomeViewModel @Inject constructor(
     private val timetableRepository: TimetableRepository,
     private val activityRepository: ActivityRepository,
     private val settingsRepository: SettingsRepository,
-    private val notificationScheduler: NotificationScheduler
+    private val notificationScheduler: NotificationScheduler,
+    private val streakRepository: StreakRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private val _streak = MutableStateFlow(0)
+
     init {
+        viewModelScope.launch {
+            _streak.value = streakRepository.getCurrentStreak()
+        }
         viewModelScope.launch {
             val activitiesFlow = settingsRepository.activeTimetableIdFlow.flatMapLatest { activeId ->
                 if (activeId != null && activeId > 0) {
@@ -51,8 +59,9 @@ class HomeViewModel @Inject constructor(
             combine(
                 settingsRepository.activeTimetableIdFlow,
                 timetableRepository.getAllTimetables(),
-                activitiesFlow
-            ) { activeId, timetables, allActivities ->
+                activitiesFlow,
+                _streak
+            ) { activeId, timetables, allActivities, streak ->
                 val activeTimetable = if (activeId != null && activeId > 0) timetables.find { it.id == activeId } else null
                 val todayActivities = if (activeTimetable != null) {
                     allActivities
@@ -68,9 +77,16 @@ class HomeViewModel @Inject constructor(
                     todayActivities = todayActivities,
                     currentActivityId = currentActivityId,
                     timetables = timetables,
-                    activeTimetableId = activeId
+                    activeTimetableId = activeId,
+                    studyStreak = streak
                 )
             }.collect { _uiState.value = it }
+        }
+    }
+
+    fun refreshStreak() {
+        viewModelScope.launch {
+            _streak.value = streakRepository.getCurrentStreak()
         }
     }
 

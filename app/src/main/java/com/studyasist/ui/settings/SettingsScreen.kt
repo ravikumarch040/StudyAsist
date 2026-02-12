@@ -1,6 +1,10 @@
 package com.studyasist.ui.settings
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +20,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -39,6 +44,7 @@ import com.studyasist.data.repository.AppSettings
 import com.studyasist.notification.openUsageAccessSettings
 import com.studyasist.util.VoiceOption
 import com.studyasist.util.loadAvailableVoicesIndia
+import java.io.InputStreamReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -52,7 +58,36 @@ fun SettingsScreen(
         initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false)
     )
     val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
+    val backupExportJson by viewModel.backupExportJson.collectAsState(initial = null)
+    val backupImportResult by viewModel.backupImportResult.collectAsState(initial = null)
     val context = LocalContext.current
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri: Uri? ->
+        uri?.let { u ->
+            backupExportJson?.let { json ->
+                context.contentResolver.openOutputStream(u)?.use { it.write(json.toByteArray()) }
+            }
+        }
+        viewModel.clearBackupExport()
+    }
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let { u ->
+            context.contentResolver.openInputStream(u)?.use { input ->
+                val json = InputStreamReader(input).readText()
+                viewModel.importBackup(json)
+            }
+        }
+    }
+
+    LaunchedEffect(backupExportJson) {
+        backupExportJson?.let { json ->
+            exportLauncher.launch("studyasist_backup_${System.currentTimeMillis()}.json")
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -174,7 +209,7 @@ fun SettingsScreen(
                 Text("Test API key")
             }
             apiKeyTestMessage?.let { msg ->
-                androidx.compose.foundation.layout.Box(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
@@ -183,6 +218,35 @@ fun SettingsScreen(
                         msg,
                         style = MaterialTheme.typography.bodySmall,
                         color = if (msg.startsWith("OK") || msg.contains("success")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        maxLines = Int.MAX_VALUE
+                    )
+                }
+            }
+            Text(stringResource(R.string.backup_restore), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.backup_export_hint), style = MaterialTheme.typography.bodySmall)
+            Button(
+                onClick = { viewModel.exportBackup() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.backup))
+            }
+            Text(stringResource(R.string.restore_import_hint), style = MaterialTheme.typography.bodySmall)
+            Button(
+                onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.restore))
+            }
+            backupImportResult?.let { msg ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text(
+                        msg,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (msg.startsWith("Restore successful")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         maxLines = Int.MAX_VALUE
                     )
                 }

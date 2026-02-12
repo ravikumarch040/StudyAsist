@@ -19,7 +19,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val geminiRepository: GeminiRepository,
-    private val notificationScheduler: NotificationScheduler
+    private val notificationScheduler: NotificationScheduler,
+    private val backupRepository: com.studyasist.data.repository.BackupRepository
 ) : ViewModel() {
 
     val settings: StateFlow<AppSettings> = settingsRepository.settingsFlow
@@ -72,5 +73,38 @@ class SettingsViewModel @Inject constructor(
                 onFailure = { "Failed: ${it.message}" }
             )
         }
+    }
+
+    private val _backupExportJson = MutableStateFlow<String?>(null)
+    val backupExportJson: StateFlow<String?> = _backupExportJson.asStateFlow()
+
+    private val _backupImportResult = MutableStateFlow<String?>(null)
+    val backupImportResult: StateFlow<String?> = _backupImportResult.asStateFlow()
+
+    fun exportBackup() {
+        viewModelScope.launch {
+            _backupExportJson.value = null
+            val json = backupRepository.exportToJson()
+            _backupExportJson.value = json
+        }
+    }
+
+    fun importBackup(json: String) {
+        viewModelScope.launch {
+            _backupImportResult.value = null
+            val result = backupRepository.importFromJson(json)
+            _backupImportResult.value = result.fold(
+                onSuccess = { "Restore successful." },
+                onFailure = { "Restore failed: ${it.message}" }
+            )
+        }
+    }
+
+    fun clearBackupExport() {
+        _backupExportJson.value = null
+    }
+
+    fun clearBackupImportResult() {
+        _backupImportResult.value = null
     }
 }

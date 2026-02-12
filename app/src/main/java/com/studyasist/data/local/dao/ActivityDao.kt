@@ -49,4 +49,10 @@ interface ActivityDao {
 
     @Query("DELETE FROM activities WHERE timetableId = :timetableId")
     suspend fun deleteByTimetableId(timetableId: Long)
+
+    @Query("SELECT * FROM activities")
+    suspend fun getAll(): List<ActivityEntity>
+
+    @Query("DELETE FROM activities")
+    suspend fun deleteAll()
 }

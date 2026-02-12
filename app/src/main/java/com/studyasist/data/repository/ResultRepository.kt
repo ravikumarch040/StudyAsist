@@ -166,6 +166,44 @@ class ResultRepository @Inject constructor(
         return output.toByteArray()
     }
 
+    /**
+     * Generates an Excel-compatible XML Spreadsheet 2003 file.
+     * Saves as .xls for compatibility; Excel and LibreOffice open it natively.
+     * Columns: Assessment, Attempt, Date, Score, Max Score, Percent
+     */
+    suspend fun getExportExcel(): ByteArray {
+        val rows = resultDao.getAllResultsWithAttempt()
+        val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US)
+        val sb = StringBuilder()
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+        sb.append("<?mso-application progid=\"Excel.Sheet\"?>\n")
+        sb.append("<Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\">\n")
+        sb.append("  <Worksheet ss:Name=\"Results\">\n")
+        sb.append("    <Table>\n")
+        sb.append("      <Row><Cell><Data ss:Type=\"String\">Assessment</Data></Cell><Cell><Data ss:Type=\"String\">Attempt</Data></Cell><Cell><Data ss:Type=\"String\">Date</Data></Cell><Cell><Data ss:Type=\"String\">Score</Data></Cell><Cell><Data ss:Type=\"String\">Max Score</Data></Cell><Cell><Data ss:Type=\"String\">Percent</Data></Cell></Row>\n")
+        for (row in rows) {
+            val assessment = assessmentDao.getById(row.assessmentId)
+            val attempts = attemptDao.getByAssessmentIdOnce(row.assessmentId).sortedBy { it.startedAt }
+            val attemptNum = attempts.indexOfFirst { it.id == row.attemptId }.let { if (it >= 0) it + 1 else 1 }
+            val title = assessment?.title?.escapeXml() ?: "Assessment"
+            val dateStr = dateFormat.format(java.util.Date(row.startedAt))
+            sb.append("      <Row><Cell><Data ss:Type=\"String\">$title</Data></Cell><Cell><Data ss:Type=\"String\">Attempt $attemptNum</Data></Cell><Cell><Data ss:Type=\"String\">$dateStr</Data></Cell><Cell><Data ss:Type=\"Number\">${row.score}</Data></Cell><Cell><Data ss:Type=\"Number\">${row.maxScore}</Data></Cell><Cell><Data ss:Type=\"Number\">${row.percent}</Data></Cell></Row>\n")
+        }
+        sb.append("    </Table>\n")
+        sb.append("  </Worksheet>\n")
+        sb.append("</Workbook>")
+        return sb.toString().toByteArray(Charsets.UTF_8)
+    }
+
+    private fun String.escapeXml(): String {
+        return this
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&apos;")
+    }
+
     private fun String.escapeCsv(): String {
         return if (contains(',') || contains('"') || contains('\n')) {
             "\"" + replace("\"", "\"\"") + "\""

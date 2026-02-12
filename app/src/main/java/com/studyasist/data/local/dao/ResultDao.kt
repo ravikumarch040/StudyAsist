@@ -17,6 +17,12 @@ interface ResultDao {
     @Query("SELECT * FROM results WHERE attemptId IN (:attemptIds)")
     suspend fun getByAttemptIds(attemptIds: List<Long>): List<Result>
 
+    @Query("SELECT * FROM results")
+    suspend fun getAll(): List<Result>
+
+    @Query("DELETE FROM results")
+    suspend fun deleteAll()
+
     @Query("""
         SELECT r.id as resultId, r.attemptId, r.score, r.maxScore, r.percent,
                att.assessmentId, att.startedAt

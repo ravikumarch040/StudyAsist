@@ -23,6 +23,15 @@ interface AttemptDao {
     @Query("SELECT * FROM attempts WHERE needsManualReview = 1 ORDER BY startedAt DESC")
     suspend fun getNeedingManualReview(): List<Attempt>
 
+    @Query("SELECT startedAt FROM attempts WHERE endedAt IS NOT NULL")
+    suspend fun getCompletedAttemptTimestamps(): List<Long>
+
+    @Query("SELECT * FROM attempts")
+    suspend fun getAll(): List<Attempt>
+
+    @Query("DELETE FROM attempts")
+    suspend fun deleteAll()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: Attempt): Long
 

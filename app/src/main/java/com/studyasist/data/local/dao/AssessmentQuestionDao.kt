@@ -20,4 +20,10 @@ interface AssessmentQuestionDao {
 
     @Query("DELETE FROM assessment_questions WHERE assessmentId = :assessmentId")
     suspend fun deleteByAssessmentId(assessmentId: Long)
+
+    @Query("SELECT * FROM assessment_questions")
+    suspend fun getAll(): List<AssessmentQuestion>
+
+    @Query("DELETE FROM assessment_questions")
+    suspend fun deleteAll()
 }

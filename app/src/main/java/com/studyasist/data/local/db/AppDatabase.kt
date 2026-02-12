@@ -14,6 +14,7 @@ import com.studyasist.data.local.dao.GoalDao
 import com.studyasist.data.local.dao.GoalItemDao
 import com.studyasist.data.local.dao.QADao
 import com.studyasist.data.local.dao.ResultDao
+import com.studyasist.data.local.dao.StudyToolHistoryDao
 import com.studyasist.data.local.dao.TimetableDao
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityTypeConverter
@@ -26,6 +27,7 @@ import com.studyasist.data.local.entity.GoalItem
 import com.studyasist.data.local.entity.QA
 import com.studyasist.data.local.entity.QuestionTypeConverter
 import com.studyasist.data.local.entity.Result
+import com.studyasist.data.local.entity.StudyToolHistoryEntity
 import com.studyasist.data.local.entity.TimetableEntity
 import com.studyasist.data.local.entity.WeekTypeConverter
 
@@ -162,6 +164,20 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
     }
 }
 
+private val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS study_tool_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                toolType TEXT NOT NULL,
+                inputText TEXT NOT NULL,
+                usedAt INTEGER NOT NULL
+            )
+        """.trimIndent())
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_study_tool_history_toolType_usedAt ON study_tool_history(toolType, usedAt)")
+    }
+}
+
 @Database(
     entities = [
         TimetableEntity::class,
@@ -173,9 +189,10 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         AssessmentQuestion::class,
         Attempt::class,
         AttemptAnswer::class,
-        Result::class
+        Result::class,
+        StudyToolHistoryEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(
@@ -194,8 +211,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun attemptDao(): AttemptDao
     abstract fun attemptAnswerDao(): AttemptAnswerDao
     abstract fun resultDao(): ResultDao
+    abstract fun studyToolHistoryDao(): StudyToolHistoryDao
 
     companion object {
-        fun migrations(): Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+        fun migrations(): Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
     }
 }

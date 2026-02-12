@@ -129,7 +129,16 @@
     <string name="manual_feedback">Feedback</string>
     <string name="export_pdf">Export PDF</string>
     <string name="export_csv">Export CSV</string>
+    <string name="export_excel">Export Excel</string>
     <string name="retry">Retry</string>
     <string name="retry_all">Retry all</string>
     <string name="retry_weak">Retry weak only</string>
+    <string name="streak_days"> day streak</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="backup_restore">Backup &amp; Restore</string>
+    <string name="backup_export_hint">Export all data to a file</string>
+    <string name="restore_import_hint">Import from a backup file</string>
+    <string name="recent">Recent</string>
+    <string name="study_tool_history">History</string>
 </resources>

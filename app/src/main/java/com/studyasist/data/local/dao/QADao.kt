@@ -32,6 +32,12 @@ interface QADao {
     @Query("SELECT * FROM qa_bank ORDER BY createdAt DESC")
     fun getAll(): Flow<List<QA>>
 
+    @Query("SELECT * FROM qa_bank ORDER BY createdAt DESC")
+    suspend fun getAllOnce(): List<QA>
+
+    @Query("DELETE FROM qa_bank")
+    suspend fun deleteAll()
+
     @Query("SELECT DISTINCT subject FROM qa_bank WHERE subject IS NOT NULL AND subject != '' ORDER BY subject")
     suspend fun getDistinctSubjects(): List<String>
 

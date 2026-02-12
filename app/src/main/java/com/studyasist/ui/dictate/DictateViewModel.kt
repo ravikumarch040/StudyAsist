@@ -3,6 +3,8 @@ package com.studyasist.ui.dictate
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.studyasist.data.local.dao.StudyToolHistoryDao
+import com.studyasist.data.local.entity.StudyToolHistoryEntity
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.util.extractTextFromImage
 import com.studyasist.util.speakText
@@ -26,19 +28,28 @@ data class DictateUiState(
     val isLoading: Boolean = false,
     val isSpeaking: Boolean = false,
     val errorMessage: String? = null,
-    val selectedLanguageCode: String = "en"
+    val selectedLanguageCode: String = "en",
+    val recentItems: List<StudyToolHistoryEntity> = emptyList()
 )
 
 @HiltViewModel
 class DictateViewModel @Inject constructor(
     @ApplicationContext private val context: android.content.Context,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val studyToolHistoryDao: StudyToolHistoryDao
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DictateUiState())
     val uiState: StateFlow<DictateUiState> = _uiState.asStateFlow()
 
     val languageOptions = LanguageOptions.LIST
+
+    init {
+        viewModelScope.launch {
+            val recent = studyToolHistoryDao.getRecentByTool("dictate")
+            _uiState.update { it.copy(recentItems = recent) }
+        }
+    }
 
     fun setImageUri(uri: Uri?) {
         _uiState.update { it.copy(imageUri = uri, errorMessage = null, extractedText = "") }
@@ -65,6 +76,11 @@ class DictateViewModel @Inject constructor(
                 )
             }
             if (text.isNotBlank()) {
+                studyToolHistoryDao.insert(
+                    StudyToolHistoryEntity(toolType = "dictate", inputText = text.take(2000), usedAt = System.currentTimeMillis())
+                )
+                val recent = studyToolHistoryDao.getRecentByTool("dictate")
+                _uiState.update { it.copy(recentItems = recent) }
                 _uiState.update { it.copy(isSpeaking = true) }
                 val voiceName = settingsRepository.settingsFlow.first().ttsVoiceName
                 val locale = Locale.forLanguageTag(_uiState.value.selectedLanguageCode)
@@ -104,5 +120,9 @@ class DictateViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun selectRecent(text: String) {
+        _uiState.update { it.copy(extractedText = text) }
     }
 }

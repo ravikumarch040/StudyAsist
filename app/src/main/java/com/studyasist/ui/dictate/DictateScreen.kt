@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -102,6 +104,22 @@ fun DictateScreen(
                 stringResource(R.string.dictate_subtitle),
                 style = MaterialTheme.typography.bodyMedium
             )
+            if (uiState.recentItems.isNotEmpty()) {
+                Text(stringResource(R.string.recent), style = MaterialTheme.typography.titleSmall)
+                uiState.recentItems.forEach { item ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth().clickable { viewModel.selectRecent(item.inputText) },
+                        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Text(
+                            text = item.inputText.take(100).let { if (item.inputText.length > 100) "$it…" else it },
+                            modifier = Modifier.padding(12.dp),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)

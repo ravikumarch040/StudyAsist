@@ -15,6 +15,12 @@ interface TimetableDao {
     @Query("SELECT * FROM timetables ORDER BY updatedAt DESC")
     fun getAll(): Flow<List<TimetableEntity>>
 
+    @Query("SELECT * FROM timetables ORDER BY updatedAt DESC")
+    suspend fun getAllOnce(): List<TimetableEntity>
+
+    @Query("DELETE FROM timetables")
+    suspend fun deleteAll()
+
     @Query("SELECT * FROM timetables WHERE id = :id")
     suspend fun getById(id: Long): TimetableEntity?
 

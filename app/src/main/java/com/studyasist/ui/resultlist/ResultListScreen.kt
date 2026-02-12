@@ -87,6 +87,21 @@ fun ResultListScreen(
         }
     }
 
+    fun shareExportExcel() {
+        coroutineScope.launch {
+            val excelBytes = viewModel.getExportExcel()
+            val file = java.io.File(context.cacheDir, "studyasist_results_${System.currentTimeMillis()}.xls")
+            file.writeBytes(excelBytes)
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/vnd.ms-excel"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_results)))
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -123,6 +138,13 @@ fun ResultListScreen(
                                 onClick = {
                                     showExportMenu = false
                                     shareExportPdf()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.export_excel)) },
+                                onClick = {
+                                    showExportMenu = false
+                                    shareExportExcel()
                                 }
                             )
                         }

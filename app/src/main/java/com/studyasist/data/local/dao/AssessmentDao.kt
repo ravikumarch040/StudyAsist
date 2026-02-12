@@ -14,6 +14,12 @@ interface AssessmentDao {
     @Query("SELECT * FROM assessments ORDER BY createdAt DESC")
     fun getAll(): Flow<List<Assessment>>
 
+    @Query("SELECT * FROM assessments ORDER BY createdAt DESC")
+    suspend fun getAllOnce(): List<Assessment>
+
+    @Query("DELETE FROM assessments")
+    suspend fun deleteAll()
+
     @Query("SELECT * FROM assessments WHERE goalId = :goalId ORDER BY createdAt DESC")
     fun getByGoalId(goalId: Long): Flow<List<Assessment>>
 

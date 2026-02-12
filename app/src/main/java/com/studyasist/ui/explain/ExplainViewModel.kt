@@ -3,6 +3,8 @@ package com.studyasist.ui.explain
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.studyasist.data.local.dao.StudyToolHistoryDao
+import com.studyasist.data.local.entity.StudyToolHistoryEntity
 import com.studyasist.data.repository.GeminiRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.util.LanguageOptions
@@ -29,20 +31,29 @@ data class ExplainUiState(
     val isLoading: Boolean = false,
     val isSpeaking: Boolean = false,
     val errorMessage: String? = null,
-    val selectedLanguageCode: String = "en"
+    val selectedLanguageCode: String = "en",
+    val recentItems: List<StudyToolHistoryEntity> = emptyList()
 )
 
 @HiltViewModel
 class ExplainViewModel @Inject constructor(
     @ApplicationContext private val context: android.content.Context,
     private val geminiRepository: GeminiRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val studyToolHistoryDao: StudyToolHistoryDao
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExplainUiState())
     val uiState: StateFlow<ExplainUiState> = _uiState.asStateFlow()
 
     val languageOptions = LanguageOptions.LIST
+
+    init {
+        viewModelScope.launch {
+            val recent = studyToolHistoryDao.getRecentByTool("explain")
+            _uiState.update { it.copy(recentItems = recent) }
+        }
+    }
 
     fun setInputText(text: String) {
         _uiState.update { it.copy(inputText = text, errorMessage = null) }
@@ -92,14 +103,26 @@ class ExplainViewModel @Inject constructor(
                 apiKey,
                 "Explain the following in simple terms. Write the explanation in $langName. Do not add any preamble.\n\n$text"
             )
+            val explanation = result.getOrElse { "" }
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    explanation = result.getOrElse { "" },
+                    explanation = explanation,
                     errorMessage = result.exceptionOrNull()?.message
                 )
             }
+            if (explanation.isNotBlank()) {
+                studyToolHistoryDao.insert(
+                    StudyToolHistoryEntity(toolType = "explain", inputText = text.take(2000), usedAt = System.currentTimeMillis())
+                )
+                val recent = studyToolHistoryDao.getRecentByTool("explain")
+                _uiState.update { it.copy(recentItems = recent) }
+            }
         }
+    }
+
+    fun selectRecent(text: String) {
+        _uiState.update { it.copy(inputText = text) }
     }
 
     fun speakExplanation() {
