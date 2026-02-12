@@ -11,8 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +39,8 @@ import com.studyasist.R
 fun AssessmentResultScreen(
     viewModel: AssessmentResultViewModel,
     onBack: () -> Unit,
-    onRevise: (subject: String?, chapter: String?) -> Unit = { _, _ -> }
+    onRevise: (subject: String?, chapter: String?) -> Unit = { _, _ -> },
+    onManualReview: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -48,6 +51,15 @@ fun AssessmentResultScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.toggleFlagForReview() }) {
+                        Icon(
+                            Icons.Default.Flag,
+                            contentDescription = if (uiState.needsManualReview) stringResource(R.string.unflag) else stringResource(R.string.flag_for_review),
+                            tint = if (uiState.needsManualReview) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -96,15 +108,47 @@ fun AssessmentResultScreen(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                    Button(
-                        onClick = {
-                            val sc = uiState.subjectChapter
-                            onRevise(sc?.subject, sc?.chapter)
-                        },
-                        modifier = Modifier.padding(top = 16.dp)
+                    Row(
+                        modifier = Modifier.padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                        Text(stringResource(R.string.revise))
+                        Button(
+                            onClick = {
+                                val sc = uiState.subjectChapter
+                                onRevise(sc?.subject, sc?.chapter)
+                            }
+                        ) {
+                            Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                            Text(stringResource(R.string.revise))
+                        }
+                        if (uiState.needsManualReview) {
+                            Button(
+                                onClick = onManualReview,
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
+                            ) {
+                                Text(stringResource(R.string.override_score))
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (uiState.manualFeedback != null && uiState.manualFeedback!!.isNotBlank()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f))
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(
+                            stringResource(R.string.manual_feedback),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            uiState.manualFeedback!!,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }

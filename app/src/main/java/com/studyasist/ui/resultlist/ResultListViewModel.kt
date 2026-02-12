@@ -32,6 +32,8 @@ class ResultListViewModel @Inject constructor(
 
     suspend fun getExportCsv(): String = resultRepository.getExportCsv()
 
+    suspend fun getExportPdf(): ByteArray = resultRepository.getExportPdf()
+
     fun loadResults() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }

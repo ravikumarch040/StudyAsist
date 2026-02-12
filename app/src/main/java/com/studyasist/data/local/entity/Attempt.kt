@@ -23,5 +23,6 @@ data class Attempt(
     val assessmentId: Long,
     val startedAt: Long,
     val endedAt: Long? = null,
-    val userNotes: String? = null
+    val userNotes: String? = null,
+    val needsManualReview: Boolean = false
 )

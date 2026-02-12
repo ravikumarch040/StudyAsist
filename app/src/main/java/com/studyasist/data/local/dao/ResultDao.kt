@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.studyasist.data.local.entity.Result
 import com.studyasist.data.local.entity.ResultWithAttempt
 
@@ -38,4 +39,7 @@ interface ResultDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: Result): Long
+
+    @Update
+    suspend fun update(entity: Result)
 }

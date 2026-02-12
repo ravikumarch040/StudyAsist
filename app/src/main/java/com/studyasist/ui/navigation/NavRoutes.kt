@@ -27,6 +27,8 @@ object NavRoutes {
     const val ASSESSMENT_RUN = "assessment_run/{assessmentId}"
     const val ASSESSMENT_RESULT = "assessment_result/{attemptId}"
     const val RESULT_LIST = "result_list"
+    const val MANUAL_REVIEW_LIST = "manual_review_list"
+    const val MANUAL_OVERRIDE = "manual_override/{attemptId}"
     const val ADD_REVISION = "add_revision/{subject}/{chapter}"
 
     fun timetableDetail(timetableId: Long) = "timetable_detail/$timetableId"
@@ -42,4 +44,5 @@ object NavRoutes {
     fun assessmentEdit(assessmentId: Long) = "assessment_edit/$assessmentId"
     fun assessmentRun(assessmentId: Long) = "assessment_run/$assessmentId"
     fun assessmentResult(attemptId: Long) = "assessment_result/$attemptId"
+    fun manualOverride(attemptId: Long) = "manual_override/$attemptId"
 }

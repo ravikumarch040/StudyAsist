@@ -20,6 +20,9 @@ interface AttemptDao {
     @Query("SELECT * FROM attempts WHERE assessmentId = :assessmentId ORDER BY startedAt DESC")
     suspend fun getByAssessmentIdOnce(assessmentId: Long): List<Attempt>
 
+    @Query("SELECT * FROM attempts WHERE needsManualReview = 1 ORDER BY startedAt DESC")
+    suspend fun getNeedingManualReview(): List<Attempt>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: Attempt): Long
 

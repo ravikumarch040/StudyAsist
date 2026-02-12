@@ -27,7 +27,8 @@ class AttemptRepository @Inject constructor(
             assessmentId = assessmentId,
             startedAt = System.currentTimeMillis(),
             endedAt = null,
-            userNotes = null
+            userNotes = null,
+            needsManualReview = false
         )
         return attemptDao.insert(attempt)
     }
@@ -38,6 +39,14 @@ class AttemptRepository @Inject constructor(
             attempt.copy(endedAt = System.currentTimeMillis())
         )
     }
+
+    suspend fun setNeedsManualReview(attemptId: Long, needs: Boolean) {
+        val attempt = attemptDao.getById(attemptId) ?: return
+        attemptDao.update(attempt.copy(needsManualReview = needs))
+    }
+
+    suspend fun getNeedingManualReview(): List<Attempt> =
+        attemptDao.getNeedingManualReview()
 
     suspend fun saveAnswers(attemptId: Long, answers: List<AttemptAnswerInput>) {
         val now = System.currentTimeMillis()

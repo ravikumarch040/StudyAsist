@@ -43,6 +43,7 @@ import com.studyasist.data.repository.SuggestedPracticeArea
 import com.studyasist.data.repository.SubjectChapterProgress
 import com.studyasist.data.repository.TrackPrediction
 import com.studyasist.data.repository.TrackStatus
+import com.studyasist.ui.components.ActivityHeatmap
 import com.studyasist.ui.components.ScoreSparkline
 import com.studyasist.util.formatExamDate
 
@@ -225,6 +226,19 @@ fun GoalDetailScreen(
                             }
                         }
                     }
+                }
+            }
+            if (uiState.activityByDay.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+                ) {
+                    ActivityHeatmap(
+                        activityByDay = uiState.activityByDay,
+                        weeks = 12,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(12.dp)
+                    )
                 }
             }
             if (uiState.recentAttempts.size >= 2) {

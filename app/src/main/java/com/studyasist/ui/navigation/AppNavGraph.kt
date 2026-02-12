@@ -48,6 +48,10 @@ import com.studyasist.ui.assessmentedit.AssessmentEditScreen
 import com.studyasist.ui.assessmentedit.AssessmentEditViewModel
 import com.studyasist.ui.resultlist.ResultListScreen
 import com.studyasist.ui.resultlist.ResultListViewModel
+import com.studyasist.ui.manualreview.ManualReviewListScreen
+import com.studyasist.ui.manualreview.ManualReviewListViewModel
+import com.studyasist.ui.manualreview.ManualOverrideScreen
+import com.studyasist.ui.manualreview.ManualOverrideViewModel
 
 @Composable
 fun AppNavGraph(
@@ -346,7 +350,8 @@ fun AppNavGraph(
         composable(
             route = NavRoutes.ASSESSMENT_RESULT,
             arguments = listOf(navArgument("attemptId") { type = NavType.LongType })
-        ) {
+        ) { backStackEntry ->
+            val attemptId = backStackEntry.arguments?.getLong("attemptId") ?: 0L
             val viewModel: AssessmentResultViewModel = hiltViewModel()
             AssessmentResultScreen(
                 viewModel = viewModel,
@@ -361,7 +366,8 @@ fun AppNavGraph(
                             popUpTo(NavRoutes.ASSESSMENT_RESULT) { inclusive = false }
                         }
                     }
-                }
+                },
+                onManualReview = { navController.navigate(NavRoutes.manualOverride(attemptId)) }
             )
         }
 
@@ -392,7 +398,31 @@ fun AppNavGraph(
             ResultListScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
-                onResultClick = { attemptId -> navController.navigate(NavRoutes.assessmentResult(attemptId)) }
+                onResultClick = { attemptId -> navController.navigate(NavRoutes.assessmentResult(attemptId)) },
+                onManualReview = { navController.navigate(NavRoutes.MANUAL_REVIEW_LIST) }
+            )
+        }
+
+        composable(NavRoutes.MANUAL_REVIEW_LIST) {
+            val viewModel: ManualReviewListViewModel = hiltViewModel()
+            ManualReviewListScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onItemClick = { attemptId ->
+                    navController.navigate(NavRoutes.manualOverride(attemptId))
+                }
+            )
+        }
+
+        composable(
+            route = NavRoutes.MANUAL_OVERRIDE,
+            arguments = listOf(navArgument("attemptId") { type = NavType.LongType })
+        ) {
+            val viewModel: ManualOverrideViewModel = hiltViewModel()
+            ManualOverrideScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() }
             )
         }
     }

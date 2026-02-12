@@ -24,5 +24,6 @@ data class Result(
     val score: Float,
     val maxScore: Float,
     val percent: Float,
-    val detailsJson: String
+    val detailsJson: String,
+    val manualFeedback: String? = null
 )

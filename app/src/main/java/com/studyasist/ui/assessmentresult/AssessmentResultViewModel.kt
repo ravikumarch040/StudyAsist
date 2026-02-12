@@ -3,6 +3,7 @@ package com.studyasist.ui.assessmentresult
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.studyasist.data.repository.AttemptRepository
 import com.studyasist.data.repository.ResultRepository
 import com.studyasist.data.repository.SubjectChapter
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,8 @@ data class AssessmentResultUiState(
     val details: List<ResultDetailItem> = emptyList(),
     val assessmentTitle: String = "",
     val subjectChapter: SubjectChapter? = null,
+    val needsManualReview: Boolean = false,
+    val manualFeedback: String? = null,
     val isLoading: Boolean = true,
     val errorMessage: String? = null
 )
@@ -40,7 +43,8 @@ data class ResultDetailItem(
 @HiltViewModel
 class AssessmentResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val resultRepository: ResultRepository
+    private val resultRepository: ResultRepository,
+    private val attemptRepository: AttemptRepository
 ) : ViewModel() {
 
     private val attemptId: Long = checkNotNull(savedStateHandle["attemptId"]) { "attemptId required" }
@@ -52,9 +56,18 @@ class AssessmentResultViewModel @Inject constructor(
         loadResult()
     }
 
+    fun toggleFlagForReview() {
+        viewModelScope.launch {
+            val current = _uiState.value.needsManualReview
+            attemptRepository.setNeedsManualReview(attemptId, !current)
+            _uiState.update { it.copy(needsManualReview = !current) }
+        }
+    }
+
     private fun loadResult() {
         viewModelScope.launch {
             val result = resultRepository.getResult(attemptId)
+            val attempt = attemptRepository.getAttempt(attemptId)
             if (result == null) {
                 _uiState.update {
                     it.copy(isLoading = false, errorMessage = "Result not found")
@@ -70,6 +83,8 @@ class AssessmentResultViewModel @Inject constructor(
                     percent = result.percent,
                     details = details,
                     subjectChapter = subjectChapter,
+                    needsManualReview = attempt?.needsManualReview ?: false,
+                    manualFeedback = result.manualFeedback,
                     isLoading = false
                 )
             }

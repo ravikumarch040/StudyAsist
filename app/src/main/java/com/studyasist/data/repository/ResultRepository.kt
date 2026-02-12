@@ -1,5 +1,8 @@
 package com.studyasist.data.repository
 
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
 import com.studyasist.data.local.dao.AttemptDao
 import com.studyasist.data.local.dao.ResultDao
 import com.studyasist.data.local.dao.AssessmentDao
@@ -31,6 +34,8 @@ class ResultRepository @Inject constructor(
 ) {
 
     suspend fun getResult(attemptId: Long): Result? = resultDao.getByAttemptId(attemptId)
+
+    suspend fun updateResult(result: Result) = resultDao.update(result)
 
     suspend fun getAllResultListItems(): List<ResultListItem> {
         val rows = resultDao.getAllResultsWithAttempt()
@@ -99,6 +104,66 @@ class ResultRepository @Inject constructor(
             lines.add("$title,Attempt $attemptNum,$dateStr,${row.score},${row.maxScore},${row.percent}")
         }
         return lines.joinToString("\n")
+    }
+
+    /**
+     * Generates a PDF report of all results.
+     * Returns the PDF as a ByteArray suitable for writing to a file.
+     */
+    suspend fun getExportPdf(): ByteArray {
+        val rows = resultDao.getAllResultsWithAttempt()
+        val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US)
+        val pageWidth = 595
+        val pageHeight = 842
+        val margin = 40
+        val lineHeight = 24
+        val titlePaint = Paint().apply {
+            textSize = 24f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            isAntiAlias = true
+        }
+        val headerPaint = Paint().apply {
+            textSize = 12f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            isAntiAlias = true
+        }
+        val normalPaint = Paint().apply {
+            textSize = 11f
+            isAntiAlias = true
+        }
+        val document = PdfDocument()
+        var y = margin
+        val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+        var page = document.startPage(pageInfo)
+        var canvas = page.canvas
+        canvas.drawText("StudyAsist - Results Report", margin.toFloat(), y.toFloat(), titlePaint)
+        y += lineHeight * 2
+        canvas.drawText("Generated: ${dateFormat.format(java.util.Date())}", margin.toFloat(), y.toFloat(), normalPaint)
+        y += lineHeight * 2
+        canvas.drawText("Assessment | Attempt | Date | Score | Max | %", margin.toFloat(), y.toFloat(), headerPaint)
+        y += lineHeight
+        for (row in rows) {
+            if (y > pageHeight - margin - lineHeight * 2) {
+                document.finishPage(page)
+                val newPageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, document.pages.size + 1).create()
+                page = document.startPage(newPageInfo)
+                canvas = page.canvas
+                y = margin
+            }
+            val assessment = assessmentDao.getById(row.assessmentId)
+            val attempts = attemptDao.getByAssessmentIdOnce(row.assessmentId).sortedBy { it.startedAt }
+            val attemptNum = attempts.indexOfFirst { it.id == row.attemptId }.let { if (it >= 0) it + 1 else 1 }
+            val title = assessment?.title ?: "Assessment"
+            val dateStr = dateFormat.format(java.util.Date(row.startedAt))
+            val line = "$title | Attempt $attemptNum | $dateStr | ${row.score} | ${row.maxScore} | ${row.percent}%"
+            canvas.drawText(line, margin.toFloat(), y.toFloat(), normalPaint)
+            y += lineHeight
+        }
+        document.finishPage(page)
+        val output = java.io.ByteArrayOutputStream()
+        document.writeTo(output)
+        document.close()
+        return output.toByteArray()
     }
 
     private fun String.escapeCsv(): String {

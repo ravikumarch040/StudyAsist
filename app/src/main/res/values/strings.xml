@@ -120,4 +120,13 @@
     <string name="export_results">Export results</string>
     <string name="add_revision_block">Add revision block</string>
     <string name="add_to_timetable">Add to timetable</string>
+    <string name="flag_for_review">Flag for review</string>
+    <string name="unflag">Unflag</string>
+    <string name="manual_review">Manual review</string>
+    <string name="manual_review_list">Review list</string>
+    <string name="no_items_to_review">No items need review</string>
+    <string name="override_score">Override score</string>
+    <string name="manual_feedback">Feedback</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="export_csv">Export CSV</string>
 </resources>

@@ -32,6 +32,7 @@ data class GoalDetailUiState(
     val subjectProgress: List<SubjectChapterProgress> = emptyList(),
     val trackPrediction: TrackPrediction? = null,
     val suggestedPractice: List<SuggestedPracticeArea> = emptyList(),
+    val activityByDay: Map<Long, Int> = emptyMap(),
     val isLoading: Boolean = true
 )
 
@@ -63,6 +64,7 @@ class GoalDetailViewModel @Inject constructor(
             subjectProgress = metrics?.subjectProgress ?: emptyList(),
             trackPrediction = metrics?.trackPrediction,
             suggestedPractice = metrics?.suggestedPractice ?: emptyList(),
+            activityByDay = metrics?.activityByDay ?: emptyMap(),
             isLoading = false
         )
     }.stateIn(

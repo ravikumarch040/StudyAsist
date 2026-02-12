@@ -2,6 +2,7 @@ package com.studyasist.ui.resultlist
 
 import android.content.Intent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,9 +12,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,7 +29,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,13 +48,16 @@ import com.studyasist.data.repository.ResultListItem
 fun ResultListScreen(
     viewModel: ResultListViewModel,
     onBack: () -> Unit,
-    onResultClick: (Long) -> Unit
+    onResultClick: (Long) -> Unit,
+    onManualReview: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    fun shareExport() {
+    var showExportMenu by remember { mutableStateOf(false) }
+
+    fun shareExportCsv() {
         coroutineScope.launch {
             val csv = viewModel.getExportCsv()
             val file = java.io.File(context.cacheDir, "studyasist_results_${System.currentTimeMillis()}.csv")
@@ -55,6 +65,21 @@ fun ResultListScreen(
             val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/csv"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_results)))
+        }
+    }
+
+    fun shareExportPdf() {
+        coroutineScope.launch {
+            val pdfBytes = viewModel.getExportPdf()
+            val file = java.io.File(context.cacheDir, "studyasist_results_${System.currentTimeMillis()}.pdf")
+            file.writeBytes(pdfBytes)
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
                 putExtra(Intent.EXTRA_STREAM, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
@@ -72,11 +97,35 @@ fun ResultListScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = { shareExport() },
-                        enabled = uiState.items.isNotEmpty()
-                    ) {
-                        Icon(Icons.Default.Share, contentDescription = stringResource(R.string.export_results))
+                    IconButton(onClick = onManualReview) {
+                        Icon(Icons.Default.Assignment, contentDescription = stringResource(R.string.manual_review_list))
+                    }
+                    Box {
+                        IconButton(
+                            onClick = { showExportMenu = true },
+                            enabled = uiState.items.isNotEmpty()
+                        ) {
+                            Icon(Icons.Default.Share, contentDescription = stringResource(R.string.export_results))
+                        }
+                        DropdownMenu(
+                            expanded = showExportMenu,
+                            onDismissRequest = { showExportMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.export_csv)) },
+                                onClick = {
+                                    showExportMenu = false
+                                    shareExportCsv()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.export_pdf)) },
+                                onClick = {
+                                    showExportMenu = false
+                                    shareExportPdf()
+                                }
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

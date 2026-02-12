@@ -30,7 +30,9 @@ data class GoalDashboardMetrics(
     val recentAttempts: List<RecentAttemptSummary>,
     val subjectProgress: List<SubjectChapterProgress> = emptyList(),
     val trackPrediction: TrackPrediction = TrackPrediction(TrackStatus.NOT_ENOUGH_DATA),
-    val suggestedPractice: List<SuggestedPracticeArea> = emptyList()
+    val suggestedPractice: List<SuggestedPracticeArea> = emptyList(),
+    /** Map of day (ms at midnight) -> number of attempts that day, for last N weeks */
+    val activityByDay: Map<Long, Int> = emptyMap()
 )
 
 data class SubjectChapterProgress(
@@ -138,6 +140,8 @@ class GoalDashboardRepository @Inject constructor(
 
         val suggestedPractice = computeSuggestedPractice(resultRows = resultRows, resultDao = resultDao)
 
+        val activityByDay = computeActivityByDay(allAttempts = assessments.flatMap { attemptDao.getByAssessmentIdOnce(it.id) })
+
         return GoalDashboardMetrics(
             totalQuestions = totalQuestions,
             questionsPracticed = qaAttempted,
@@ -145,8 +149,25 @@ class GoalDashboardRepository @Inject constructor(
             recentAttempts = recentAttempts,
             subjectProgress = subjectProgress,
             trackPrediction = trackPrediction,
-            suggestedPractice = suggestedPractice
+            suggestedPractice = suggestedPractice,
+            activityByDay = activityByDay
         )
+    }
+
+    /** Returns map of day (ms at midnight in default timezone) -> attempt count, for last 12 weeks */
+    private fun computeActivityByDay(allAttempts: List<com.studyasist.data.local.entity.Attempt>): Map<Long, Int> {
+        val cal = java.util.Calendar.getInstance()
+        val dayCounts = mutableMapOf<Long, Int>()
+        for (attempt in allAttempts) {
+            cal.timeInMillis = attempt.startedAt
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            cal.set(java.util.Calendar.MINUTE, 0)
+            cal.set(java.util.Calendar.SECOND, 0)
+            cal.set(java.util.Calendar.MILLISECOND, 0)
+            val day = cal.timeInMillis
+            dayCounts[day] = (dayCounts[day] ?: 0) + 1
+        }
+        return dayCounts
     }
 
     private suspend fun computeSuggestedPractice(
