@@ -27,6 +27,12 @@ data class TimetableDetailUiState(
     val filteredActivities: List<ActivityEntity>
         get() = if (filterType == null) activities
         else activities.filter { it.type == filterType }
+
+    /** Total minutes per activity type for the week (simple analytics). */
+    val minutesByType: Map<ActivityType, Int>
+        get() = activities.groupBy { it.type }.mapValues { (_, list) ->
+            list.sumBy { act -> act.endTimeMinutes - act.startTimeMinutes }
+        }
 }
 
 @HiltViewModel

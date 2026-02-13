@@ -53,6 +53,7 @@ import com.studyasist.R
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityType
 import androidx.core.content.FileProvider
+import com.studyasist.ui.components.colorForActivityType
 import com.studyasist.util.formatTimeMinutes
 import kotlinx.coroutines.launch
 
@@ -233,11 +234,50 @@ fun TimetableDetailScreen(
                     label = { Text(stringResource(R.string.filter_all)) }
                 )
                 for (type in ActivityType.entries) {
+                    val (containerColor, contentColor) = MaterialTheme.colorScheme.colorForActivityType(type)
                     androidx.compose.material3.FilterChip(
                         selected = uiState.filterType == type,
                         onClick = { viewModel.setFilterType(type) },
-                        label = { Text(type.name) }
+                        label = { Text(type.name) },
+                        colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = containerColor,
+                            selectedLabelColor = contentColor
+                        )
                     )
+                }
+            }
+            if (uiState.minutesByType.isNotEmpty()) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.weekly_summary),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    uiState.minutesByType.entries
+                        .filter { it.value > 0 }
+                        .sortedBy { it.key.name }
+                        .forEach { (type, mins) ->
+                            val hours = mins / 60
+                            val minsPart = mins % 60
+                            val (_, contentColor) = MaterialTheme.colorScheme.colorForActivityType(type)
+                            val durationStr = when {
+                                hours > 0 && minsPart > 0 -> "${hours}h ${minsPart}m"
+                                hours > 0 -> "${hours}h"
+                                else -> "${minsPart}m"
+                            }
+                            Text(
+                                "${type.name}: $durationStr",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = contentColor
+                            )
+                        }
                 }
             }
             when (selectedViewTab) {
@@ -352,15 +392,18 @@ private fun WeekView(
                             )
                     ) {
                         if (cellActivities.isNotEmpty()) {
+                            val act = cellActivities.first()
+                            val (containerColor, contentColor) = MaterialTheme.colorScheme.colorForActivityType(act.type)
                             Card(
                                 modifier = Modifier.fillMaxSize(),
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)),
+                                colors = CardDefaults.cardColors(containerColor = containerColor.copy(alpha = 0.7f)),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                             ) {
                                 Box(Modifier.fillMaxSize().padding(4.dp)) {
                                     Text(
-                                        cellActivities.first().title,
+                                        act.title,
                                         style = MaterialTheme.typography.labelSmall,
+                                        color = contentColor,
                                         maxLines = 2
                                     )
                                 }
@@ -378,10 +421,11 @@ private fun ActivityCard(
     activity: ActivityEntity,
     onClick: () -> Unit
 ) {
+    val (containerColor, contentColor) = MaterialTheme.colorScheme.colorForActivityType(activity.type)
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
         Row(
             Modifier.fillMaxWidth().padding(12.dp),
@@ -392,16 +436,16 @@ private fun ActivityCard(
                 Text(
                     text = activity.title,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = contentColor
                 )
                 Text(
                     text = "${formatTimeMinutes(activity.startTimeMinutes)} – ${formatTimeMinutes(activity.endTimeMinutes)} · ${activity.type.name}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = contentColor.copy(alpha = 0.8f)
                 )
                 activity.note?.let { note ->
                     if (note.isNotBlank()) {
-                        Text(text = note, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = note, style = MaterialTheme.typography.bodySmall, color = contentColor.copy(alpha = 0.8f))
                     }
                 }
             }

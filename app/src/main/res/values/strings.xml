@@ -12,6 +12,7 @@
     <string name="week_view">Week</string>
     <string name="no_activities_day">No activities for this day.\nTap + to add one.</string>
     <string name="no_activities_week">No activities. Add some in Day view.</string>
+    <string name="weekly_summary">Weekly total</string>
     <string name="no_active_timetable">No active timetable.\nGo to Timetables tab and set one as active.</string>
     <string name="no_activities_today">No activities for today.\nOpen the timetable and add activities.</string>
     <string name="set_active">Set active</string>

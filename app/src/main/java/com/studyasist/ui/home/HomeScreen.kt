@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
 import com.studyasist.data.local.entity.ActivityEntity
+import com.studyasist.ui.components.colorForActivityType
 import com.studyasist.ui.timetablelist.TimetableListScreen
 import com.studyasist.ui.timetablelist.TimetableListViewModel
 import com.studyasist.util.formatTimeMinutes
@@ -301,13 +302,14 @@ private fun TodayTabContent(
     ) {
         items(todayActivities, key = { it.id }) { activity ->
             val isCurrent = activity.id == currentActivityId
+            val (typeContainerColor, typeContentColor) = MaterialTheme.colorScheme.colorForActivityType(activity.type)
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
                     containerColor = if (isCurrent) {
                         MaterialTheme.colorScheme.primaryContainer
                     } else {
-                        MaterialTheme.colorScheme.surface
+                        typeContainerColor
                     }
                 ),
                 elevation = CardDefaults.cardElevation(
@@ -319,6 +321,7 @@ private fun TodayTabContent(
                         .fillMaxWidth()
                         .padding(12.dp)
                 ) {
+                    val textColor = if (isCurrent) MaterialTheme.colorScheme.onPrimaryContainer else typeContentColor
                     if (isCurrent) {
                         Text(
                             stringResource(R.string.now),
@@ -329,12 +332,12 @@ private fun TodayTabContent(
                     Text(
                         text = activity.title,
                         style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = textColor
                     )
                     Text(
                         text = "${formatTimeMinutes(activity.startTimeMinutes)} – ${formatTimeMinutes(activity.endTimeMinutes)} · ${activity.type.name}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = textColor.copy(alpha = 0.85f)
                     )
                 }
             }
