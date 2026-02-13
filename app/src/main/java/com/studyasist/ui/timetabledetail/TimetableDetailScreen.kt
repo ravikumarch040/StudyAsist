@@ -1,5 +1,9 @@
 package com.studyasist.ui.timetabledetail
 
+import android.content.Intent
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintManager
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +22,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,8 +40,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,7 +52,9 @@ import androidx.compose.ui.unit.dp
 import com.studyasist.R
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityType
+import androidx.core.content.FileProvider
 import com.studyasist.util.formatTimeMinutes
+import kotlinx.coroutines.launch
 
 private const val SLOT_MINUTES = 30
 
@@ -59,7 +70,99 @@ fun TimetableDetailScreen(
     val timetable = uiState.timetable ?: return
     val timetableId = timetable.id
     var selectedViewTab by remember { mutableIntStateOf(0) }
+    var showExportMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val days = listOf(1 to "Mon", 2 to "Tue", 3 to "Wed", 4 to "Thu", 5 to "Fri", 6 to "Sat", 7 to "Sun")
+
+    fun shareExportCsv() {
+        coroutineScope.launch {
+            val csv = viewModel.getExportCsv()
+            val file = java.io.File(context.cacheDir, "studyasist_timetable_${timetableId}_${System.currentTimeMillis()}.csv")
+            file.writeText(csv)
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/csv"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_timetable)))
+        }
+    }
+
+    fun shareExportPdf() {
+        coroutineScope.launch {
+            val pdfBytes = viewModel.getExportPdf()
+            val file = java.io.File(context.cacheDir, "studyasist_timetable_${timetableId}_${System.currentTimeMillis()}.pdf")
+            file.writeBytes(pdfBytes)
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_timetable)))
+        }
+    }
+
+    fun shareExportExcel() {
+        coroutineScope.launch {
+            val excelBytes = viewModel.getExportExcel()
+            val file = java.io.File(context.cacheDir, "studyasist_timetable_${timetableId}_${System.currentTimeMillis()}.xls")
+            file.writeBytes(excelBytes)
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/vnd.ms-excel"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_timetable)))
+        }
+    }
+
+    fun printTimetable() {
+        coroutineScope.launch {
+            val pdfBytes = viewModel.getExportPdf()
+            if (pdfBytes.isEmpty()) return@launch
+            val printManager = context.getSystemService(android.content.Context.PRINT_SERVICE) as? PrintManager ?: return@launch
+            val jobName = "${context.getString(R.string.app_name)} - ${timetable.name}"
+            val bytes = pdfBytes
+            val adapter = object : PrintDocumentAdapter() {
+                override fun onLayout(
+                    oldAttributes: PrintAttributes?,
+                    newAttributes: PrintAttributes,
+                    cancellationSignal: android.os.CancellationSignal?,
+                    callback: android.print.PrintDocumentAdapter.LayoutResultCallback?,
+                    metadata: android.os.Bundle?
+                ) {
+                    if (cancellationSignal?.isCanceled == true) {
+                        callback?.onLayoutCancelled()
+                        return
+                    }
+                    val info = android.print.PrintDocumentInfo.Builder("timetable.pdf")
+                        .setContentType(android.print.PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .setPageCount(1)
+                        .build()
+                    callback?.onLayoutFinished(info, true)
+                }
+
+                override fun onWrite(
+                    pages: Array<out android.print.PageRange>,
+                    destination: android.os.ParcelFileDescriptor,
+                    cancellationSignal: android.os.CancellationSignal,
+                    callback: android.print.PrintDocumentAdapter.WriteResultCallback
+                ) {
+                    try {
+                        java.io.FileOutputStream(destination.fileDescriptor).use { it.write(bytes) }
+                        callback.onWriteFinished(arrayOf(android.print.PageRange.ALL_PAGES))
+                    } catch (e: Exception) {
+                        callback.onWriteFailed(e.message)
+                    }
+                }
+            }
+            printManager.print(jobName, adapter, PrintAttributes.Builder().build())
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -71,6 +174,31 @@ fun TimetableDetailScreen(
                     }
                 },
                 actions = {
+                    Box {
+                        IconButton(onClick = { showExportMenu = true }) {
+                            Icon(Icons.Default.Share, contentDescription = stringResource(R.string.export_timetable))
+                        }
+                        androidx.compose.material3.DropdownMenu(
+                            expanded = showExportMenu,
+                            onDismissRequest = { showExportMenu = false }
+                        ) {
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { Text(stringResource(R.string.export_csv)) },
+                                onClick = { showExportMenu = false; shareExportCsv() }
+                            )
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { Text(stringResource(R.string.export_pdf)) },
+                                onClick = { showExportMenu = false; shareExportPdf() }
+                            )
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { Text(stringResource(R.string.export_excel)) },
+                                onClick = { showExportMenu = false; shareExportExcel() }
+                            )
+                        }
+                    }
+                    IconButton(onClick = { printTimetable() }) {
+                        Icon(Icons.Default.Print, contentDescription = stringResource(R.string.print_timetable))
+                    }
                     IconButton(onClick = { onAddActivity(timetableId, uiState.selectedDay) }) {
                         Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_activity))
                     }

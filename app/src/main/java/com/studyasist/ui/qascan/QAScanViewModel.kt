@@ -258,6 +258,43 @@ class QAScanViewModel @Inject constructor(
         _uiState.update { it.copy(useAiExtraction = use) }
     }
 
+    /**
+     * Re-runs extraction with AI on the current image.
+     * Use when user has OCR/heuristic results and wants AI-improved parsing.
+     */
+    fun improveWithAi() {
+        val uri = _uiState.value.imageUri ?: run {
+            _uiState.update { it.copy(errorMessage = "Add an image first") }
+            return
+        }
+        viewModelScope.launch {
+            val apiKey = settingsRepository.settingsFlow.first().geminiApiKey
+            if (apiKey.isBlank()) {
+                _uiState.update { it.copy(errorMessage = "Add Gemini API key in Settings to use AI improvement") }
+                return@launch
+            }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            extractWithAi(context, uri, apiKey).fold(
+                onSuccess = { rows ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            parsedRows = rows.ifEmpty { listOf(EditableQARow("", "", QuestionType.SHORT)) }
+                        )
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = e.message ?: "AI improvement failed"
+                        )
+                    }
+                }
+            )
+        }
+    }
+
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
     }

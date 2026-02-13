@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TimetableDetailUiState(
@@ -71,4 +72,10 @@ class TimetableDetailViewModel @Inject constructor(
         val list = if (state.filterType == null) state.activities else state.activities.filter { it.type == state.filterType }
         return list.filter { it.dayOfWeek == day }
     }
+
+    suspend fun getExportCsv(): String = timetableRepository.getExportCsv(timetableId)
+
+    suspend fun getExportPdf(): ByteArray = timetableRepository.getExportPdf(timetableId)
+
+    suspend fun getExportExcel(): ByteArray = timetableRepository.getExportExcel(timetableId)
 }

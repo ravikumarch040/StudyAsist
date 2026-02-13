@@ -22,17 +22,18 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 - **Settings:** Default lead time, sound, vibration.
 - **Polish:** String resources for main labels and empty states; content descriptions for key actions.
 
-## Phase 2 (to do)
+## Phase 2
 
-- **Export:** CSV/Excel to app storage and Share sheet.
+- **Export:** CSV/Excel of timetable to app storage and Share sheet (from Timetable detail screen).
 - **Print:** PDF of timetable and system Print dialog (PrintManager).
-- Optional: color per type, simple analytics, backup/restore.
+- **Backup/Restore:** JSON export and import in Settings.
+- Optional: color per type, simple analytics.
 
-## Phase 3 – Study tools (planned)
+## Phase 3 – Study tools
 
 - **Change Voice:** Settings option to choose TTS voice for alarms and reading.
 - **Dictate:** Capture/upload image → OCR (ML Kit) → read aloud in chosen language.
-- **Explain:** Text or image input → AI explanation in chosen language (Gemini/OpenAI).
+- **Explain:** Text or image input → AI explanation in chosen language (Gemini).
 - **Solve:** Problem as text or image → AI step-by-step solution.
 
 See [docs/PLAN-STUDY-TOOLS.md](docs/PLAN-STUDY-TOOLS.md) for plan and design.

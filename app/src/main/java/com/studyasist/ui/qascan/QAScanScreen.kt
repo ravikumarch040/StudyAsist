@@ -247,11 +247,23 @@ fun QAScanScreen(
                         )
                     }
                 }
-                Text(
-                    stringResource(R.string.question) + " / " + stringResource(R.string.answer),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.question) + " / " + stringResource(R.string.answer),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Button(
+                        onClick = { viewModel.improveWithAi() },
+                        enabled = !uiState.isLoading && uiState.imageUri != null
+                    ) {
+                        Text(stringResource(R.string.improve_with_ai))
+                    }
+                }
                 uiState.parsedRows.forEachIndexed { index, row ->
                     EditableQARowCard(
                         index = index,

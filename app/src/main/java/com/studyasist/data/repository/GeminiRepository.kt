@@ -110,6 +110,44 @@ class GeminiRepository @Inject constructor() {
         }
     }
 
+    /**
+     * Grades a short/essay answer using LLM. Returns JSON with score (0-1), feedback, gradeLevel.
+     */
+    suspend fun gradeAnswer(
+        apiKey: String,
+        question: String,
+        modelAnswer: String,
+        studentAnswer: String
+    ): Result<GradeResult> = withContext(Dispatchers.IO) {
+        if (apiKey.isBlank()) return@withContext Result.failure(IllegalStateException("API key not set"))
+        try {
+            val prompt = """
+                Grade this student answer. Return ONLY valid JSON, no other text.
+                {"score": <0.0-1.0>, "gradeLevel": "full"|"partial"|"wrong", "feedback": "<brief feedback>"}
+                Question: $question
+                Model answer: $modelAnswer
+                Student answer: $studentAnswer
+            """.trimIndent()
+            generateContent(apiKey, prompt).mapCatching { text ->
+                val trimmed = text.trim().removeSurrounding("```json", "```").trim()
+                val json = JSONObject(trimmed)
+                GradeResult(
+                    score = json.optDouble("score", 0.0).toFloat(),
+                    gradeLevel = json.optString("gradeLevel", "wrong"),
+                    feedback = json.optString("feedback", "")
+                )
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    data class GradeResult(
+        val score: Float,
+        val gradeLevel: String,
+        val feedback: String
+    )
+
     private fun parseGeminiError(body: String): String? {
         if (body.isBlank()) return null
         return try {

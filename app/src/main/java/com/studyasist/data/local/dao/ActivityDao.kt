@@ -14,6 +14,9 @@ interface ActivityDao {
     @Query("SELECT * FROM activities WHERE timetableId = :timetableId ORDER BY dayOfWeek, startTimeMinutes, sortOrder")
     fun getAllForTimetable(timetableId: Long): Flow<List<ActivityEntity>>
 
+    @Query("SELECT * FROM activities WHERE timetableId = :timetableId ORDER BY dayOfWeek, startTimeMinutes, sortOrder")
+    suspend fun getAllForTimetableOnce(timetableId: Long): List<ActivityEntity>
+
     @Query("SELECT * FROM activities WHERE timetableId = :timetableId AND dayOfWeek = :dayOfWeek ORDER BY startTimeMinutes, sortOrder")
     suspend fun getByTimetableAndDay(timetableId: Long, dayOfWeek: Int): List<ActivityEntity>
 
