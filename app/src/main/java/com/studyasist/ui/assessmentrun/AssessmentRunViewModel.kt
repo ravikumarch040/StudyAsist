@@ -10,6 +10,7 @@ import com.studyasist.data.grading.ObjectiveGradingService
 import com.studyasist.data.local.entity.QA
 import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.AttemptRepository
+import com.studyasist.data.repository.BadgeRepository
 import com.studyasist.data.repository.ResultRepository
 import com.studyasist.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,6 +56,7 @@ class AssessmentRunViewModel @Inject constructor(
     private val assessmentRepository: AssessmentRepository,
     private val attemptRepository: AttemptRepository,
     private val resultRepository: ResultRepository,
+    private val badgeRepository: BadgeRepository,
     private val settingsRepository: SettingsRepository,
     private val gradingService: ObjectiveGradingService
 ) : ViewModel() {
@@ -207,6 +209,7 @@ class AssessmentRunViewModel @Inject constructor(
                 percent = result.percent,
                 detailsJson = result.detailsJson
             )
+            badgeRepository.checkAndAwardAfterAttempt(state.attemptId)
 
             _uiState.update {
                 it.copy(

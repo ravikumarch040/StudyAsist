@@ -29,6 +29,7 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 - **Backup/Restore:** JSON export and import in Settings.
 - **Color per type:** Activities use distinct colors by type (STUDY, BREAK, SCHOOL, etc.) in timetable and home.
 - **Simple analytics:** Weekly total by activity type shown in Timetable detail (e.g. Study: 12h, Break: 3h).
+- **Gamification:** Study streak (consecutive days with completed assessments), badges (First Step, Week Warrior, Perfect, etc.).
 
 ## Phase 3 – Study tools
 

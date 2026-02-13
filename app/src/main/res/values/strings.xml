@@ -138,6 +138,7 @@
     <string name="retry_all">Retry all</string>
     <string name="retry_weak">Retry weak only</string>
     <string name="streak_days"> day streak</string>
+    <string name="badges">Badges</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
     <string name="backup_restore">Backup &amp; Restore</string>

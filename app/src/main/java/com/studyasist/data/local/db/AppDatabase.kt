@@ -7,6 +7,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.studyasist.data.local.dao.ActivityDao
 import com.studyasist.data.local.dao.AssessmentDao
+import com.studyasist.data.local.dao.BadgeDao
 import com.studyasist.data.local.dao.AssessmentQuestionDao
 import com.studyasist.data.local.dao.AttemptAnswerDao
 import com.studyasist.data.local.dao.AttemptDao
@@ -16,6 +17,7 @@ import com.studyasist.data.local.dao.QADao
 import com.studyasist.data.local.dao.ResultDao
 import com.studyasist.data.local.dao.StudyToolHistoryDao
 import com.studyasist.data.local.dao.TimetableDao
+import com.studyasist.data.local.entity.BadgeEarned
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityTypeConverter
 import com.studyasist.data.local.entity.Assessment
@@ -178,10 +180,24 @@ private val MIGRATION_5_6 = object : Migration(5, 6) {
     }
 }
 
+private val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS badges_earned (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                badgeId TEXT NOT NULL,
+                earnedAt INTEGER NOT NULL
+            )
+        """.trimIndent())
+        db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_badges_earned_badgeId ON badges_earned(badgeId)")
+    }
+}
+
 @Database(
     entities = [
         TimetableEntity::class,
         ActivityEntity::class,
+        BadgeEarned::class,
         Goal::class,
         GoalItem::class,
         QA::class,
@@ -192,7 +208,7 @@ private val MIGRATION_5_6 = object : Migration(5, 6) {
         Result::class,
         StudyToolHistoryEntity::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(
@@ -212,8 +228,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun attemptAnswerDao(): AttemptAnswerDao
     abstract fun resultDao(): ResultDao
     abstract fun studyToolHistoryDao(): StudyToolHistoryDao
+    abstract fun badgeDao(): BadgeDao
 
     companion object {
-        fun migrations(): Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+        fun migrations(): Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
     }
 }
