@@ -367,6 +367,9 @@ fun AppNavGraph(
                         }
                     }
                 },
+                onAddToTimetable = { subject, chapter ->
+                    navController.navigate(NavRoutes.addRevision(subject, chapter))
+                },
                 onManualReview = { navController.navigate(NavRoutes.manualOverride(attemptId)) },
                 onRetry = { newAssessmentId ->
                     navController.popBackStack()

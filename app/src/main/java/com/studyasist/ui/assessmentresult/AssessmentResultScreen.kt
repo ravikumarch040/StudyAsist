@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -43,6 +44,7 @@ fun AssessmentResultScreen(
     viewModel: AssessmentResultViewModel,
     onBack: () -> Unit,
     onRevise: (subject: String?, chapter: String?) -> Unit = { _, _ -> },
+    onAddToTimetable: (subject: String, chapter: String?) -> Unit = { _, _ -> },
     onManualReview: () -> Unit = {},
     onRetry: (Long) -> Unit = {}
 ) {
@@ -146,6 +148,18 @@ fun AssessmentResultScreen(
                         ) {
                             Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
                             Text(stringResource(R.string.revise))
+                        }
+                        if (uiState.subjectChapter != null) {
+                            val sc = uiState.subjectChapter!!
+                            if ((sc.subject ?: "").isNotBlank() || !sc.chapter.isNullOrBlank()) {
+                                Button(
+                                    onClick = { onAddToTimetable((sc.subject ?: "").ifBlank { "Revision" }, sc.chapter) },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                                ) {
+                                    Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                                    Text(stringResource(R.string.add_to_timetable))
+                                }
+                            }
                         }
                         if (uiState.needsManualReview) {
                             Button(
@@ -252,13 +266,28 @@ fun AssessmentResultScreen(
                             )
                         }
                         if (canRevise) {
-                            Button(
-                                onClick = { onRevise(item.subject, item.chapter) },
+                            Row(
                                 modifier = Modifier.padding(top = 8.dp),
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
-                                Text(stringResource(R.string.revise))
+                                Button(
+                                    onClick = { onRevise(item.subject, item.chapter) },
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                ) {
+                                    Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                                    Text(stringResource(R.string.revise))
+                                }
+                                Button(
+                                    onClick = {
+                                        val subj = item.subject?.takeIf { it.isNotBlank() } ?: "Revision"
+                                        onAddToTimetable(subj, item.chapter)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                ) {
+                                    Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                                    Text(stringResource(R.string.add_to_timetable))
+                                }
                             }
                         }
                     }
