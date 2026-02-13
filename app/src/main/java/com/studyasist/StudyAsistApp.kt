@@ -8,9 +8,13 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.studyasist.data.repository.SettingsRepository
+import com.studyasist.notification.CloudBackupWorker
 import com.studyasist.notification.DeferredGradingWorker
 import com.studyasist.notification.ExamGoalAlertWorker
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -19,6 +23,9 @@ class StudyAsistApp : Application(), Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -29,6 +36,20 @@ class StudyAsistApp : Application(), Configuration.Provider {
         super.onCreate()
         scheduleExamGoalAlert()
         scheduleDeferredGrading()
+        scheduleCloudBackupIfEnabled()
+    }
+
+    private fun scheduleCloudBackupIfEnabled() {
+        runBlocking {
+            if (settingsRepository.settingsFlow.first().cloudBackupAuto) {
+                val request = PeriodicWorkRequestBuilder<CloudBackupWorker>(24, TimeUnit.HOURS).build()
+                WorkManager.getInstance(this@StudyAsistApp).enqueueUniquePeriodicWork(
+                    "cloud_backup_auto",
+                    ExistingPeriodicWorkPolicy.KEEP,
+                    request
+                )
+            }
+        }
     }
 
     private fun scheduleExamGoalAlert() {

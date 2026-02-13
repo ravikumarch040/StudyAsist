@@ -4,6 +4,7 @@ import com.studyasist.data.local.db.AppDatabase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.studyasist.data.local.dao.ActivityDao
+import com.studyasist.data.local.dao.BadgeDao
 import com.studyasist.data.local.dao.AssessmentDao
 import com.studyasist.data.local.dao.AssessmentQuestionDao
 import com.studyasist.data.local.dao.AttemptAnswerDao
@@ -14,6 +15,7 @@ import com.studyasist.data.local.dao.QADao
 import com.studyasist.data.local.dao.ResultDao
 import com.studyasist.data.local.dao.StudyToolHistoryDao
 import com.studyasist.data.local.dao.TimetableDao
+import com.studyasist.data.local.entity.BadgeEarned
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.Assessment
 import com.studyasist.data.local.entity.AssessmentQuestion
@@ -29,7 +31,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private data class BackupData(
-    val version: Int = 1,
+    val version: Int = 2,
     val exportedAt: Long = System.currentTimeMillis(),
     val timetables: List<TimetableEntity>,
     val activities: List<ActivityEntity>,
@@ -41,7 +43,8 @@ private data class BackupData(
     val attempts: List<Attempt>,
     val attemptAnswers: List<AttemptAnswer>,
     val results: List<Result>,
-    val studyToolHistory: List<StudyToolHistoryEntity>? = null
+    val studyToolHistory: List<StudyToolHistoryEntity>? = null,
+    val badgesEarned: List<BadgeEarned>? = null
 )
 
 @Singleton
@@ -57,6 +60,7 @@ class BackupRepository @Inject constructor(
     private val attemptAnswerDao: AttemptAnswerDao,
     private val resultDao: ResultDao,
     private val studyToolHistoryDao: StudyToolHistoryDao,
+    private val badgeDao: BadgeDao,
     private val database: AppDatabase,
     private val gson: Gson
 ) {
@@ -73,7 +77,8 @@ class BackupRepository @Inject constructor(
             attempts = attemptDao.getAll(),
             attemptAnswers = attemptAnswerDao.getAll(),
             results = resultDao.getAll(),
-            studyToolHistory = studyToolHistoryDao.getAll()
+            studyToolHistory = studyToolHistoryDao.getAll(),
+            badgesEarned = badgeDao.getAllEarnedOnce()
         )
         return gson.toJson(data)
     }
@@ -97,6 +102,7 @@ class BackupRepository @Inject constructor(
                 timetableDao.deleteAll()
                 qaDao.deleteAll()
                 studyToolHistoryDao.deleteAll()
+                badgeDao.deleteAll()
                 data.timetables.forEach { timetableDao.insert(it) }
                 data.activities.forEach { activityDao.insert(it) }
                 data.goals.forEach { goalDao.insert(it) }
@@ -108,6 +114,7 @@ class BackupRepository @Inject constructor(
                 data.attemptAnswers.forEach { attemptAnswerDao.insert(it) }
                 data.results.forEach { resultDao.insert(it) }
                 (data.studyToolHistory ?: emptyList()).forEach { studyToolHistoryDao.insert(it) }
+                (data.badgesEarned ?: emptyList()).forEach { badgeDao.insert(it) }
                 db.setTransactionSuccessful()
             } finally {
                 db.endTransaction()

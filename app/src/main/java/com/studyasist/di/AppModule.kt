@@ -2,6 +2,7 @@ package com.studyasist.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.studyasist.data.local.db.AppDatabase
 import com.studyasist.data.local.dao.ActivityDao
@@ -26,6 +27,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+        WorkManager.getInstance(context)
 
     @Provides
     @Singleton

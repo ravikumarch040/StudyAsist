@@ -24,4 +24,7 @@ interface BadgeDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entity: BadgeEarned): Long
+
+    @Query("DELETE FROM badges_earned")
+    suspend fun deleteAll()
 }

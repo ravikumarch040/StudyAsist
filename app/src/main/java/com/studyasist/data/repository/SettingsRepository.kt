@@ -16,7 +16,9 @@ data class AppSettings(
     val ttsVoiceName: String?,
     val geminiApiKey: String,
     val focusGuardEnabled: Boolean,
-    val blockOverlap: Boolean = false
+    val blockOverlap: Boolean = false,
+    val cloudBackupFolderUri: String? = null,
+    val cloudBackupAuto: Boolean = false
 ) {
     companion object {
         const val DEFAULT_LEAD_MINUTES = 5
@@ -37,7 +39,9 @@ class SettingsRepository @Inject constructor(
             ttsVoiceName = prefs[dataStore.ttsVoiceName]?.takeIf { it.isNotEmpty() },
             geminiApiKey = prefs[dataStore.geminiApiKey] ?: "",
             focusGuardEnabled = prefs[dataStore.focusGuardEnabled] ?: false,
-            blockOverlap = prefs[dataStore.blockOverlap] ?: false
+            blockOverlap = prefs[dataStore.blockOverlap] ?: false,
+            cloudBackupFolderUri = prefs[dataStore.cloudBackupFolderUri]?.takeIf { it.isNotEmpty() },
+            cloudBackupAuto = prefs[dataStore.cloudBackupAuto] ?: false
         )
     }
 
@@ -78,5 +82,13 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setBlockOverlap(block: Boolean) {
         dataStore.dataStore.edit { it[dataStore.blockOverlap] = block }
+    }
+
+    suspend fun setCloudBackupFolderUri(uri: String?) {
+        dataStore.dataStore.edit { it[dataStore.cloudBackupFolderUri] = uri ?: "" }
+    }
+
+    suspend fun setCloudBackupAuto(enabled: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.cloudBackupAuto] = enabled }
     }
 }

@@ -148,4 +148,10 @@
     <string name="study_tool_history">History</string>
     <string name="block_overlap">Block overlapping activities</string>
     <string name="block_overlap_summary">Prevent saving when another activity overlaps this time</string>
+    <string name="cloud_backup">Cloud backup</string>
+    <string name="cloud_backup_summary">Save backups to Google Drive, Dropbox, or other cloud folders</string>
+    <string name="set_backup_folder">Set backup folder</string>
+    <string name="backup_folder_hint">Pick a folder (e.g. Drive) where backups will be saved</string>
+    <string name="backup_to_cloud">Backup to cloud</string>
+    <string name="auto_daily_backup">Auto daily backup</string>
 </resources>

@@ -1,8 +1,10 @@
 package com.studyasist.ui.settings
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,12 +57,27 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState(
-        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false)
+        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, false)
     )
     val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
     val backupExportJson by viewModel.backupExportJson.collectAsState(initial = null)
     val backupImportResult by viewModel.backupImportResult.collectAsState(initial = null)
+    val cloudBackupResult by viewModel.cloudBackupResult.collectAsState(initial = null)
     val context = LocalContext.current
+
+    val backupFolderLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri: Uri? ->
+        uri?.let { u ->
+            try {
+                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(u, takeFlags)
+                viewModel.setCloudBackupFolder(u)
+            } catch (e: Exception) {
+                viewModel.setCloudBackupFolder(null)
+            }
+        }
+    }
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -233,6 +250,55 @@ fun SettingsScreen(
                     )
                 }
             }
+            Text(stringResource(R.string.cloud_backup), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.cloud_backup_summary), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.backup_folder_hint), style = MaterialTheme.typography.bodySmall)
+            Button(
+                onClick = { backupFolderLauncher.launch(null) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.set_backup_folder))
+            }
+            if (!settings.cloudBackupFolderUri.isNullOrBlank()) {
+                Text(
+                    "Folder set",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Button(
+                onClick = { viewModel.backupToCloud() },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !settings.cloudBackupFolderUri.isNullOrBlank()
+            ) {
+                Text(stringResource(R.string.backup_to_cloud))
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.auto_daily_backup))
+                Switch(
+                    checked = settings.cloudBackupAuto,
+                    onCheckedChange = viewModel::setCloudBackupAuto
+                )
+            }
+            cloudBackupResult?.let { msg ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text(
+                        msg,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (msg.startsWith("Backup started")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        maxLines = Int.MAX_VALUE
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.padding(8.dp))
             Text(stringResource(R.string.backup_restore), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.backup_export_hint), style = MaterialTheme.typography.bodySmall)
             Button(
