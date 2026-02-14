@@ -5,9 +5,12 @@ import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
+import com.studyasist.data.repository.SettingsRepositoryEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import android.os.Build
 import android.os.Process
 import android.provider.Settings
+import kotlinx.coroutines.runBlocking
 import java.util.SortedMap
 import java.util.TreeMap
 
@@ -96,4 +99,16 @@ fun getForegroundPackage(context: Context): String? {
         sorted[usageStats.lastTimeUsed] = usageStats
     }
     return sorted[sorted.lastKey()]?.packageName
+}
+
+/**
+ * Returns the effective set of restricted package names (built-in + user-added).
+ * Use when checking if foreground app should trigger alert.
+ */
+fun getRestrictedPackages(context: Context): Set<String> = runBlocking {
+    val entryPoint = EntryPointAccessors.fromApplication(
+        context.applicationContext,
+        SettingsRepositoryEntryPoint::class.java
+    )
+    entryPoint.getSettingsRepository().getEffectiveRestrictedPackages()
 }

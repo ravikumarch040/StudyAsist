@@ -1,13 +1,19 @@
 package com.studyasist.notification
 
-import android.content.ContentResolver
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.studyasist.R
 import com.studyasist.data.repository.BackupRepository
 import com.studyasist.data.repository.SettingsRepository
 import dagger.assisted.Assisted
@@ -51,14 +57,42 @@ class CloudBackupWorker @AssistedInject constructor(
                     os.write(json.toByteArray(Charsets.UTF_8))
                 }
                 Log.d(TAG, "Cloud backup: saved to $filename")
+                showCompletionNotification(applicationContext, success = true)
+                Result.success()
             } else {
                 Log.e(TAG, "Cloud backup: failed to create document")
-                return Result.failure()
+                showCompletionNotification(applicationContext, success = false)
+                Result.failure()
             }
-            Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Cloud backup failed", e)
+            showCompletionNotification(applicationContext, success = false)
             Result.failure()
+        }
+    }
+
+    private fun showCompletionNotification(context: Context, success: Boolean) {
+        createChannel(context)
+        val title = if (success) context.getString(R.string.cloud_backup_completed)
+        else context.getString(R.string.cloud_backup_failed)
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID_CLOUD_BACKUP)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .build()
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_CLOUD_BACKUP, notification)
+    }
+
+    private fun createChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID_CLOUD_BACKUP,
+                CHANNEL_NAME_CLOUD_BACKUP,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                .createNotificationChannel(channel)
         }
     }
 

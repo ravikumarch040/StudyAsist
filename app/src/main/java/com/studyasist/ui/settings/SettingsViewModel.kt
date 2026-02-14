@@ -59,6 +59,21 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    val focusGuardRestrictedExtra: StateFlow<Set<String>> = settingsRepository.focusGuardRestrictedExtraFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), emptySet())
+
+    fun addFocusGuardPackage(packageName: String) {
+        viewModelScope.launch {
+            settingsRepository.addFocusGuardPackage(packageName)
+        }
+    }
+
+    fun removeFocusGuardPackage(packageName: String) {
+        viewModelScope.launch {
+            settingsRepository.removeFocusGuardPackage(packageName)
+        }
+    }
+
     fun setUserName(name: String) {
         viewModelScope.launch { settingsRepository.setUserName(name) }
     }

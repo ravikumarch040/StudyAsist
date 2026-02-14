@@ -32,3 +32,6 @@ const val NOTIFICATION_ID_FOCUS_ALERT = 9001
 const val CHANNEL_ID_EXAM_GOAL_ALERT = "exam_goal_alert"
 const val CHANNEL_NAME_EXAM_GOAL_ALERT = "Exam Goal Alert"
 const val NOTIFICATION_ID_EXAM_GOAL_ALERT_BASE = 9100
+const val CHANNEL_ID_CLOUD_BACKUP = "cloud_backup"
+const val CHANNEL_NAME_CLOUD_BACKUP = "Cloud backup"
+const val NOTIFICATION_ID_CLOUD_BACKUP = 9200

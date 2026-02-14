@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,8 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -195,6 +198,53 @@ fun SettingsScreen(
                     stringResource(R.string.focus_guard_usage_hint),
                     style = MaterialTheme.typography.bodySmall
                 )
+                val customPackages by viewModel.focusGuardRestrictedExtra.collectAsState()
+                var addPkgInput by remember { mutableStateOf("") }
+                Text(
+                    stringResource(R.string.focus_guard_custom_apps),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = addPkgInput,
+                        onValueChange = { addPkgInput = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text(stringResource(R.string.focus_guard_add_app_hint)) },
+                        singleLine = true
+                    )
+                    Button(
+                        onClick = {
+                            if (addPkgInput.isNotBlank()) {
+                                viewModel.addFocusGuardPackage(addPkgInput.trim())
+                                addPkgInput = ""
+                            }
+                        },
+                        enabled = addPkgInput.isNotBlank()
+                    ) {
+                        Text("Add")
+                    }
+                }
+                if (customPackages.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        customPackages.forEach { pkg ->
+                            AssistChip(
+                                onClick = { viewModel.removeFocusGuardPackage(pkg) },
+                                label = { Text(pkg, maxLines = 1) },
+                                trailingIcon = {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        contentDescription = stringResource(R.string.delete),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
             }
             Text("Your name", style = MaterialTheme.typography.titleMedium)
             Text(

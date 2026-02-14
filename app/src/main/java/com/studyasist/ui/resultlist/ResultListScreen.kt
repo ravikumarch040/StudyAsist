@@ -1,5 +1,8 @@
 package com.studyasist.ui.resultlist
 
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintManager
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -102,6 +105,50 @@ fun ResultListScreen(
         }
     }
 
+    fun printResults() {
+        coroutineScope.launch {
+            val pdfBytes = viewModel.getExportPdf()
+            if (pdfBytes.isEmpty()) return@launch
+            val printManager = context.getSystemService(android.content.Context.PRINT_SERVICE) as? PrintManager
+                ?: return@launch
+            val jobName = "${context.getString(R.string.app_name)} - ${context.getString(R.string.results)}"
+            val adapter = object : PrintDocumentAdapter() {
+                override fun onLayout(
+                    oldAttributes: PrintAttributes?,
+                    newAttributes: PrintAttributes,
+                    cancellationSignal: android.os.CancellationSignal?,
+                    callback: android.print.PrintDocumentAdapter.LayoutResultCallback?,
+                    metadata: android.os.Bundle?
+                ) {
+                    if (cancellationSignal?.isCanceled == true) {
+                        callback?.onLayoutCancelled()
+                        return
+                    }
+                    val info = android.print.PrintDocumentInfo.Builder("results.pdf")
+                        .setContentType(android.print.PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .setPageCount(1)
+                        .build()
+                    callback?.onLayoutFinished(info, true)
+                }
+
+                override fun onWrite(
+                    pages: Array<out android.print.PageRange>,
+                    destination: android.os.ParcelFileDescriptor,
+                    cancellationSignal: android.os.CancellationSignal,
+                    callback: android.print.PrintDocumentAdapter.WriteResultCallback
+                ) {
+                    try {
+                        java.io.FileOutputStream(destination.fileDescriptor).use { it.write(pdfBytes) }
+                        callback.onWriteFinished(arrayOf(android.print.PageRange.ALL_PAGES))
+                    } catch (e: Exception) {
+                        callback.onWriteFailed(e.message)
+                    }
+                }
+            }
+            printManager.print(jobName, adapter, PrintAttributes.Builder().build())
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -145,6 +192,13 @@ fun ResultListScreen(
                                 onClick = {
                                     showExportMenu = false
                                     shareExportExcel()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.print_results)) },
+                                onClick = {
+                                    showExportMenu = false
+                                    printResults()
                                 }
                             )
                         }

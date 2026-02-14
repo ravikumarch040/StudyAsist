@@ -23,6 +23,7 @@ class StudyGuardService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private var endTimeMillis: Long = 0
     private var activityTitle: String = ""
+    private var restrictedPackages: Set<String> = emptySet()
     private val lastAlertByPackage = mutableMapOf<String, Long>()
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -45,6 +46,7 @@ class StudyGuardService : Service() {
             return START_NOT_STICKY
         }
 
+        restrictedPackages = getRestrictedPackages(this)
         createChannelIfNeeded()
         val notification = NotificationCompat.Builder(this, CHANNEL_ID_FOCUS_GUARD)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
@@ -70,7 +72,7 @@ class StudyGuardService : Service() {
                 return@postDelayed
             }
             val pkg = getForegroundPackage(this)
-            if (pkg != null && pkg != packageName && FOCUS_GUARD_RESTRICTED_PACKAGES.contains(pkg)) {
+            if (pkg != null && pkg != packageName && restrictedPackages.contains(pkg)) {
                 val last = lastAlertByPackage[pkg] ?: 0L
                 if (System.currentTimeMillis() - last >= ALERT_COOLDOWN_MS) {
                     lastAlertByPackage[pkg] = System.currentTimeMillis()

@@ -29,6 +29,7 @@ class SettingsDataStore @Inject constructor(
     val ttsVoiceName = stringPreferencesKey("tts_voice_name")
     val geminiApiKey = stringPreferencesKey("gemini_api_key")
     val focusGuardEnabled = booleanPreferencesKey("focus_guard_enabled")
+    val focusGuardRestrictedExtra = stringPreferencesKey("focus_guard_restricted_extra") // comma-separated package names
     val blockOverlap = booleanPreferencesKey("block_overlap")
     val cloudBackupFolderUri = stringPreferencesKey("cloud_backup_folder_uri")
     val cloudBackupAuto = booleanPreferencesKey("cloud_backup_auto")

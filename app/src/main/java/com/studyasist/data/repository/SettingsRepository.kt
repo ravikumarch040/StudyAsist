@@ -3,6 +3,7 @@ package com.studyasist.data.repository
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.studyasist.data.datastore.SettingsDataStore
+import com.studyasist.notification.FOCUS_GUARD_RESTRICTED_PACKAGES
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -54,6 +55,46 @@ class SettingsRepository @Inject constructor(
     }
 
     val focusGuardEnabledFlow: Flow<Boolean> = settingsFlow.map { it.focusGuardEnabled }
+
+    /** User-added packages only (excludes built-in). */
+    val focusGuardRestrictedExtraFlow: Flow<Set<String>> = dataStore.getPreferencesFlow().map { prefs ->
+        val extra = prefs[dataStore.focusGuardRestrictedExtra]?.takeIf { it.isNotBlank() } ?: ""
+        extra.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+    }
+
+    /** Effective set of restricted packages = built-in + user-added. */
+    val focusGuardRestrictedPackagesFlow: Flow<Set<String>> = dataStore.getPreferencesFlow().map { prefs ->
+        val extra = prefs[dataStore.focusGuardRestrictedExtra]?.takeIf { it.isNotBlank() } ?: ""
+        val extraSet = extra.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+        FOCUS_GUARD_RESTRICTED_PACKAGES + extraSet
+    }
+
+    suspend fun getEffectiveRestrictedPackages(): Set<String> =
+        focusGuardRestrictedPackagesFlow.first()
+
+    suspend fun getFocusGuardRestrictedExtra(): Set<String> {
+        val s = dataStore.getPreferencesFlow().map { prefs ->
+            prefs[dataStore.focusGuardRestrictedExtra]?.takeIf { it.isNotBlank() } ?: ""
+        }.first()
+        return s.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+    }
+
+    suspend fun setFocusGuardRestrictedExtra(packages: Set<String>) {
+        dataStore.dataStore.edit {
+            it[dataStore.focusGuardRestrictedExtra] = packages.joinToString(",")
+        }
+    }
+
+    suspend fun addFocusGuardPackage(packageName: String) {
+        val current = getFocusGuardRestrictedExtra()
+        if (packageName.isNotBlank() && packageName !in current) {
+            setFocusGuardRestrictedExtra(current + packageName.trim())
+        }
+    }
+
+    suspend fun removeFocusGuardPackage(packageName: String) {
+        setFocusGuardRestrictedExtra(getFocusGuardRestrictedExtra() - packageName)
+    }
 
     val activeTimetableIdFlow: Flow<Long?> = dataStore.getPreferencesFlow().map { prefs ->
         val id = prefs[dataStore.activeTimetableId] ?: -1L
