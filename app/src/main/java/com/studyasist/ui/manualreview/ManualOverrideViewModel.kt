@@ -59,7 +59,7 @@ class ManualOverrideViewModel @Inject constructor(
             val assessment = assessmentRepository.getAssessment(attempt.assessmentId)
             _uiState.update {
                 it.copy(
-                    assessmentTitle = assessment?.title ?: "Assessment",
+                    assessmentTitle = assessment?.title ?: context.getString(com.studyasist.R.string.assessment_fallback),
                     currentScore = result.score,
                     maxScore = result.maxScore,
                     currentPercent = result.percent,

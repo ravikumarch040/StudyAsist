@@ -188,7 +188,7 @@ fun ExplainScreen(
                 placeholder = { Text(stringResource(R.string.text_to_explain)) },
                 minLines = 4
             )
-            LanguageDropdown(
+            ExplainLanguageDropdown(
                 selectedCode = uiState.selectedLanguageCode,
                 onSelected = viewModel::setLanguage,
                 options = viewModel.languageOptions
@@ -249,13 +249,14 @@ fun ExplainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LanguageDropdown(
+private fun ExplainLanguageDropdown(
     selectedCode: String,
     onSelected: (String) -> Unit,
-    options: List<Pair<String, String>>
+    options: List<Pair<String, Int>>
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val selectedLabel = options.find { it.first == selectedCode }?.second ?: selectedCode
+    val selectedResId = options.find { it.first == selectedCode }?.second
+    val selectedLabel = selectedResId?.let { stringResource(it) } ?: selectedCode
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it }
@@ -273,7 +274,7 @@ private fun LanguageDropdown(
         ) {
             for (option in options) {
                 DropdownMenuItem(
-                    text = { Text(option.second) },
+                    text = { Text(stringResource(option.second)) },
                     onClick = {
                         onSelected(option.first)
                         expanded = false

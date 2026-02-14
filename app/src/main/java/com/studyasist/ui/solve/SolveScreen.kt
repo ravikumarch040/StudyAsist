@@ -253,10 +253,11 @@ fun SolveScreen(
 private fun SolveLanguageDropdown(
     selectedCode: String,
     onSelected: (String) -> Unit,
-    options: List<Pair<String, String>>
+    options: List<Pair<String, Int>>
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val selectedLabel = options.find { it.first == selectedCode }?.second ?: selectedCode
+    val selectedResId = options.find { it.first == selectedCode }?.second
+    val selectedLabel = selectedResId?.let { stringResource(it) } ?: selectedCode
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it }
@@ -274,7 +275,7 @@ private fun SolveLanguageDropdown(
         ) {
             for (option in options) {
                 DropdownMenuItem(
-                    text = { Text(option.second) },
+                    text = { Text(stringResource(option.second)) },
                     onClick = {
                         onSelected(option.first)
                         expanded = false

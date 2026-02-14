@@ -24,8 +24,8 @@ class BadgeRepository @Inject constructor(
                 BadgeDefinitions.get(earned.badgeId)?.let { def ->
                     EarnedBadge(
                         id = def.id,
-                        title = def.title,
-                        description = def.description,
+                        titleResId = def.titleResId,
+                        descriptionResId = def.descriptionResId,
                         earnedAt = earned.earnedAt
                     )
                 }
@@ -37,8 +37,8 @@ class BadgeRepository @Inject constructor(
             BadgeDefinitions.get(earned.badgeId)?.let { def ->
                 EarnedBadge(
                     id = def.id,
-                    title = def.title,
-                    description = def.description,
+                    titleResId = def.titleResId,
+                    descriptionResId = def.descriptionResId,
                     earnedAt = earned.earnedAt
                 )
             }

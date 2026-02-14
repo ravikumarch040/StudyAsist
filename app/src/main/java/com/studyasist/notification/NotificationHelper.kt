@@ -9,6 +9,7 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import com.studyasist.R
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
@@ -19,40 +20,40 @@ object NotificationHelper {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val defaultChannel = NotificationChannel(
             CHANNEL_ID,
-            CHANNEL_NAME,
+            context.getString(R.string.channel_study_reminder),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = "Reminders for timetable activities"
+            description = context.getString(R.string.channel_reminders_description)
             setSound(Uri.parse("content://settings/system/notification_sound"), AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build())
             enableVibration(true)
         }
         nm.createNotificationChannel(defaultChannel)
         val alarmChannel = NotificationChannel(
             CHANNEL_ID_ALARM,
-            CHANNEL_NAME_ALARM,
+            context.getString(R.string.channel_study_alarm),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Alarm-style reminders that ring until you dismiss"
+            description = context.getString(R.string.channel_alarm_description)
             setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM), AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).build())
             enableVibration(true)
         }
         nm.createNotificationChannel(alarmChannel)
         val alarmTtsChannel = NotificationChannel(
             CHANNEL_ID_ALARM_TTS,
-            CHANNEL_NAME_ALARM_TTS,
+            context.getString(R.string.channel_study_alarm_tts),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Custom spoken message plays when reminder fires; no notification sound"
+            description = context.getString(R.string.channel_alarm_tts_description)
             setSound(null, null)
             enableVibration(true)
         }
         nm.createNotificationChannel(alarmTtsChannel)
         val examGoalChannel = NotificationChannel(
             CHANNEL_ID_EXAM_GOAL_ALERT,
-            CHANNEL_NAME_EXAM_GOAL_ALERT,
+            context.getString(R.string.channel_exam_goal_alert),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = "Reminders when an exam is approaching and coverage is low"
+            description = context.getString(R.string.channel_exam_goal_description)
             enableVibration(true)
         }
         nm.createNotificationChannel(examGoalChannel)
@@ -74,8 +75,8 @@ object NotificationHelper {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val title = "Exam in $daysRemaining days"
-        val body = "$goalName: coverage at $percentComplete%"
+        val title = context.getString(R.string.exam_in_days_format, daysRemaining)
+        val body = context.getString(R.string.exam_goal_coverage_format, goalName, percentComplete)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID_EXAM_GOAL_ALERT)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(title)

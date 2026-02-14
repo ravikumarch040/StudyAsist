@@ -57,7 +57,7 @@ class ManualReviewListViewModel @Inject constructor(
                     ManualReviewItem(
                         attemptId = attempt.id,
                         assessmentTitle = assessment.title,
-                        attemptLabel = "Attempt $attemptNum",
+                        attemptLabel = context.getString(com.studyasist.R.string.attempt_label_format, attemptNum),
                         percent = result?.percent ?: 0f
                     )
                 }

@@ -66,7 +66,7 @@ class CloudBackupWorker @AssistedInject constructor(
                 Result.success()
             } else {
                 Log.e(TAG, "Cloud backup: failed to create document")
-                showCompletionNotification(applicationContext, success = false, errorMessage = "Could not create file in folder")
+                showCompletionNotification(applicationContext, success = false, errorMessage = applicationContext.getString(R.string.err_could_not_create_file_in_folder))
                 Result.failure()
             }
         } catch (e: Exception) {
@@ -95,7 +95,7 @@ class CloudBackupWorker @AssistedInject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID_CLOUD_BACKUP,
-                CHANNEL_NAME_CLOUD_BACKUP,
+                context.getString(R.string.channel_cloud_backup),
                 NotificationManager.IMPORTANCE_LOW
             )
             (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)

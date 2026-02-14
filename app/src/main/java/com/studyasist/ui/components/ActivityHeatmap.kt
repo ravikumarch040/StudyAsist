@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import java.util.Calendar
 import java.util.Locale
@@ -56,7 +57,7 @@ fun ActivityHeatmap(
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "Activity (last $weeks weeks)",
+            text = stringResource(com.studyasist.R.string.activity_last_weeks_format, weeks),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)

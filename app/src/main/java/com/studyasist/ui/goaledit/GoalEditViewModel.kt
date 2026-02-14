@@ -1,7 +1,9 @@
 package com.studyasist.ui.goaledit
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.repository.GoalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +33,7 @@ data class GoalEditUiState(
 
 @HiltViewModel
 class GoalEditViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val goalRepository: GoalRepository
 ) : ViewModel() {
@@ -66,7 +69,7 @@ class GoalEditViewModel @Inject constructor(
                         )
                     }
                 } else {
-                    _uiState.update { it.copy(loadError = "Goal not found") }
+                    _uiState.update { it.copy(loadError = context.getString(com.studyasist.R.string.goal_not_found)) }
                 }
             }
         } else {
@@ -149,7 +152,7 @@ class GoalEditViewModel @Inject constructor(
                 onSaved(id)
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isSaving = false, loadError = e.message ?: "Save failed")
+                    it.copy(isSaving = false, loadError = e.message ?: context.getString(com.studyasist.R.string.err_save_failed))
                 }
             }
         }

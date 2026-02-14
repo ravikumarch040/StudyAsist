@@ -358,7 +358,7 @@ fun SettingsScreen(
                     Text(
                         msg,
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (msg.startsWith("OK") || msg.contains("success")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        color = if (msg == stringResource(R.string.ok_api_key_works)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         maxLines = Int.MAX_VALUE
                     )
                 }
@@ -381,7 +381,7 @@ fun SettingsScreen(
             }
             cloudBackupLastSuccess?.let { millis ->
                 Text(
-                    stringResource(R.string.cloud_backup_last, formatRelativeTimeAgo(millis)),
+                    stringResource(R.string.cloud_backup_last, formatRelativeTimeAgo(millis, context)),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

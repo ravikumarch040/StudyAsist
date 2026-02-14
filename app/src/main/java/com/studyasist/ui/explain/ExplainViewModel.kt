@@ -99,7 +99,7 @@ class ExplainViewModel @Inject constructor(
         viewModelScope.launch {
             val apiKey = settingsRepository.settingsFlow.first().geminiApiKey
             val lang = _uiState.value.selectedLanguageCode
-            val langName = languageOptions.find { option -> option.first == lang }?.second ?: lang
+            val langName = languageOptions.find { it.first == lang }?.second?.let { context.getString(it) } ?: lang
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             val result = geminiRepository.generateContent(
                 apiKey,

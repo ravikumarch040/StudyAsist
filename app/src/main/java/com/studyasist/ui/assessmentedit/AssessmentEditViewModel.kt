@@ -80,7 +80,7 @@ class AssessmentEditViewModel @Inject constructor(
         viewModelScope.launch {
             val assessment = assessmentRepository.getAssessment(assessmentId)
                 ?: run {
-                    _uiState.update { it.copy(errorMessage = "Assessment not found") }
+                    _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_assessment_not_found)) }
                     return@launch
                 }
             assessmentRepository.updateAssessment(

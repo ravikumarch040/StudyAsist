@@ -1,5 +1,7 @@
 package com.studyasist.util
 
+import android.content.Context
+import com.studyasist.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -23,8 +25,8 @@ fun daysUntil(epochMillis: Long): Long {
     return (diff / (24 * 60 * 60 * 1000)).coerceAtLeast(0)
 }
 
-/** Returns a human-readable "X ago" string, or date if older than 7 days. */
-fun formatRelativeTimeAgo(epochMillis: Long): String {
+/** Returns a human-readable "X ago" string, or date if older than 7 days. Pass context for localized strings. */
+fun formatRelativeTimeAgo(epochMillis: Long, context: Context? = null): String {
     val now = System.currentTimeMillis()
     val diffMs = now - epochMillis
     if (diffMs < 0) return SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(epochMillis))
@@ -33,10 +35,10 @@ fun formatRelativeTimeAgo(epochMillis: Long): String {
     val diffHour = diffMin / 60
     val diffDay = diffHour / 24
     return when {
-        diffSec < 60 -> "Just now"
-        diffMin < 60 -> "$diffMin min ago"
-        diffHour < 24 -> "$diffHour hr ago"
-        diffDay < 7 -> "$diffDay days ago"
+        diffSec < 60 -> context?.getString(R.string.just_now) ?: "Just now"
+        diffMin < 60 -> context?.getString(R.string.min_ago_format, diffMin) ?: "$diffMin min ago"
+        diffHour < 24 -> context?.getString(R.string.hr_ago_format, diffHour) ?: "$diffHour hr ago"
+        diffDay < 7 -> context?.getString(R.string.days_ago_format, diffDay) ?: "$diffDay days ago"
         else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(epochMillis))
     }
 }

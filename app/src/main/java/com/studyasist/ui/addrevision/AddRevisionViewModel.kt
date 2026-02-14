@@ -79,7 +79,11 @@ class AddRevisionViewModel @Inject constructor(
     }
 
     private fun buildTitle(subj: String, ch: String?): String {
-        return if (ch.isNullOrBlank()) "Revise: $subj" else "Revise: $subj - $ch"
+        return if (ch.isNullOrBlank()) {
+            context.getString(com.studyasist.R.string.revise_title_subject, subj)
+        } else {
+            context.getString(com.studyasist.R.string.revise_title_subject_chapter, subj, ch)
+        }
     }
 
     fun updateDay(day: Int) = _uiState.update { it.copy(dayOfWeek = day) }

@@ -240,11 +240,11 @@ private fun StudyToolsTabContent(
                                 ) {
                                     Icon(
                                         Icons.Default.EmojiEvents,
-                                        contentDescription = badge.title,
+                                        contentDescription = stringResource(badge.titleResId),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                     Text(
-                                        badge.title,
+                                        stringResource(badge.titleResId),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurface,
                                         maxLines = 1

@@ -1,19 +1,21 @@
 package com.studyasist.data.gamification
 
+import com.studyasist.R
+
 data class BadgeDefinition(
     val id: String,
-    val title: String,
-    val description: String
+    val titleResId: Int,
+    val descriptionResId: Int
 )
 
 object BadgeDefinitions {
     val ALL = listOf(
-        BadgeDefinition("first_assessment", "First Step", "Complete your first assessment"),
-        BadgeDefinition("streak_7", "Week Warrior", "Maintain a 7-day study streak"),
-        BadgeDefinition("streak_30", "Monthly Master", "Maintain a 30-day study streak"),
-        BadgeDefinition("perfect_score", "Perfect", "Get 100% on an assessment"),
-        BadgeDefinition("assessments_10", "Dedicated", "Complete 10 assessments"),
-        BadgeDefinition("questions_100", "Century", "Practice 100 questions")
+        BadgeDefinition("first_assessment", R.string.badge_first_step, R.string.badge_first_step_desc),
+        BadgeDefinition("streak_7", R.string.badge_week_warrior, R.string.badge_week_warrior_desc),
+        BadgeDefinition("streak_30", R.string.badge_monthly_master, R.string.badge_monthly_master_desc),
+        BadgeDefinition("perfect_score", R.string.badge_perfect, R.string.badge_perfect_desc),
+        BadgeDefinition("assessments_10", R.string.badge_dedicated, R.string.badge_dedicated_desc),
+        BadgeDefinition("questions_100", R.string.badge_century, R.string.badge_century_desc)
     )
 
     fun get(id: String): BadgeDefinition? = ALL.find { it.id == id }

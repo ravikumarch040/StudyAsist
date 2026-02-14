@@ -1,7 +1,9 @@
 package com.studyasist.ui.activityedit
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityType
@@ -45,6 +47,7 @@ data class ActivityEditUiState(
 
 @HiltViewModel
 class ActivityEditViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val activityRepository: ActivityRepository,
     private val timetableRepository: TimetableRepository,
@@ -133,9 +136,9 @@ class ActivityEditViewModel @Inject constructor(
         if (state.alarmTtsMessage.isBlank()) {
             viewModelScope.launch {
                 val userName = settingsRepository.settingsFlow.first().userName
-                val name = userName.ifBlank { "there" }
-                val title = state.title.ifBlank { "your activity" }
-                _uiState.update { it.copy(alarmTtsMessage = "Hey $name, Its time for $title") }
+                val name = userName.ifBlank { context.getString(com.studyasist.R.string.alarm_tts_default_name) }
+                val title = state.title.ifBlank { context.getString(com.studyasist.R.string.alarm_tts_default_title) }
+                _uiState.update { it.copy(alarmTtsMessage = context.getString(com.studyasist.R.string.alarm_tts_message_format, name, title)) }
             }
         }
     }
@@ -170,7 +173,7 @@ class ActivityEditViewModel @Inject constructor(
                 if (blockOverlap) {
                     _uiState.update {
                         it.copy(
-                            overlapBlockedMessage = "Another activity overlaps this time. Reschedule or disable \"Block overlapping\" in Settings."
+                            overlapBlockedMessage = context.getString(com.studyasist.R.string.overlap_blocked_message)
                         )
                     }
                 } else {
