@@ -37,6 +37,7 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 ### Export & Print
 
 - **Export:** CSV, PDF, Excel from Timetable detail and Results; share via system sheet.
+- **Share as image:** Timetable and assessment results rendered as PNG (from PDF) and shared via system sheet.
 - **Print:** PDF of timetable and assessment results via system Print dialog (PrintManager).
 
 ### Gamification

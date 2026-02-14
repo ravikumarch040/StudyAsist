@@ -67,7 +67,8 @@
     <string name="focus_guard">Focus guard</string>
     <string name="focus_guard_summary">Alert when you open games, YouTube, or social apps during study time</string>
     <string name="focus_guard_usage_hint">Enable Usage access for StudyAsist in the next screen so we can detect which app you\'re using.</string>
-    <string name="focus_guard_custom_apps">Additional apps to restrict</string>
+    <string name="focus_guard_built_in">Built-in (%1$d apps)</string>
+    <string name="focus_guard_custom_apps">Your additions</string>
     <string name="focus_guard_add_app_hint">Enter package name (e.g. com.example.game)</string>
     <string name="focus_guard_foreground_service_justification">Runs during scheduled study blocks to detect when the user opens other apps (e.g. games, social media) and show a gentle reminder notification. Does not block any apps.</string>
     <string name="cloud_backup_completed">Cloud backup completed</string>
@@ -138,6 +139,7 @@
     <string name="override_score">Override score</string>
     <string name="manual_feedback">Feedback</string>
     <string name="export_pdf">Export PDF</string>
+    <string name="share_as_image">Share as image</string>
     <string name="export_csv">Export CSV</string>
     <string name="export_excel">Export Excel</string>
     <string name="retry">Retry</string>

@@ -55,6 +55,7 @@ import com.studyasist.data.local.entity.ActivityType
 import androidx.core.content.FileProvider
 import com.studyasist.ui.components.colorForActivityType
 import com.studyasist.util.formatTimeMinutes
+import com.studyasist.util.sharePdfAsImage
 import kotlinx.coroutines.launch
 
 private const val SLOT_MINUTES = 30
@@ -118,6 +119,19 @@ fun TimetableDetailScreen(
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_timetable)))
+        }
+    }
+
+    fun shareAsImage() {
+        coroutineScope.launch {
+            val pdfBytes = viewModel.getExportPdf()
+            if (pdfBytes.isEmpty()) return@launch
+            sharePdfAsImage(
+                context = context,
+                pdfBytes = pdfBytes,
+                filePrefix = "timetable_share_$timetableId",
+                chooserTitle = context.getString(R.string.export_timetable)
+            )
         }
     }
 
@@ -194,6 +208,10 @@ fun TimetableDetailScreen(
                             androidx.compose.material3.DropdownMenuItem(
                                 text = { Text(stringResource(R.string.export_excel)) },
                                 onClick = { showExportMenu = false; shareExportExcel() }
+                            )
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { Text(stringResource(R.string.share_as_image)) },
+                                onClick = { showExportMenu = false; shareAsImage() }
                             )
                         }
                     }

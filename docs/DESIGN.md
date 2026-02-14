@@ -1,8 +1,24 @@
 # StudyAsist – Design & Plan
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Target:** Android (personal, single-user)  
-**Scope:** Phase 1 (core) + Phase 2 (nice-to-have) outline
+**Scope:** Phase 1–3 + Exam Goal (implemented); Phase 2 extended.
+
+---
+
+## Implementation Status (as of v1.1)
+
+The following are **implemented** beyond the original Phase 1 scope:
+
+- **Export & Print:** CSV, PDF, Excel from Timetable detail and **Results**; Print via PrintManager for both.
+- **Backup/Restore:** JSON export/import via system share/save in Settings.
+- **Cloud backup:** User-selectable folder (Drive, Dropbox, etc.); manual or daily auto backup; `StudyAsist_Backup_YYYY-MM-DD_HHmmss.json` naming; last backup timestamp in Settings; completion/failure notifications with error details.
+- **Color per type:** Activities use distinct colors by type (STUDY, BREAK, etc.) in timetable and home.
+- **Simple analytics:** Weekly total minutes by activity type in Timetable detail.
+- **Gamification:** Study streak, badges (First Step, Week Warrior, etc.).
+- **Focus guard:** During STUDY blocks, alerts when user opens games/YouTube/social apps (Usage access); built-in + custom restricted package list; nudges via notification only (no blocking).
+- **Study tools (Phase 3):** Dictate (OCR → TTS), Explain, Solve (Gemini); TTS voice selection in Settings.
+- **Exam goal:** Goals, Q&A bank, assessments, attempts, results, manual review, export.
 
 ---
 
@@ -112,11 +128,16 @@
 ### 3.3 Settings (DataStore)
 
 - `defaultLeadMinutes`: Int (0, 5, 10)
-- `soundEnabled`: Boolean
 - `vibrationEnabled`: Boolean
-- `defaultChannelImportance`: Int (Importance constant)
-- `exportFileNamePattern`: String? (e.g. "StudyAsist_{name}_{date}.xlsx")
-- `lastExportPath`: String? (optional, for “save to same folder”)
+- `userName`: String (for TTS: “Hey {name}...”)
+- `ttsVoiceName`: String? (TTS voice for alarms/reading)
+- `geminiApiKey`: String (for Explain/Solve)
+- `focusGuardEnabled`: Boolean
+- `focusGuardRestrictedExtra`: String (comma-separated, user-added package names)
+- `blockOverlap`: Boolean
+- `cloudBackupFolderUri`: String? (DocumentsProvider tree URI)
+- `cloudBackupAuto`: Boolean (daily periodic backup)
+- `cloudBackupLastSuccessMillis`: Long (last successful backup timestamp)
 
 ### 3.4 DAOs (conceptual)
 
@@ -133,10 +154,13 @@
 | Screen | Purpose |
 |--------|--------|
 | **TimetableList** | List all timetables; FAB “Add”; swipe/action to duplicate, delete, export. |
-| **TimetableDetail** | Tabs or toggle: Day view | Week view. App bar: title, filter by type, overflow: Export Excel, Print, Share, Edit timetable name, Duplicate. |
+| **TimetableDetail** | Day view | Week view; filter by type; weekly analytics; Export CSV/PDF/Excel, Print, Share, Duplicate. |
 | **ActivityEdit** | Add/Edit activity form (day, start/end time, title, type, note, notification toggle, lead time). Overlap warning at save. |
-| **Settings** | Default notification lead time, sound on/off, vibration on/off, channel importance. Optional: export path. |
-| **Dialogs** | Delete confirm; Overlap warning; Export success → “Open with…” / Share. |
+| **Settings** | Lead time, vibration, user name, TTS voice, focus guard, Backup/Restore, Cloud backup, block overlap, Gemini API key. |
+| **ResultList** | Assessment results; Export CSV/PDF/Excel, Print. |
+| **Study tools** | Dictate, Explain, Solve (OCR, AI). |
+| **Exam goal** | Goals, Q&A bank, assessments, attempts, manual review. |
+| **Dialogs** | Delete confirm; Overlap warning; Export success → Share. |
 
 ### 4.2 Navigation Graph (Compose)
 
@@ -225,6 +249,13 @@
 
 - **BOOT_COMPLETED** receiver: Reschedule all alarms from Activity table (notifyEnabled = true). Use WorkManager one-time “reschedule notifications” worker if AlarmManager is not yet allowed post-boot.
 
+### 6.5 Focus Guard (Study blocks)
+
+- For **STUDY** activities with notifications and `focusGuardEnabled`: foreground service starts at block begin, ends at block end.
+- Uses `UsageStatsManager` (requires Usage access); polls every 5s for foreground app.
+- If app in restricted set (built-in + user custom): show alert notification (2 min cooldown per package).
+- Does not block; nudges only.
+
 ---
 
 ## 7. Non-Functional Requirements
@@ -235,12 +266,13 @@
 
 ---
 
-## 8. Phase 2 (Nice-to-Have)
+## 8. Phase 2 (Status)
 
-- **Color codes:** Per subject or per type; store color in Activity or in a “Subject” table.
-- **Analytics:** Aggregate total study hours per subject/week from Activity (type=STUDY); simple screen or chart.
-- **Backup/Restore:** Export DB or JSON to file; import from file; optional Google Drive later.
-- **Share as image:** Screenshot week/day view and share PNG.
+**Done:** Color per type, simple analytics (weekly minutes by type), Backup/Restore JSON, Cloud backup (DocumentsProvider).
+
+**Done:** Share as image (timetable PDF rendered to PNG, shared via system sheet).
+
+**Future:** Optional native Google Drive API.
 
 ---
 

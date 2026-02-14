@@ -1,9 +1,9 @@
 package com.studyasist.ui.resultlist
 
+import android.content.Intent
 import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintManager
-import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.studyasist.R
 import com.studyasist.data.repository.ResultListItem
+import com.studyasist.util.sharePdfAsImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,6 +103,19 @@ fun ResultListScreen(
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_results)))
+        }
+    }
+
+    fun shareAsImage() {
+        coroutineScope.launch {
+            val pdfBytes = viewModel.getExportPdf()
+            if (pdfBytes.isEmpty()) return@launch
+            sharePdfAsImage(
+                context = context,
+                pdfBytes = pdfBytes,
+                filePrefix = "results_share",
+                chooserTitle = context.getString(R.string.export_results)
+            )
         }
     }
 
@@ -192,6 +206,13 @@ fun ResultListScreen(
                                 onClick = {
                                     showExportMenu = false
                                     shareExportExcel()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.share_as_image)) },
+                                onClick = {
+                                    showExportMenu = false
+                                    shareAsImage()
                                 }
                             )
                             DropdownMenuItem(

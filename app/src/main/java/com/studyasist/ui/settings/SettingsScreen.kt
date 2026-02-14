@@ -37,6 +37,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
 import com.studyasist.data.repository.AppSettings
+import com.studyasist.notification.FOCUS_GUARD_RESTRICTED_PACKAGES
 import com.studyasist.notification.openUsageAccessSettings
 import com.studyasist.util.VoiceOption
 import com.studyasist.util.formatRelativeTimeAgo
@@ -200,6 +204,41 @@ fun SettingsScreen(
                     stringResource(R.string.focus_guard_usage_hint),
                     style = MaterialTheme.typography.bodySmall
                 )
+                var showBuiltIn by remember { mutableStateOf(false) }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.focus_guard_built_in, FOCUS_GUARD_RESTRICTED_PACKAGES.size),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    androidx.compose.material3.TextButton(
+                        onClick = { showBuiltIn = !showBuiltIn }
+                    ) {
+                        Text(if (showBuiltIn) "Hide" else "View")
+                    }
+                }
+                AnimatedVisibility(
+                    visible = showBuiltIn,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        FOCUS_GUARD_RESTRICTED_PACKAGES.sorted().forEach { pkg ->
+                            Text(
+                                pkg,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
                 val customPackages by viewModel.focusGuardRestrictedExtra.collectAsState()
                 var addPkgInput by remember { mutableStateOf("") }
                 Text(
