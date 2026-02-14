@@ -97,7 +97,7 @@ fun ManualReviewListScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                "%.0f%%".format(item.percent),
+                                stringResource(R.string.percent_format, item.percent),
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.primary
                             )

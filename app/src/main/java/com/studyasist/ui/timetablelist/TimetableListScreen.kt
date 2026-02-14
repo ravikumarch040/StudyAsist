@@ -192,8 +192,8 @@ private fun TimetableCard(
                     }
                     Text(
                         text = when (timetable.weekType) {
-                            WeekType.MON_SUN -> "Mon–Sun"
-                            WeekType.MON_SAT_PLUS_SUNDAY -> "Mon–Sat + Sunday"
+                            WeekType.MON_SUN -> stringResource(R.string.week_type_mon_sun)
+                            WeekType.MON_SAT_PLUS_SUNDAY -> stringResource(R.string.week_type_mon_sat_sunday)
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -252,8 +252,8 @@ private fun CreateTimetableDialog(
                     selected = weekType,
                     onSelected = onWeekTypeChange,
                     options = listOf(
-                        WeekType.MON_SUN to "Mon–Sun",
-                        WeekType.MON_SAT_PLUS_SUNDAY to "Mon–Sat + Sunday"
+                        WeekType.MON_SUN to R.string.week_type_mon_sun,
+                        WeekType.MON_SAT_PLUS_SUNDAY to R.string.week_type_mon_sat_sunday
                     )
                 )
             }
@@ -263,7 +263,7 @@ private fun CreateTimetableDialog(
                 onClick = onCreate,
                 enabled = name.isNotBlank() && !isCreating
             ) {
-                Text(if (isCreating) "Creating…" else "Create")
+                Text(if (isCreating) stringResource(R.string.creating) else stringResource(R.string.create))
             }
         },
         dismissButton = {
@@ -278,11 +278,11 @@ private fun CreateTimetableDialog(
 private fun RadioButtonGroup(
     selected: WeekType,
     onSelected: (WeekType) -> Unit,
-    options: List<Pair<WeekType, String>>
+    options: List<Pair<WeekType, Int>>
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(stringResource(R.string.week_type), style = MaterialTheme.typography.labelMedium)
-        for ((value, label) in options) {
+        for ((value, labelResId) in options) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.clickable { onSelected(value) }
@@ -291,7 +291,7 @@ private fun RadioButtonGroup(
                     selected = selected == value,
                     onClick = { onSelected(value) }
                 )
-                Text(label)
+                Text(stringResource(labelResId))
             }
         }
     }

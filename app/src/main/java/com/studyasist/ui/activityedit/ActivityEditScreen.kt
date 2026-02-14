@@ -79,11 +79,11 @@ fun ActivityEditScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                for ((day, label) in listOf(1 to "Mon", 2 to "Tue", 3 to "Wed", 4 to "Thu", 5 to "Fri", 6 to "Sat", 7 to "Sun")) {
+                for ((day, labelResId) in listOf(1 to R.string.day_mon, 2 to R.string.day_tue, 3 to R.string.day_wed, 4 to R.string.day_thu, 5 to R.string.day_fri, 6 to R.string.day_sat, 7 to R.string.day_sun)) {
                     androidx.compose.material3.FilterChip(
                         selected = uiState.dayOfWeek == day,
                         onClick = { viewModel.updateDay(day) },
-                        label = { Text(label) }
+                        label = { Text(stringResource(labelResId)) }
                     )
                 }
             }
@@ -94,12 +94,12 @@ fun ActivityEditScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    for ((day, label) in listOf(1 to "Mon", 2 to "Tue", 3 to "Wed", 4 to "Thu", 5 to "Fri", 6 to "Sat", 7 to "Sun")) {
+                    for ((day, labelResId) in listOf(1 to R.string.day_mon, 2 to R.string.day_tue, 3 to R.string.day_wed, 4 to R.string.day_thu, 5 to R.string.day_fri, 6 to R.string.day_sat, 7 to R.string.day_sun)) {
                         if (day != uiState.dayOfWeek) {
                             androidx.compose.material3.FilterChip(
                                 selected = false,
                                 onClick = { viewModel.copyScheduleFromDay(day, onDone = onSaved) },
-                                label = { Text(stringResource(R.string.from_day, label)) }
+                                label = { Text(stringResource(R.string.from_day, stringResource(labelResId))) }
                             )
                         }
                     }

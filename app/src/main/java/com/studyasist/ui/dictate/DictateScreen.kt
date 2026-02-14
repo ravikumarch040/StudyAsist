@@ -180,7 +180,7 @@ fun DictateScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading && uiState.imageUri != null
             ) {
-                Text(if (uiState.isLoading) "Extracting…" else stringResource(R.string.dictate_read_aloud))
+                Text(if (uiState.isLoading) stringResource(R.string.extracting) else stringResource(R.string.dictate_read_aloud))
             }
             if (uiState.errorMessage != null) {
                 Text(uiState.errorMessage!!, color = MaterialTheme.colorScheme.error)

@@ -211,12 +211,12 @@ fun AssessmentResultScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "%.0f%%".format(uiState.percent),
+                        stringResource(R.string.percent_format, uiState.percent),
                         style = MaterialTheme.typography.displayMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        "Score: %.0f / %.0f".format(uiState.score, uiState.maxScore),
+                        stringResource(R.string.score_format, uiState.score, uiState.maxScore),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -323,7 +323,7 @@ fun AssessmentResultScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    "%.1f/1".format(item.questionScore),
+                                    stringResource(R.string.question_score_format, item.questionScore),
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

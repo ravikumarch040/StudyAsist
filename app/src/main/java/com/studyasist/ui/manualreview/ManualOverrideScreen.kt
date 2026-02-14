@@ -87,7 +87,7 @@ fun ManualOverrideScreen(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        "Current: %.1f / %.1f (%.0f%%)".format(
+                        stringResource(R.string.current_score_format,
                             uiState.currentScore,
                             uiState.maxScore,
                             uiState.currentPercent

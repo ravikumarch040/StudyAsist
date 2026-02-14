@@ -249,4 +249,21 @@
     <string name="cd_start">Start assessment</string>
     <string name="cd_decrease">Decrease</string>
     <string name="cd_increase">Increase</string>
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+    <string name="day_sat">Sat</string>
+    <string name="day_sun">Sun</string>
+    <string name="week_type_mon_sun">Mon–Sun</string>
+    <string name="week_type_mon_sat_sunday">Mon–Sat + Sunday</string>
+    <string name="creating">Creating…</string>
+    <string name="percent_complete">%1$.0f%% complete</string>
+    <string name="percent_format">%1$.0f%%</string>
+    <string name="score_format">Score: %1$.0f / %2$.0f</string>
+    <string name="current_score_format">Current: %1$.1f / %2$.1f (%3$.0f%%)</string>
+    <string name="practiced_format">%1$d / %2$d (%3$.0f%%)</string>
+    <string name="question_score_format">%1$.1f/1</string>
+    <string name="extracting">Extracting…</string>
 </resources>

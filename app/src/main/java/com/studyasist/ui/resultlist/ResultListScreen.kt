@@ -294,7 +294,7 @@ private fun ResultCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                "%.0f%%".format(percent),
+                stringResource(R.string.percent_format, percent),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary
             )

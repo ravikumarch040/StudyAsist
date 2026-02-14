@@ -75,7 +75,7 @@ fun TimetableDetailScreen(
     var showExportMenu by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val days = listOf(1 to "Mon", 2 to "Tue", 3 to "Wed", 4 to "Thu", 5 to "Fri", 6 to "Sat", 7 to "Sun")
+    val days = listOf(1 to R.string.day_mon, 2 to R.string.day_tue, 3 to R.string.day_wed, 4 to R.string.day_thu, 5 to R.string.day_fri, 6 to R.string.day_sat, 7 to R.string.day_sun)
 
     fun shareExportCsv() {
         coroutineScope.launch {
@@ -307,12 +307,12 @@ fun TimetableDetailScreen(
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        for ((day, label) in days) {
+                        for ((day, labelResId) in days) {
                             val selected = uiState.selectedDay == day
                             androidx.compose.material3.FilterChip(
                                 selected = selected,
                                 onClick = { viewModel.setSelectedDay(day) },
-                                label = { Text(label) }
+                                label = { Text(stringResource(labelResId)) }
                             )
                         }
                     }
@@ -364,19 +364,19 @@ private fun WeekView(
     val minMinutes = activities.minOf { it.startTimeMinutes }.let { (it / SLOT_MINUTES) * SLOT_MINUTES }
     val maxMinutes = activities.maxOf { it.endTimeMinutes }.let { ((it + SLOT_MINUTES - 1) / SLOT_MINUTES) * SLOT_MINUTES }
     val slotCount = ((maxMinutes - minMinutes) / SLOT_MINUTES).coerceAtLeast(1)
-    val dayLabels = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val dayLabelResIds = listOf(R.string.day_mon, R.string.day_tue, R.string.day_wed, R.string.day_thu, R.string.day_fri, R.string.day_sat, R.string.day_sun)
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(8.dp)) {
         item {
             Row(Modifier.fillMaxWidth()) {
                 Box(Modifier.widthIn(min = 48.dp).padding(4.dp)) {}
-                dayLabels.forEach { label ->
+                dayLabelResIds.forEach { resId ->
                     Box(
                         Modifier
                             .weight(1f)
                             .padding(4.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(label, style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(resId), style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }

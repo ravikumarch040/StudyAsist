@@ -159,7 +159,7 @@ fun GoalDetailScreen(
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     Text(
-                        "%.0f%% complete".format(uiState.percentComplete),
+                        stringResource(R.string.percent_complete, uiState.percentComplete),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -292,7 +292,7 @@ fun GoalDetailScreen(
                                 )
                             }
                             Text(
-                                "%.0f%%".format(attempt.percent),
+                                stringResource(R.string.percent_format, attempt.percent),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -321,7 +321,7 @@ fun GoalDetailScreen(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                "${progress.practiced} / ${progress.total} (%.0f%%)".format(progress.percent),
+                                stringResource(R.string.practiced_format, progress.practiced, progress.total, progress.percent),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
