@@ -113,7 +113,7 @@ fun AssessmentRunScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Loading…", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.loading), style = MaterialTheme.typography.bodyLarge)
             }
             return@Scaffold
         }
@@ -128,7 +128,7 @@ fun AssessmentRunScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    uiState.errorMessage ?: "No questions in this assessment",
+                    uiState.errorMessage ?: stringResource(R.string.no_questions_in_assessment),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -202,7 +202,7 @@ fun AssessmentRunScreen(
                 )
             }
             Text(
-                "Question ${uiState.currentIndex + 1} of ${uiState.questions.size}",
+                stringResource(R.string.question_x_of_y, uiState.currentIndex + 1, uiState.questions.size),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -372,7 +372,7 @@ private fun QuestionCard(
                                 enabled = !isExtracting
                             ) {
                                 Icon(Icons.Default.Mic, contentDescription = stringResource(R.string.cd_record), Modifier.padding(end = 4.dp))
-                                Text("Record")
+                                Text(stringResource(R.string.record))
                             }
                             Button(
                                 onClick = onUploadImageClick,
@@ -380,7 +380,7 @@ private fun QuestionCard(
                                 enabled = !isExtracting
                             ) {
                                 Icon(Icons.Default.PhotoCamera, contentDescription = stringResource(R.string.cd_photo), Modifier.padding(end = 4.dp))
-                                Text("Photo")
+                                Text(stringResource(R.string.photo))
                             }
                             Button(
                                 onClick = onGalleryClick,
@@ -388,7 +388,7 @@ private fun QuestionCard(
                                 enabled = !isExtracting
                             ) {
                                 Icon(Icons.Default.PhotoLibrary, contentDescription = stringResource(R.string.cd_gallery), Modifier.padding(end = 4.dp))
-                                Text("Gallery")
+                                Text(stringResource(R.string.gallery))
                             }
                         }
                     }
@@ -432,7 +432,7 @@ private fun McqOptions(
                     selected = selected.equals(letter, ignoreCase = true) || selected.equals(opt, ignoreCase = true),
                     onClick = { onSelect(letter) }
                 )
-                Text("$letter) $opt", Modifier.padding(start = 8.dp))
+                Text(stringResource(R.string.mcq_option_format, letter, opt), Modifier.padding(start = 8.dp))
             }
         }
     }
@@ -458,7 +458,7 @@ private fun TrueFalseOptions(
                 selected = selected.equals("true", ignoreCase = true),
                 onClick = { onSelect("true") }
             )
-            Text("True", Modifier.padding(start = 8.dp))
+            Text(stringResource(R.string.true_label), Modifier.padding(start = 8.dp))
         }
         Row(
             Modifier
@@ -469,7 +469,7 @@ private fun TrueFalseOptions(
                 selected = selected.equals("false", ignoreCase = true),
                 onClick = { onSelect("false") }
             )
-            Text("False", Modifier.padding(start = 8.dp))
+            Text(stringResource(R.string.false_label), Modifier.padding(start = 8.dp))
         }
     }
 }

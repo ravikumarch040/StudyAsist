@@ -139,7 +139,7 @@ fun QAScanScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Use AI extraction (recommended for math)", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.use_ai_extraction_hint), style = MaterialTheme.typography.bodyMedium)
                 Switch(
                     checked = uiState.useAiExtraction,
                     onCheckedChange = { viewModel.setUseAiExtraction(it) }
@@ -201,7 +201,7 @@ fun QAScanScreen(
                             }
                         if (uiState.distinctSubjects.none { it.equals(uiState.subject, ignoreCase = true) } && uiState.subject.isNotBlank()) {
                             DropdownMenuItem(
-                                text = { Text("Use \"${uiState.subject}\" (new)") },
+                                text = { Text(stringResource(R.string.use_subject_new, uiState.subject)) },
                                 onClick = {
                                     subjectExpanded = false
                                 }
@@ -242,7 +242,7 @@ fun QAScanScreen(
                             )
                         }
                         DropdownMenuItem(
-                            text = { Text("Enter new (type above)") },
+                            text = { Text(stringResource(R.string.enter_new_type_above)) },
                             onClick = { chapterExpanded = false }
                         )
                     }

@@ -126,7 +126,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -161,9 +161,9 @@ fun SettingsScreen(
                     )
                 }
             }
-            Text("Notifications", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.notifications), style = MaterialTheme.typography.titleMedium)
             Text(
-                "Default reminder (minutes before activity)",
+                stringResource(R.string.default_reminder_minutes),
                 style = MaterialTheme.typography.bodySmall
             )
             Row(
@@ -174,7 +174,7 @@ fun SettingsScreen(
                     androidx.compose.material3.FilterChip(
                         selected = settings.defaultLeadMinutes == mins,
                         onClick = { viewModel.setDefaultLeadMinutes(mins) },
-                        label = { Text("$mins min") }
+                        label = { Text(stringResource(R.string.mins_min, mins)) }
                     )
                 }
             }
@@ -183,7 +183,7 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Vibration")
+                Text(stringResource(R.string.vibration))
                 Switch(
                     checked = settings.vibrationEnabled,
                     onCheckedChange = viewModel::setVibrationEnabled
@@ -240,7 +240,7 @@ fun SettingsScreen(
                     androidx.compose.material3.TextButton(
                         onClick = { showBuiltIn = !showBuiltIn }
                     ) {
-                        Text(if (showBuiltIn) "Hide" else "View")
+                        Text(if (showBuiltIn) stringResource(R.string.hide) else stringResource(R.string.view))
                     }
                 }
                 AnimatedVisibility(
@@ -288,7 +288,7 @@ fun SettingsScreen(
                         },
                         enabled = addPkgInput.isNotBlank()
                     ) {
-                        Text("Add")
+                        Text(stringResource(R.string.cd_add))
                     }
                 }
                 if (customPackages.isNotEmpty()) {
@@ -309,37 +309,37 @@ fun SettingsScreen(
                     }
                 }
             }
-            Text("Your name", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.your_name), style = MaterialTheme.typography.titleMedium)
             Text(
-                "Used in alarm speech: \"Hey {name}, Its time for {activity}\". Optional.",
+                stringResource(R.string.your_name_hint),
                 style = MaterialTheme.typography.bodySmall
             )
             OutlinedTextField(
                 value = settings.userName,
                 onValueChange = viewModel::setUserName,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Your name") },
+                placeholder = { Text(stringResource(R.string.your_name)) },
                 singleLine = true
             )
-            Text("Speech (India voices)", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.speech_india_voices), style = MaterialTheme.typography.titleMedium)
             Text(
-                "Voice for alarms and reading aloud. Only India voices are listed.",
+                stringResource(R.string.voice_for_alarms_hint),
                 style = MaterialTheme.typography.bodySmall
             )
             VoiceDropdown(
                 selectedVoiceName = settings.ttsVoiceName,
                 onVoiceSelected = viewModel::setTtsVoiceName
             )
-            Text("AI (Explain / Solve)", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ai_explain_solve), style = MaterialTheme.typography.titleMedium)
             Text(
-                "Gemini API key from Google AI Studio. Required for Explain and Solve.",
+                stringResource(R.string.gemini_api_key_hint_long),
                 style = MaterialTheme.typography.bodySmall
             )
             OutlinedTextField(
                 value = settings.geminiApiKey,
                 onValueChange = viewModel::setGeminiApiKey,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("API key") },
+                placeholder = { Text(stringResource(R.string.api_key)) },
                 singleLine = true
             )
             androidx.compose.material3.Button(
@@ -347,7 +347,7 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = settings.geminiApiKey.isNotBlank()
             ) {
-                Text("Test API key")
+                Text(stringResource(R.string.test_api_key))
             }
             apiKeyTestMessage?.let { msg ->
                 Box(
@@ -412,7 +412,7 @@ fun SettingsScreen(
                     title = { Text(stringResource(R.string.restore_from_folder_hint)) },
                     text = {
                         if (cloudBackupFilesLoading) {
-                            Text("Loading…")
+                            Text(stringResource(R.string.loading))
                         } else if (cloudBackupFiles.isEmpty()) {
                             Text(stringResource(R.string.no_backups_in_folder))
                         } else {
@@ -510,22 +510,23 @@ private fun VoiceDropdown(
     onVoiceSelected: (String?) -> Unit
 ) {
     val context = LocalContext.current
+    val systemDefaultStr = stringResource(R.string.system_default)
     var voices by remember { mutableStateOf<List<VoiceOption>>(emptyList()) }
     var expanded by remember { mutableStateOf(false) }
     var selectedLabel by remember(selectedVoiceName) {
         mutableStateOf(
-            if (selectedVoiceName.isNullOrEmpty()) "System default"
-            else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: "System default"
+            if (selectedVoiceName.isNullOrEmpty()) systemDefaultStr
+            else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: systemDefaultStr
         )
     }
     LaunchedEffect(Unit) {
         voices = withContext(Dispatchers.Main.immediate) { loadAvailableVoicesIndia(context) }
-        selectedLabel = if (selectedVoiceName.isNullOrEmpty()) "System default"
-        else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: "System default"
+        selectedLabel = if (selectedVoiceName.isNullOrEmpty()) systemDefaultStr
+        else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: systemDefaultStr
     }
     LaunchedEffect(selectedVoiceName, voices) {
-        selectedLabel = if (selectedVoiceName.isNullOrEmpty()) "System default"
-        else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: "System default"
+        selectedLabel = if (selectedVoiceName.isNullOrEmpty()) systemDefaultStr
+        else voices.find { it.voiceName == selectedVoiceName }?.displayName ?: systemDefaultStr
     }
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -545,10 +546,10 @@ private fun VoiceDropdown(
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("System default") },
+                text = { Text(systemDefaultStr) },
                 onClick = {
                     onVoiceSelected(null)
-                    selectedLabel = "System default"
+                    selectedLabel = systemDefaultStr
                     expanded = false
                 }
             )

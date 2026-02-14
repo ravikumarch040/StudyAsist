@@ -53,7 +53,7 @@ fun AssessmentListScreen(
         AlertDialog(
             onDismissRequest = { deleteConfirmId = null },
             title = { Text(stringResource(R.string.delete)) },
-            text = { Text("Delete this assessment?") },
+            text = { Text(stringResource(R.string.delete_assessment_confirm)) },
             confirmButton = {
                 TextButton(
                     onClick = {

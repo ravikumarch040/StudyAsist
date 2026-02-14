@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -33,6 +34,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.studyasist.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,7 +79,7 @@ fun ImageCropSelector(
 
     if (bitmap == null && imageUri != null) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            Text("Failed to load image", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.failed_to_load_image), style = MaterialTheme.typography.bodyMedium)
         }
         return
     }
@@ -176,10 +178,10 @@ fun ImageCropSelector(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
         ) {
-            Text("Drag corners to adjust region", style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.drag_corners_hint), style = MaterialTheme.typography.bodySmall)
             Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
                 Button(onClick = onCancel) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
                 Button(
                     onClick = {
@@ -201,7 +203,7 @@ fun ImageCropSelector(
                         }
                     }
                 ) {
-                    Text("Use selection")
+                    Text(stringResource(R.string.use_selection))
                 }
             }
         }

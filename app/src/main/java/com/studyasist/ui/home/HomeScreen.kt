@@ -69,7 +69,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("StudyAsist") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
@@ -279,7 +279,7 @@ private fun StudyToolsTabContent(
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(stringResource(R.string.assessments), style = MaterialTheme.typography.titleSmall)
-                    Text("Create and take practice tests", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.create_practice_tests), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -290,7 +290,7 @@ private fun StudyToolsTabContent(
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text(stringResource(R.string.results), style = MaterialTheme.typography.titleSmall)
-                    Text("View your attempt history and scores", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.view_attempt_history), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

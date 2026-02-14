@@ -100,17 +100,17 @@ fun AssessmentCreateScreen(
                     selected = uiState.sourceMode == SourceMode.BY_GOAL,
                     onClick = { viewModel.setSourceMode(SourceMode.BY_GOAL) }
                 )
-                Text("By goal", Modifier.padding(end = 12.dp))
+                Text(stringResource(R.string.by_goal), Modifier.padding(end = 12.dp))
                 RadioButton(
                     selected = uiState.sourceMode == SourceMode.BY_SUBJECT_CHAPTER,
                     onClick = { viewModel.setSourceMode(SourceMode.BY_SUBJECT_CHAPTER) }
                 )
-                Text("By subject/chapter", Modifier.padding(end = 12.dp))
+                Text(stringResource(R.string.by_subject_chapter), Modifier.padding(end = 12.dp))
                 RadioButton(
                     selected = uiState.sourceMode == SourceMode.MANUAL,
                     onClick = { viewModel.setSourceMode(SourceMode.MANUAL) }
                 )
-                Text("Manual")
+                Text(stringResource(R.string.manual))
             }
 
             when (uiState.sourceMode) {
@@ -175,7 +175,7 @@ fun AssessmentCreateScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Randomize questions", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.randomize_questions), style = MaterialTheme.typography.bodyMedium)
                 Switch(
                     checked = uiState.randomize,
                     onCheckedChange = { viewModel.setRandomize(it) }
@@ -255,7 +255,7 @@ private fun ManualSelectionSection(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         OutlinedButton(onClick = onSelectClick) {
-            Text("Select questions")
+            Text(stringResource(R.string.select_questions))
         }
         if (selectedCount > 0) {
             Text(
@@ -264,7 +264,7 @@ private fun ManualSelectionSection(
                 color = MaterialTheme.colorScheme.primary
             )
             OutlinedButton(onClick = onClearClick) {
-                Text("Clear")
+                Text(stringResource(R.string.clear))
             }
         }
     }
@@ -291,7 +291,7 @@ private fun SelectedQAPreview(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 OutlinedButton(onClick = onEditSelection) {
-                    Text("Change selection")
+                    Text(stringResource(R.string.change_selection))
                 }
             }
             LazyColumn(

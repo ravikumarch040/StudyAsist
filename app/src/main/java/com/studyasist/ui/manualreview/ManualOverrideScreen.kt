@@ -63,7 +63,7 @@ fun ManualOverrideScreen(
                     .padding(paddingValues),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("Loading…", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.loading), style = MaterialTheme.typography.bodyLarge)
             }
             return@Scaffold
         }
@@ -101,7 +101,7 @@ fun ManualOverrideScreen(
             OutlinedTextField(
                 value = uiState.overrideScore,
                 onValueChange = { viewModel.updateOverrideScore(it) },
-                label = { Text("Score") },
+                label = { Text(stringResource(R.string.score)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true
@@ -109,7 +109,7 @@ fun ManualOverrideScreen(
             OutlinedTextField(
                 value = uiState.overrideMaxScore,
                 onValueChange = { viewModel.updateOverrideMaxScore(it) },
-                label = { Text("Max score") },
+                label = { Text(stringResource(R.string.max_score)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true

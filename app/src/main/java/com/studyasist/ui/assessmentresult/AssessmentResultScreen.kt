@@ -189,7 +189,7 @@ fun AssessmentResultScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Loading…", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.loading), style = MaterialTheme.typography.bodyLarge)
             }
             return@Scaffold
         }

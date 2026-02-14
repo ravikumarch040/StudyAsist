@@ -82,7 +82,7 @@ fun AddRevisionScreen(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Day", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.day), style = MaterialTheme.typography.labelMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -96,13 +96,13 @@ fun AddRevisionScreen(
                 }
             }
 
-            Text("Start time", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.start_time), style = MaterialTheme.typography.labelMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                    Text("Hour", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.hour), style = MaterialTheme.typography.labelSmall)
                     NumberPicker(
                         value = uiState.startHour.coerceIn(0, 23),
                         onValueChange = { viewModel.updateStartTime(it, uiState.startMinute) },
@@ -110,7 +110,7 @@ fun AddRevisionScreen(
                     )
                 }
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                    Text("Min", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.min_label), style = MaterialTheme.typography.labelSmall)
                     NumberPicker(
                         value = uiState.startMinute.coerceIn(0, 59),
                         onValueChange = { viewModel.updateStartTime(uiState.startHour, it) },
@@ -118,13 +118,13 @@ fun AddRevisionScreen(
                     )
                 }
             }
-            Text("End time", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.end_time), style = MaterialTheme.typography.labelMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                    Text("Hour", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.hour), style = MaterialTheme.typography.labelSmall)
                     NumberPicker(
                         value = uiState.endHour.coerceIn(0, 23),
                         onValueChange = { viewModel.updateEndTime(it, uiState.endMinute) },
@@ -132,7 +132,7 @@ fun AddRevisionScreen(
                     )
                 }
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                    Text("Min", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.min_label), style = MaterialTheme.typography.labelSmall)
                     NumberPicker(
                         value = uiState.endMinute.coerceIn(0, 59),
                         onValueChange = { viewModel.updateEndTime(uiState.endHour, it) },
@@ -144,7 +144,7 @@ fun AddRevisionScreen(
             OutlinedTextField(
                 value = uiState.title,
                 onValueChange = viewModel::updateTitle,
-                label = { Text("Title") },
+                label = { Text(stringResource(R.string.title)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -162,7 +162,7 @@ fun AddRevisionScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isSaving
             ) {
-                Text(if (uiState.isSaving) "..." else stringResource(R.string.save))
+                Text(if (uiState.isSaving) stringResource(R.string.saving) else stringResource(R.string.save))
             }
         }
     }

@@ -74,7 +74,7 @@ fun ActivityEditScreen(
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
-            Text("Day", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.day), style = MaterialTheme.typography.labelMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -89,7 +89,7 @@ fun ActivityEditScreen(
             }
 
             if (!uiState.isEdit) {
-                Text("Copy schedule from another day", style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.copy_from_day), style = MaterialTheme.typography.labelMedium)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -99,20 +99,20 @@ fun ActivityEditScreen(
                             androidx.compose.material3.FilterChip(
                                 selected = false,
                                 onClick = { viewModel.copyScheduleFromDay(day, onDone = onSaved) },
-                                label = { Text("From $label") }
+                                label = { Text(stringResource(R.string.from_day, label)) }
                             )
                         }
                     }
                 }
             }
 
-            Text("Start time", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.start_time), style = MaterialTheme.typography.labelMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                    Text("Hour", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.hour), style = MaterialTheme.typography.labelSmall)
                     NumberPicker(
                         value = uiState.startHour.coerceIn(0, 23),
                         onValueChange = { viewModel.updateStartTime(it, uiState.startMinute) },
@@ -120,7 +120,7 @@ fun ActivityEditScreen(
                     )
                 }
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                    Text("Min", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.min_label), style = MaterialTheme.typography.labelSmall)
                     NumberPicker(
                         value = uiState.startMinute.coerceIn(0, 59),
                         onValueChange = { viewModel.updateStartTime(uiState.startHour, it) },
@@ -128,13 +128,13 @@ fun ActivityEditScreen(
                     )
                 }
             }
-            Text("End time", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.end_time), style = MaterialTheme.typography.labelMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                    Text("Hour", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.hour), style = MaterialTheme.typography.labelSmall)
                     NumberPicker(
                         value = uiState.endHour.coerceIn(0, 23),
                         onValueChange = { viewModel.updateEndTime(it, uiState.endMinute) },
@@ -142,7 +142,7 @@ fun ActivityEditScreen(
                     )
                 }
                 Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                    Text("Min", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.min_label), style = MaterialTheme.typography.labelSmall)
                     NumberPicker(
                         value = uiState.endMinute.coerceIn(0, 59),
                         onValueChange = { viewModel.updateEndTime(uiState.endHour, it) },
@@ -154,12 +154,12 @@ fun ActivityEditScreen(
             OutlinedTextField(
                 value = uiState.title,
                 onValueChange = viewModel::updateTitle,
-                label = { Text("Title") },
+                label = { Text(stringResource(R.string.title)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
-            Text("Type", style = MaterialTheme.typography.labelMedium)
+            Text(stringResource(R.string.type), style = MaterialTheme.typography.labelMedium)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -181,7 +181,7 @@ fun ActivityEditScreen(
             OutlinedTextField(
                 value = uiState.note,
                 onValueChange = viewModel::updateNote,
-                label = { Text("Note (optional)") },
+                label = { Text(stringResource(R.string.note_optional)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 1,
                 maxLines = 2
@@ -191,10 +191,10 @@ fun ActivityEditScreen(
             SwitchRow(
                 checked = uiState.notifyEnabled,
                 onCheckedChange = viewModel::updateNotifyEnabled,
-                label = "Notify me"
+                label = stringResource(R.string.notify_me)
             )
             if (uiState.notifyEnabled) {
-                Text("Notify before (minutes)", style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.notify_before_minutes), style = MaterialTheme.typography.labelMedium)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -203,22 +203,22 @@ fun ActivityEditScreen(
                         androidx.compose.material3.FilterChip(
                             selected = uiState.notifyLeadMinutes == mins,
                             onClick = { viewModel.updateNotifyLeadMinutes(mins) },
-                            label = { Text("$mins min") }
+                            label = { Text(stringResource(R.string.mins_min, mins)) }
                         )
                     }
                 }
                 SwitchRow(
                     checked = uiState.useSpeechSound,
                     onCheckedChange = viewModel::updateUseSpeechSound,
-                    label = "Use speech sound"
+                    label = stringResource(R.string.use_speech_sound)
                 )
                 if (uiState.useSpeechSound) {
                     OutlinedTextField(
                         value = uiState.alarmTtsMessage,
                         onValueChange = viewModel::updateAlarmTtsMessage,
-                        label = { Text("Alarm message (spoken when reminder fires)") },
+                        label = { Text(stringResource(R.string.alarm_message_label)) },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Hey there, Its time for your activity") },
+                        placeholder = { Text(stringResource(R.string.alarm_message_placeholder)) },
                         singleLine = false,
                         maxLines = 3
                     )
@@ -233,14 +233,14 @@ fun ActivityEditScreen(
                     onClick = onBack,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
                 androidx.compose.material3.Button(
                     onClick = { viewModel.save(onSaved = onSaved) },
                     modifier = Modifier.weight(1f),
                     enabled = uiState.title.isNotBlank() && !uiState.isSaving
                 ) {
-                    Text(if (uiState.isSaving) "Saving…" else "Save")
+                    Text(if (uiState.isSaving) stringResource(R.string.saving) else stringResource(R.string.save))
                 }
             }
         }
@@ -249,18 +249,18 @@ fun ActivityEditScreen(
     if (uiState.showOverlapDialog) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = viewModel::dismissOverlapDialog,
-            title = { Text("Overlapping activities") },
+            title = { Text(stringResource(R.string.overlapping_activities)) },
             text = {
-                Text("Another activity overlaps this time. Save anyway?")
+                Text(stringResource(R.string.overlap_warning))
             },
             confirmButton = {
                 androidx.compose.material3.TextButton(onClick = { viewModel.save(saveAnyway = true, onSaved = onSaved) }) {
-                    Text("Save anyway")
+                    Text(stringResource(R.string.save_anyway))
                 }
             },
             dismissButton = {
                 androidx.compose.material3.TextButton(onClick = viewModel::dismissOverlapDialog) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

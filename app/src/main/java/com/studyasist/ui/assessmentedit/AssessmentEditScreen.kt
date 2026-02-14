@@ -78,7 +78,7 @@ fun AssessmentEditScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
-                Text("Randomize questions", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.randomize_questions), style = MaterialTheme.typography.bodyMedium)
                 Switch(
                     checked = uiState.randomize,
                     onCheckedChange = { viewModel.setRandomize(it) }

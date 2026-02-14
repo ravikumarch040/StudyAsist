@@ -58,7 +58,7 @@ fun TimetableListScreen(
         topBar = {
             if (showTopBar) {
                 TopAppBar(
-                    title = { Text("StudyAsist") },
+                    title = { Text(stringResource(R.string.app_name)) },
                     actions = {
                         IconButton(onClick = onSettingsClick) {
                             Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
@@ -186,7 +186,7 @@ private fun TimetableCard(
                         if (isActive) {
                             androidx.compose.material3.AssistChip(
                                 onClick = {},
-                                label = { Text("Active") }
+                                label = { Text(stringResource(R.string.active)) }
                             )
                         }
                     }
@@ -208,15 +208,15 @@ private fun TimetableCard(
                         onDismissRequest = onDismissMenu
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Set active") },
+                            text = { Text(stringResource(R.string.set_active)) },
                             onClick = onSetActive
                         )
                         DropdownMenuItem(
-                            text = { Text("Duplicate") },
+                            text = { Text(stringResource(R.string.duplicate)) },
                             onClick = onDuplicate
                         )
                         DropdownMenuItem(
-                            text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                            text = { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) },
                             onClick = onDelete
                         )
                     }
@@ -238,13 +238,13 @@ private fun CreateTimetableDialog(
 ) {
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New timetable") },
+        title = { Text(stringResource(R.string.new_timetable)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 androidx.compose.material3.OutlinedTextField(
                     value = name,
                     onValueChange = onNameChange,
-                    label = { Text("Name") },
+                    label = { Text(stringResource(R.string.name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -268,7 +268,7 @@ private fun CreateTimetableDialog(
         },
         dismissButton = {
             androidx.compose.material3.TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -281,7 +281,7 @@ private fun RadioButtonGroup(
     options: List<Pair<WeekType, String>>
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text("Week type", style = MaterialTheme.typography.labelMedium)
+        Text(stringResource(R.string.week_type), style = MaterialTheme.typography.labelMedium)
         for ((value, label) in options) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
