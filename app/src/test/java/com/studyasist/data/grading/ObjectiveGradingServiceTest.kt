@@ -1,14 +1,28 @@
 package com.studyasist.data.grading
 
+import android.app.Application
 import com.studyasist.data.local.entity.QA
 import com.studyasist.data.local.entity.QuestionType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(application = Application::class, sdk = [34])
 class ObjectiveGradingServiceTest {
 
-    private val service = ObjectiveGradingService()
+    private lateinit var service: ObjectiveGradingService
+
+    @Before
+    fun setUp() {
+        service = ObjectiveGradingService(
+            org.robolectric.RuntimeEnvironment.getApplication().applicationContext
+        )
+    }
 
     private fun qa(
         id: Long = 1L,

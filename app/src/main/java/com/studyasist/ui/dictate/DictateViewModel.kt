@@ -45,7 +45,7 @@ class DictateViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DictateUiState())
     val uiState: StateFlow<DictateUiState> = _uiState.asStateFlow()
 
-    val languageOptions = LanguageOptions.LIST
+    val languageOptions: List<Pair<String, Int>> = LanguageOptions.LIST
 
     init {
         viewModelScope.launch {

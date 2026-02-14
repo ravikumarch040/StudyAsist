@@ -1,7 +1,10 @@
 package com.studyasist.data.grading
 
+import android.content.Context
+import com.studyasist.R
 import com.studyasist.data.local.entity.QA
 import com.studyasist.data.local.entity.QuestionType
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
@@ -10,7 +13,9 @@ import javax.inject.Singleton
 enum class GradeLevel { FULL, PARTIAL, WRONG }
 
 @Singleton
-class ObjectiveGradingService @Inject constructor() {
+class ObjectiveGradingService @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
 
     fun grade(
         answers: List<Pair<Long, String?>>,
@@ -80,12 +85,12 @@ class ObjectiveGradingService @Inject constructor() {
     private fun gradeMcq(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
         val model = qa.answerText.trim()
         val user = userAnswer.trim()
-        if (model.equals(user, ignoreCase = true)) return GradeLevel.FULL to "Correct"
+        if (model.equals(user, ignoreCase = true)) return GradeLevel.FULL to context.getString(R.string.feedback_correct)
 
         val modelLetter = model.lowercase().take(1)
         val userLetter = user.lowercase().take(1)
         if (modelLetter in listOf("a", "b", "c", "d") && userLetter in listOf("a", "b", "c", "d")) {
-            return if (modelLetter == userLetter) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Incorrect"
+            return if (modelLetter == userLetter) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_incorrect)
         }
 
         val options = parseOptions(qa.optionsJson)
@@ -93,18 +98,18 @@ class ObjectiveGradingService @Inject constructor() {
             val userIdx = "abcd".indexOf(userLetter)
             val userOpt = options.getOrNull(userIdx)
             if (userOpt != null && (normalize(userOpt) == normalize(model) || userOpt.equals(model, ignoreCase = true))) {
-                return GradeLevel.FULL to "Correct"
+                return GradeLevel.FULL to context.getString(R.string.feedback_correct)
             }
         }
         if (options.isNotEmpty() && modelLetter in listOf("a", "b", "c", "d")) {
             val modelIdx = "abcd".indexOf(modelLetter)
             val modelOpt = options.getOrNull(modelIdx)
             if (modelOpt != null && (normalize(user) == normalize(modelOpt) || user.equals(modelOpt, ignoreCase = true))) {
-                return GradeLevel.FULL to "Correct"
+                return GradeLevel.FULL to context.getString(R.string.feedback_correct)
             }
         }
 
-        return GradeLevel.WRONG to "Incorrect"
+        return GradeLevel.WRONG to context.getString(R.string.feedback_incorrect)
     }
 
     private fun gradeTrueFalse(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
@@ -113,7 +118,7 @@ class ObjectiveGradingService @Inject constructor() {
         val modelBool = model == "true" || model == "t" || model == "yes"
         val userBool = user == "true" || user == "t" || user == "yes" || user == "1"
         val correct = modelBool == userBool
-        return if (correct) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Incorrect"
+        return if (correct) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_incorrect)
     }
 
     private fun gradeNumeric(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
@@ -121,29 +126,29 @@ class ObjectiveGradingService @Inject constructor() {
         val userNum = parseNumber(userAnswer)
         if (modelNum == null || userNum == null) {
             val norm = normalize(qa.answerText) == normalize(userAnswer)
-            return if (norm) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Incorrect"
+            return if (norm) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_incorrect)
         }
         val tolerance = 0.01
         val diff = kotlin.math.abs(modelNum - userNum)
         val correct = diff <= tolerance
-        return if (correct) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Expected $modelNum"
+        return if (correct) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_expected_numeric, modelNum.toString())
     }
 
     /** Token overlap thresholds: >=0.86 full credit, 0.68–0.86 partial, <0.68 wrong */
     private fun gradeText(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
         val model = normalize(qa.answerText)
         val user = normalize(userAnswer)
-        if (model == user) return GradeLevel.FULL to "Correct"
-        if (model.equals(user, ignoreCase = true)) return GradeLevel.FULL to "Correct"
+        if (model == user) return GradeLevel.FULL to context.getString(R.string.feedback_correct)
+        if (model.equals(user, ignoreCase = true)) return GradeLevel.FULL to context.getString(R.string.feedback_correct)
         val modelTokens = tokenize(model)
         val userTokens = tokenize(user)
-        if (modelTokens.isEmpty()) return if (user.isBlank()) GradeLevel.FULL to "Correct" else GradeLevel.WRONG to "Expected: ${qa.answerText.take(80)}"
+        if (modelTokens.isEmpty()) return if (user.isBlank()) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_expected_answer, qa.answerText.take(80))
         val overlap = userTokens.intersect(modelTokens.toSet()).size.toFloat()
         val ratio = overlap / modelTokens.size
         return when {
-            ratio >= 0.86f -> GradeLevel.FULL to "Correct"
-            ratio >= 0.68f -> GradeLevel.PARTIAL to "Partial credit"
-            else -> GradeLevel.WRONG to "Expected: ${qa.answerText.take(80)}"
+            ratio >= 0.86f -> GradeLevel.FULL to context.getString(R.string.feedback_correct)
+            ratio >= 0.68f -> GradeLevel.PARTIAL to context.getString(R.string.feedback_partial_credit)
+            else -> GradeLevel.WRONG to context.getString(R.string.feedback_expected_answer, qa.answerText.take(80))
         }
     }
 

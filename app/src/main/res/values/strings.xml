@@ -368,4 +368,9 @@
     <string name="lang_spanish">Spanish</string>
     <string name="lang_french">French</string>
     <string name="lang_german">German</string>
+    <string name="feedback_correct">Correct</string>
+    <string name="feedback_incorrect">Incorrect</string>
+    <string name="feedback_partial_credit">Partial credit</string>
+    <string name="feedback_expected_numeric">Expected %1$s</string>
+    <string name="feedback_expected_answer">Expected: %1$s</string>
 </resources>
