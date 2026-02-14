@@ -227,7 +227,7 @@ fun AssessmentResultScreen(
                         Button(
                             onClick = { launchRetry(onlyWrongPartial = false) }
                         ) {
-                            Icon(Icons.Default.Replay, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                            Icon(Icons.Default.Replay, contentDescription = stringResource(R.string.cd_retry), modifier = Modifier.padding(end = 8.dp))
                             Text(stringResource(R.string.retry_all))
                         }
                         if (uiState.details.any { !it.correct }) {
@@ -244,7 +244,7 @@ fun AssessmentResultScreen(
                                 onRevise(sc?.subject, sc?.chapter)
                             }
                         ) {
-                            Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                            Icon(Icons.Default.MenuBook, contentDescription = stringResource(R.string.cd_revise), modifier = Modifier.padding(end = 8.dp))
                             Text(stringResource(R.string.revise))
                         }
                         if (uiState.subjectChapter != null) {
@@ -254,7 +254,7 @@ fun AssessmentResultScreen(
                                     onClick = { onAddToTimetable((sc.subject ?: "").ifBlank { "Revision" }, sc.chapter) },
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                                 ) {
-                                    Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                                    Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.cd_add_to_timetable), modifier = Modifier.padding(end = 8.dp))
                                     Text(stringResource(R.string.add_to_timetable))
                                 }
                             }
@@ -372,7 +372,7 @@ fun AssessmentResultScreen(
                                     onClick = { onRevise(item.subject, item.chapter) },
                                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                                 ) {
-                                    Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                                    Icon(Icons.Default.MenuBook, contentDescription = stringResource(R.string.cd_revise), modifier = Modifier.padding(end = 4.dp))
                                     Text(stringResource(R.string.revise))
                                 }
                                 Button(
@@ -383,7 +383,7 @@ fun AssessmentResultScreen(
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                                 ) {
-                                    Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                                    Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.cd_add_to_timetable), modifier = Modifier.padding(end = 4.dp))
                                     Text(stringResource(R.string.add_to_timetable))
                                 }
                             }

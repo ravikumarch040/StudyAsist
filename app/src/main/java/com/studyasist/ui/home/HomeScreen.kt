@@ -179,7 +179,7 @@ private fun StudyToolsTabContent(
                         ) {
                             Icon(
                                 Icons.Default.LocalFireDepartment,
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.cd_streak),
                                 tint = MaterialTheme.colorScheme.tertiary
                             )
                             Text(
@@ -196,7 +196,7 @@ private fun StudyToolsTabContent(
                         ) {
                             Icon(
                                 Icons.Default.EmojiEvents,
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.cd_badges),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Text(

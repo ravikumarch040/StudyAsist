@@ -166,7 +166,7 @@ fun GoalEditScreen(
                 onClick = { viewModel.addItem() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Default.Add, contentDescription = null, Modifier.padding(end = 8.dp))
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_add), Modifier.padding(end = 8.dp))
                 Text(stringResource(R.string.add_subject))
             }
             Button(

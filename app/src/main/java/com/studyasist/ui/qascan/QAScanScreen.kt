@@ -123,14 +123,14 @@ fun QAScanScreen(
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(Icons.Default.PhotoCamera, contentDescription = null, Modifier.padding(end = 4.dp))
+                    Icon(Icons.Default.PhotoCamera, contentDescription = stringResource(R.string.cd_photo), Modifier.padding(end = 4.dp))
                     Text(stringResource(R.string.take_photo))
                 }
                 Button(
                     onClick = { galleryLauncher.launch("image/*") },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(Icons.Default.PhotoLibrary, contentDescription = null, Modifier.padding(end = 4.dp))
+                    Icon(Icons.Default.PhotoLibrary, contentDescription = stringResource(R.string.cd_gallery), Modifier.padding(end = 4.dp))
                     Text(stringResource(R.string.upload_image))
                 }
             }
@@ -277,7 +277,7 @@ fun QAScanScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(onClick = { viewModel.addEmptyRow() }) {
-                        Icon(Icons.Default.Add, contentDescription = null, Modifier.padding(end = 4.dp))
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_add), Modifier.padding(end = 4.dp))
                         Text(stringResource(R.string.add_row))
                     }
                     Button(

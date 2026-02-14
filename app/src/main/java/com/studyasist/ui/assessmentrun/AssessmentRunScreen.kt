@@ -371,7 +371,7 @@ private fun QuestionCard(
                                 modifier = Modifier.weight(1f),
                                 enabled = !isExtracting
                             ) {
-                                Icon(Icons.Default.Mic, contentDescription = null, Modifier.padding(end = 4.dp))
+                                Icon(Icons.Default.Mic, contentDescription = stringResource(R.string.cd_record), Modifier.padding(end = 4.dp))
                                 Text("Record")
                             }
                             Button(
@@ -379,7 +379,7 @@ private fun QuestionCard(
                                 modifier = Modifier.weight(1f),
                                 enabled = !isExtracting
                             ) {
-                                Icon(Icons.Default.PhotoCamera, contentDescription = null, Modifier.padding(end = 4.dp))
+                                Icon(Icons.Default.PhotoCamera, contentDescription = stringResource(R.string.cd_photo), Modifier.padding(end = 4.dp))
                                 Text("Photo")
                             }
                             Button(
@@ -387,7 +387,7 @@ private fun QuestionCard(
                                 modifier = Modifier.weight(1f),
                                 enabled = !isExtracting
                             ) {
-                                Icon(Icons.Default.PhotoLibrary, contentDescription = null, Modifier.padding(end = 4.dp))
+                                Icon(Icons.Default.PhotoLibrary, contentDescription = stringResource(R.string.cd_gallery), Modifier.padding(end = 4.dp))
                                 Text("Gallery")
                             }
                         }

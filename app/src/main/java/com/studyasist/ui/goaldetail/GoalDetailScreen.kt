@@ -131,7 +131,7 @@ fun GoalDetailScreen(
                 onClick = { onCreateAssessment(goal.id) },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                Icon(Icons.Default.PlayArrow, contentDescription = stringResource(R.string.cd_create_assessment), modifier = Modifier.padding(end = 8.dp))
                 Text(stringResource(R.string.create_assessment))
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -219,7 +219,7 @@ fun GoalDetailScreen(
                                         onClick = { onPracticeTopic(area.subject, area.chapter) },
                                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                                     ) {
-                                        Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                                        Icon(Icons.Default.MenuBook, contentDescription = stringResource(R.string.cd_revise), modifier = Modifier.padding(end = 4.dp))
                                         Text(stringResource(R.string.revise))
                                     }
                                 }
@@ -394,7 +394,15 @@ private fun TrackPredictionCard(prediction: TrackPrediction) {
         ) {
             Icon(
                 icon,
-                contentDescription = null,
+                contentDescription = stringResource(
+                    when (prediction.status) {
+                        TrackStatus.ON_TRACK -> R.string.cd_on_track
+                        TrackStatus.BEHIND -> R.string.cd_behind
+                        TrackStatus.COMPLETE -> R.string.track_complete
+                        TrackStatus.EXAM_PASSED -> R.string.track_exam_passed
+                        TrackStatus.NOT_ENOUGH_DATA -> R.string.track_not_enough_data
+                    }
+                ),
                 tint = when (prediction.status) {
                     TrackStatus.ON_TRACK, TrackStatus.COMPLETE -> MaterialTheme.colorScheme.primary
                     TrackStatus.BEHIND -> MaterialTheme.colorScheme.onErrorContainer
