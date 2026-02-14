@@ -10,6 +10,8 @@ import com.studyasist.data.repository.AppSettings
 import com.studyasist.data.repository.GeminiRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.notification.CloudBackupWorker
+import com.studyasist.util.listBackupFilesInFolder
+import com.studyasist.util.readDocumentAsText
 import com.studyasist.notification.NotificationScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +21,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import android.content.Context
+import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val settingsRepository: SettingsRepository,
     private val geminiRepository: GeminiRepository,
     private val notificationScheduler: NotificationScheduler,
@@ -161,6 +167,40 @@ class SettingsViewModel @Inject constructor(
 
     private val _cloudBackupResult = MutableStateFlow<String?>(null)
     val cloudBackupResult: StateFlow<String?> = _cloudBackupResult.asStateFlow()
+
+    private val _cloudBackupFiles = MutableStateFlow<List<Pair<String, Uri>>>(emptyList())
+    val cloudBackupFiles: StateFlow<List<Pair<String, Uri>>> = _cloudBackupFiles.asStateFlow()
+
+    private val _cloudBackupFilesLoading = MutableStateFlow(false)
+    val cloudBackupFilesLoading: StateFlow<Boolean> = _cloudBackupFilesLoading.asStateFlow()
+
+    fun loadCloudBackupFiles() {
+        viewModelScope.launch {
+            _cloudBackupFilesLoading.value = true
+            _cloudBackupFiles.value = emptyList()
+            val uriStr = settingsRepository.settingsFlow.first().cloudBackupFolderUri
+            if (!uriStr.isNullOrBlank()) {
+                val files = listBackupFilesInFolder(context.contentResolver, uriStr)
+                _cloudBackupFiles.value = files
+            }
+            _cloudBackupFilesLoading.value = false
+        }
+    }
+
+    fun restoreFromCloudBackup(uri: Uri) {
+        viewModelScope.launch {
+            _backupImportResult.value = null
+            val json = readDocumentAsText(context.contentResolver, uri) ?: run {
+                _backupImportResult.value = "Could not read file"
+                return@launch
+            }
+            importBackup(json)
+        }
+    }
+
+    fun clearCloudBackupFiles() {
+        _cloudBackupFiles.value = emptyList()
+    }
 
     fun backupToCloud() {
         viewModelScope.launch {

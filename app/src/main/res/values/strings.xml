@@ -161,5 +161,8 @@
     <string name="set_backup_folder">Set backup folder</string>
     <string name="backup_folder_hint">Pick a folder (e.g. Drive) where backups will be saved</string>
     <string name="backup_to_cloud">Backup to cloud</string>
+    <string name="restore_from_backup_folder">Restore from backup folder</string>
+    <string name="restore_from_folder_hint">Pick a backup file to restore</string>
+    <string name="no_backups_in_folder">No backup files found in folder</string>
     <string name="auto_daily_backup">Auto daily backup</string>
 </resources>

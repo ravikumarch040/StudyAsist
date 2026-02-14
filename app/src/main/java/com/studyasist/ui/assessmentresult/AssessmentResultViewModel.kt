@@ -86,6 +86,8 @@ class AssessmentResultViewModel @Inject constructor(
         }
     }
 
+    suspend fun getExportPdf(): ByteArray? = resultRepository.getExportPdfForAttempt(attemptId)
+
     private fun loadResult() {
         viewModelScope.launch {
             val result = resultRepository.getResult(attemptId)

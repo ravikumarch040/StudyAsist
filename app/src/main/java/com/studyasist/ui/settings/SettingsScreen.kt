@@ -4,7 +4,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -72,6 +76,9 @@ fun SettingsScreen(
     val backupImportResult by viewModel.backupImportResult.collectAsState(initial = null)
     val cloudBackupResult by viewModel.cloudBackupResult.collectAsState(initial = null)
     val cloudBackupLastSuccess by viewModel.cloudBackupLastSuccess.collectAsState(initial = null)
+    val cloudBackupFiles by viewModel.cloudBackupFiles.collectAsState(initial = emptyList())
+    val cloudBackupFilesLoading by viewModel.cloudBackupFilesLoading.collectAsState(initial = false)
+    var showRestoreFromFolderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     val backupFolderLauncher = rememberLauncherForActivityResult(
@@ -370,6 +377,57 @@ fun SettingsScreen(
                 enabled = !settings.cloudBackupFolderUri.isNullOrBlank()
             ) {
                 Text(stringResource(R.string.backup_to_cloud))
+            }
+            Button(
+                onClick = {
+                    viewModel.loadCloudBackupFiles()
+                    showRestoreFromFolderDialog = true
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !settings.cloudBackupFolderUri.isNullOrBlank()
+            ) {
+                Text(stringResource(R.string.restore_from_backup_folder))
+            }
+            if (showRestoreFromFolderDialog) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showRestoreFromFolderDialog = false
+                        viewModel.clearCloudBackupFiles()
+                    },
+                    title = { Text(stringResource(R.string.restore_from_folder_hint)) },
+                    text = {
+                        if (cloudBackupFilesLoading) {
+                            Text("Loading…")
+                        } else if (cloudBackupFiles.isEmpty()) {
+                            Text(stringResource(R.string.no_backups_in_folder))
+                        } else {
+                            LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                items(cloudBackupFiles, key = { it.second.toString() }) { (name, uri) ->
+                                    Text(
+                                        text = name,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                viewModel.restoreFromCloudBackup(uri)
+                                                showRestoreFromFolderDialog = false
+                                                viewModel.clearCloudBackupFiles()
+                                            }
+                                            .padding(vertical = 8.dp),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            showRestoreFromFolderDialog = false
+                            viewModel.clearCloudBackupFiles()
+                        }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),

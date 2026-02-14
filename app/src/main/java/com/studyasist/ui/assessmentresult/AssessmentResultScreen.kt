@@ -1,6 +1,10 @@
 package com.studyasist.ui.assessmentresult
 
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintManager
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,10 +19,13 @@ import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,13 +37,18 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
+import com.studyasist.util.sharePdfAsImage
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +62,65 @@ fun AssessmentResultScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    var showExportMenu by remember { mutableStateOf(false) }
+
+    fun shareAsImage() {
+        coroutineScope.launch {
+            val pdfBytes = viewModel.getExportPdf()
+            if (pdfBytes == null || pdfBytes.isEmpty()) return@launch
+            sharePdfAsImage(
+                context = context,
+                pdfBytes = pdfBytes,
+                filePrefix = "result_share",
+                chooserTitle = context.getString(R.string.export_results)
+            )
+        }
+    }
+
+    fun printResult() {
+        coroutineScope.launch {
+            val pdfBytes = viewModel.getExportPdf()
+            if (pdfBytes == null || pdfBytes.isEmpty()) return@launch
+            val printManager = context.getSystemService(android.content.Context.PRINT_SERVICE) as? PrintManager
+                ?: return@launch
+            val jobName = "${context.getString(R.string.app_name)} - ${context.getString(R.string.result)}"
+            val adapter = object : PrintDocumentAdapter() {
+                override fun onLayout(
+                    oldAttributes: android.print.PrintAttributes?,
+                    newAttributes: android.print.PrintAttributes,
+                    cancellationSignal: android.os.CancellationSignal?,
+                    callback: android.print.PrintDocumentAdapter.LayoutResultCallback?,
+                    metadata: android.os.Bundle?
+                ) {
+                    if (cancellationSignal?.isCanceled == true) {
+                        callback?.onLayoutCancelled()
+                        return
+                    }
+                    val info = android.print.PrintDocumentInfo.Builder("result.pdf")
+                        .setContentType(android.print.PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                        .setPageCount(1)
+                        .build()
+                    callback?.onLayoutFinished(info, true)
+                }
+
+                override fun onWrite(
+                    pages: Array<out android.print.PageRange>,
+                    destination: android.os.ParcelFileDescriptor,
+                    cancellationSignal: android.os.CancellationSignal,
+                    callback: android.print.PrintDocumentAdapter.WriteResultCallback
+                ) {
+                    try {
+                        java.io.FileOutputStream(destination.fileDescriptor).use { it.write(pdfBytes) }
+                        callback.onWriteFinished(arrayOf(android.print.PageRange.ALL_PAGES))
+                    } catch (e: Exception) {
+                        callback.onWriteFailed(e.message)
+                    }
+                }
+            }
+            printManager.print(jobName, adapter, PrintAttributes.Builder().build())
+        }
+    }
 
     fun launchRetry(onlyWrongPartial: Boolean) {
         coroutineScope.launch {
@@ -74,6 +145,33 @@ fun AssessmentResultScreen(
                             contentDescription = if (uiState.needsManualReview) stringResource(R.string.unflag) else stringResource(R.string.flag_for_review),
                             tint = if (uiState.needsManualReview) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                    Box {
+                        IconButton(
+                            onClick = { showExportMenu = true },
+                            enabled = !uiState.isLoading
+                        ) {
+                            Icon(Icons.Default.Share, contentDescription = stringResource(R.string.export_results))
+                        }
+                        DropdownMenu(
+                            expanded = showExportMenu,
+                            onDismissRequest = { showExportMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.share_as_image)) },
+                                onClick = {
+                                    showExportMenu = false
+                                    shareAsImage()
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.print_results)) },
+                                onClick = {
+                                    showExportMenu = false
+                                    printResult()
+                                }
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
