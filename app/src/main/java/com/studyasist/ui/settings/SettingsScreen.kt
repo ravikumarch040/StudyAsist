@@ -78,6 +78,7 @@ fun SettingsScreen(
     val cloudBackupLastSuccess by viewModel.cloudBackupLastSuccess.collectAsState(initial = null)
     val cloudBackupFiles by viewModel.cloudBackupFiles.collectAsState(initial = emptyList())
     val cloudBackupFilesLoading by viewModel.cloudBackupFilesLoading.collectAsState(initial = false)
+    val darkMode by viewModel.darkMode.collectAsState(initial = "system")
     var showRestoreFromFolderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -146,6 +147,20 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Text(stringResource(R.string.appearance), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.theme), style = MaterialTheme.typography.bodySmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf("system" to R.string.theme_system, "light" to R.string.theme_light, "dark" to R.string.theme_dark).forEach { (mode, labelRes) ->
+                    androidx.compose.material3.FilterChip(
+                        selected = darkMode == mode,
+                        onClick = { viewModel.setDarkMode(mode) },
+                        label = { Text(stringResource(labelRes)) }
+                    )
+                }
+            }
             Text("Notifications", style = MaterialTheme.typography.titleMedium)
             Text(
                 "Default reminder (minutes before activity)",

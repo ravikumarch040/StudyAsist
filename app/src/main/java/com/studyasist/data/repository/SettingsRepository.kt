@@ -141,4 +141,36 @@ class SettingsRepository @Inject constructor(
     suspend fun setCloudBackupLastSuccessMillis(millis: Long) {
         dataStore.dataStore.edit { it[dataStore.cloudBackupLastSuccessMillis] = millis }
     }
+
+    suspend fun getDictateLanguage(): String =
+        dataStore.getPreferencesFlow().map { it[dataStore.dictateLanguage] }.first() ?: "en"
+
+    suspend fun setDictateLanguage(code: String) {
+        dataStore.dataStore.edit { it[dataStore.dictateLanguage] = code }
+    }
+
+    suspend fun getExplainLanguage(): String =
+        dataStore.getPreferencesFlow().map { it[dataStore.explainLanguage] }.first() ?: "en"
+
+    suspend fun setExplainLanguage(code: String) {
+        dataStore.dataStore.edit { it[dataStore.explainLanguage] = code }
+    }
+
+    suspend fun getSolveLanguage(): String =
+        dataStore.getPreferencesFlow().map { it[dataStore.solveLanguage] }.first() ?: "en"
+
+    suspend fun setSolveLanguage(code: String) {
+        dataStore.dataStore.edit { it[dataStore.solveLanguage] = code }
+    }
+
+    val darkModeFlow: Flow<String> = dataStore.getPreferencesFlow().map {
+        it[dataStore.darkMode] ?: "system"
+    }
+
+    suspend fun getDarkMode(): String =
+        dataStore.getPreferencesFlow().map { it[dataStore.darkMode] }.first() ?: "system"
+
+    suspend fun setDarkMode(mode: String) {
+        dataStore.dataStore.edit { it[dataStore.darkMode] = mode }
+    }
 }

@@ -27,8 +27,27 @@ import com.studyasist.data.local.entity.QA
 import com.studyasist.data.local.entity.Result
 import com.studyasist.data.local.entity.StudyToolHistoryEntity
 import com.studyasist.data.local.entity.TimetableEntity
+import com.studyasist.notification.NotificationScheduler
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private data class BackupSettings(
+    val defaultLeadMinutes: Int = 5,
+    val vibrationEnabled: Boolean = true,
+    val userName: String = "",
+    val ttsVoiceName: String? = null,
+    val geminiApiKey: String = "",
+    val focusGuardEnabled: Boolean = false,
+    val focusGuardRestrictedExtra: String = "",
+    val blockOverlap: Boolean = false,
+    val cloudBackupFolderUri: String? = null,
+    val cloudBackupAuto: Boolean = false,
+    val dictateLanguage: String = "en",
+    val explainLanguage: String = "en",
+    val solveLanguage: String = "en",
+    val darkMode: String = "system"
+)
 
 private data class BackupData(
     val version: Int = 2,
@@ -44,7 +63,8 @@ private data class BackupData(
     val attemptAnswers: List<AttemptAnswer>,
     val results: List<Result>,
     val studyToolHistory: List<StudyToolHistoryEntity>? = null,
-    val badgesEarned: List<BadgeEarned>? = null
+    val badgesEarned: List<BadgeEarned>? = null,
+    val settings: BackupSettings? = null
 )
 
 @Singleton
@@ -62,10 +82,34 @@ class BackupRepository @Inject constructor(
     private val studyToolHistoryDao: StudyToolHistoryDao,
     private val badgeDao: BadgeDao,
     private val database: AppDatabase,
-    private val gson: Gson
+    private val gson: Gson,
+    private val settingsRepository: SettingsRepository,
+    private val notificationScheduler: NotificationScheduler
 ) {
 
     suspend fun exportToJson(): String {
+        val appSettings = settingsRepository.settingsFlow.first()
+        val focusExtra = settingsRepository.getFocusGuardRestrictedExtra().joinToString(",")
+        val dictLang = settingsRepository.getDictateLanguage()
+        val explLang = settingsRepository.getExplainLanguage()
+        val solvLang = settingsRepository.getSolveLanguage()
+        val darkMode = settingsRepository.getDarkMode()
+        val backupSettings = BackupSettings(
+            defaultLeadMinutes = appSettings.defaultLeadMinutes,
+            vibrationEnabled = appSettings.vibrationEnabled,
+            userName = appSettings.userName,
+            ttsVoiceName = appSettings.ttsVoiceName,
+            geminiApiKey = appSettings.geminiApiKey,
+            focusGuardEnabled = appSettings.focusGuardEnabled,
+            focusGuardRestrictedExtra = focusExtra,
+            blockOverlap = appSettings.blockOverlap,
+            cloudBackupFolderUri = appSettings.cloudBackupFolderUri,
+            cloudBackupAuto = appSettings.cloudBackupAuto,
+            dictateLanguage = dictLang,
+            explainLanguage = explLang,
+            solveLanguage = solvLang,
+            darkMode = darkMode
+        )
         val data = BackupData(
             timetables = timetableDao.getAllOnce(),
             activities = activityDao.getAll(),
@@ -78,7 +122,8 @@ class BackupRepository @Inject constructor(
             attemptAnswers = attemptAnswerDao.getAll(),
             results = resultDao.getAll(),
             studyToolHistory = studyToolHistoryDao.getAll(),
-            badgesEarned = badgeDao.getAllEarnedOnce()
+            badgesEarned = badgeDao.getAllEarnedOnce(),
+            settings = backupSettings
         )
         return gson.toJson(data)
     }
@@ -122,5 +167,26 @@ class BackupRepository @Inject constructor(
         } finally {
             db.execSQL("PRAGMA foreign_keys = ON")
         }
+        data.settings?.let { restoreSettings(it) }
+    }
+
+    private suspend fun restoreSettings(s: BackupSettings) {
+        settingsRepository.setDefaultLeadMinutes(s.defaultLeadMinutes)
+        settingsRepository.setVibrationEnabled(s.vibrationEnabled)
+        settingsRepository.setUserName(s.userName)
+        settingsRepository.setTtsVoiceName(s.ttsVoiceName)
+        settingsRepository.setGeminiApiKey(s.geminiApiKey)
+        settingsRepository.setFocusGuardEnabled(s.focusGuardEnabled)
+        settingsRepository.setFocusGuardRestrictedExtra(
+            s.focusGuardRestrictedExtra.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSet()
+        )
+        settingsRepository.setBlockOverlap(s.blockOverlap)
+        settingsRepository.setCloudBackupFolderUri(s.cloudBackupFolderUri)
+        settingsRepository.setCloudBackupAuto(s.cloudBackupAuto)
+        settingsRepository.setDictateLanguage(s.dictateLanguage)
+        settingsRepository.setExplainLanguage(s.explainLanguage)
+        settingsRepository.setSolveLanguage(s.solveLanguage)
+        settingsRepository.setDarkMode(s.darkMode)
+        notificationScheduler.rescheduleAll()
     }
 }

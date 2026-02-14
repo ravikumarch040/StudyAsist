@@ -33,6 +33,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -44,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -100,7 +102,16 @@ fun ExplainScreen(
             ) {
             Text(stringResource(R.string.explain_subtitle), style = MaterialTheme.typography.bodyMedium)
             if (uiState.recentItems.isNotEmpty()) {
-                Text(stringResource(R.string.recent), style = MaterialTheme.typography.titleSmall)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(stringResource(R.string.recent), style = MaterialTheme.typography.titleSmall)
+                    TextButton(onClick = { viewModel.clearRecent() }) {
+                        Text(stringResource(R.string.clear_recent))
+                    }
+                }
                 uiState.recentItems.forEach { item ->
                     Card(
                         modifier = Modifier.fillMaxWidth().clickable { viewModel.selectRecent(item.inputText) },

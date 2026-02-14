@@ -152,7 +152,13 @@
     <string name="backup_restore">Backup &amp; Restore</string>
     <string name="backup_export_hint">Export all data to a file</string>
     <string name="restore_import_hint">Import from a backup file</string>
+    <string name="appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
     <string name="recent">Recent</string>
+    <string name="clear_recent">Clear recent</string>
     <string name="study_tool_history">History</string>
     <string name="block_overlap">Block overlapping activities</string>
     <string name="block_overlap_summary">Prevent saving when another activity overlaps this time</string>

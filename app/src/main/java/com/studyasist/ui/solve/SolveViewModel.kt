@@ -51,7 +51,8 @@ class SolveViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val recent = studyToolHistoryDao.getRecentByTool("solve")
-            _uiState.update { it.copy(recentItems = recent) }
+            val savedLang = settingsRepository.getSolveLanguage()
+            _uiState.update { it.copy(recentItems = recent, selectedLanguageCode = savedLang) }
         }
     }
 
@@ -61,6 +62,7 @@ class SolveViewModel @Inject constructor(
 
     fun setLanguage(code: String) {
         _uiState.update { it.copy(selectedLanguageCode = code) }
+        viewModelScope.launch { settingsRepository.setSolveLanguage(code) }
     }
 
     fun setImageUri(uri: Uri?) {
@@ -137,6 +139,13 @@ $text"""
 
     fun selectRecent(text: String) {
         _uiState.update { it.copy(problemText = text) }
+    }
+
+    fun clearRecent() {
+        viewModelScope.launch {
+            studyToolHistoryDao.deleteByTool("solve")
+            _uiState.update { it.copy(recentItems = emptyList()) }
+        }
     }
 
     fun speakSolution() {

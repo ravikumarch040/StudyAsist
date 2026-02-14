@@ -34,6 +34,10 @@ class SettingsDataStore @Inject constructor(
     val cloudBackupFolderUri = stringPreferencesKey("cloud_backup_folder_uri")
     val cloudBackupAuto = booleanPreferencesKey("cloud_backup_auto")
     val cloudBackupLastSuccessMillis = longPreferencesKey("cloud_backup_last_success_millis")
+    val dictateLanguage = stringPreferencesKey("dictate_language")
+    val explainLanguage = stringPreferencesKey("explain_language")
+    val solveLanguage = stringPreferencesKey("solve_language")
+    val darkMode = stringPreferencesKey("dark_mode") // "system", "light", "dark"
 
     val dataStore: DataStore<Preferences> get() = prefs
 

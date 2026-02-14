@@ -46,6 +46,13 @@ class SettingsViewModel @Inject constructor(
     val cloudBackupLastSuccess: StateFlow<Long?> = settingsRepository.cloudBackupLastSuccessFlow
         .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), null)
 
+    val darkMode: StateFlow<String> = settingsRepository.darkModeFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), "system")
+
+    fun setDarkMode(mode: String) {
+        viewModelScope.launch { settingsRepository.setDarkMode(mode) }
+    }
+
     private val _apiKeyTestMessage = MutableStateFlow<String?>(null)
     val apiKeyTestMessage: StateFlow<String?> = _apiKeyTestMessage.asStateFlow()
 

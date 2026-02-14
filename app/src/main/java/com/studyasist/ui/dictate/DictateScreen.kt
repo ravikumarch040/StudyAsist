@@ -37,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -106,7 +107,16 @@ fun DictateScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
             if (uiState.recentItems.isNotEmpty()) {
-                Text(stringResource(R.string.recent), style = MaterialTheme.typography.titleSmall)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(stringResource(R.string.recent), style = MaterialTheme.typography.titleSmall)
+                    TextButton(onClick = { viewModel.clearRecent() }) {
+                        Text(stringResource(R.string.clear_recent))
+                    }
+                }
                 uiState.recentItems.forEach { item ->
                     Card(
                         modifier = Modifier.fillMaxWidth().clickable { viewModel.selectRecent(item.inputText) },

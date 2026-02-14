@@ -50,7 +50,8 @@ class DictateViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val recent = studyToolHistoryDao.getRecentByTool("dictate")
-            _uiState.update { it.copy(recentItems = recent) }
+            val savedLang = settingsRepository.getDictateLanguage()
+            _uiState.update { it.copy(recentItems = recent, selectedLanguageCode = savedLang) }
         }
     }
 
@@ -60,6 +61,7 @@ class DictateViewModel @Inject constructor(
 
     fun setLanguage(code: String) {
         _uiState.update { it.copy(selectedLanguageCode = code) }
+        viewModelScope.launch { settingsRepository.setDictateLanguage(code) }
     }
 
     fun extractText() {
@@ -158,5 +160,12 @@ class DictateViewModel @Inject constructor(
 
     fun selectRecent(text: String) {
         _uiState.update { it.copy(extractedText = text) }
+    }
+
+    fun clearRecent() {
+        viewModelScope.launch {
+            studyToolHistoryDao.deleteByTool("dictate")
+            _uiState.update { it.copy(recentItems = emptyList()) }
+        }
     }
 }

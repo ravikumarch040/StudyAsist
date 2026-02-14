@@ -51,7 +51,8 @@ class ExplainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val recent = studyToolHistoryDao.getRecentByTool("explain")
-            _uiState.update { it.copy(recentItems = recent) }
+            val savedLang = settingsRepository.getExplainLanguage()
+            _uiState.update { it.copy(recentItems = recent, selectedLanguageCode = savedLang) }
         }
     }
 
@@ -61,6 +62,7 @@ class ExplainViewModel @Inject constructor(
 
     fun setLanguage(code: String) {
         _uiState.update { it.copy(selectedLanguageCode = code) }
+        viewModelScope.launch { settingsRepository.setExplainLanguage(code) }
     }
 
     fun setImageUri(uri: Uri?) {
@@ -123,6 +125,13 @@ class ExplainViewModel @Inject constructor(
 
     fun selectRecent(text: String) {
         _uiState.update { it.copy(inputText = text) }
+    }
+
+    fun clearRecent() {
+        viewModelScope.launch {
+            studyToolHistoryDao.deleteByTool("explain")
+            _uiState.update { it.copy(recentItems = emptyList()) }
+        }
     }
 
     fun speakExplanation() {

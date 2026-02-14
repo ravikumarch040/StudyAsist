@@ -20,4 +20,7 @@ interface StudyToolHistoryDao {
 
     @Query("DELETE FROM study_tool_history")
     suspend fun deleteAll()
+
+    @Query("DELETE FROM study_tool_history WHERE toolType = :toolType")
+    suspend fun deleteByTool(toolType: String)
 }
