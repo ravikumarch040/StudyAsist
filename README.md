@@ -31,6 +31,7 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 
 - Default lead time, vibration, user name, TTS voice.
 - **Backup/Restore:** JSON export and import via system share/save.
+- **Cloud backup:** Pick folder (Drive, Dropbox, etc.); manual or daily auto backup; readable filenames (`StudyAsist_Backup_YYYY-MM-DD_HHmmss.json`); last backup time in Settings; completion/failure notifications with error details.
 - Gemini API key for AI features.
 
 ### Export & Print
@@ -56,7 +57,7 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 
 ## Planned / Future
 
-- **Cloud backup:** Deeper Google Drive integration (scheduled backups already work with DocumentsProvider).
+- **Cloud backup:** Optional native Google Drive API for direct sync (current DocumentsProvider approach works with Drive, Dropbox, and other providers).
 
 ---
 

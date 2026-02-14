@@ -33,6 +33,7 @@ class SettingsDataStore @Inject constructor(
     val blockOverlap = booleanPreferencesKey("block_overlap")
     val cloudBackupFolderUri = stringPreferencesKey("cloud_backup_folder_uri")
     val cloudBackupAuto = booleanPreferencesKey("cloud_backup_auto")
+    val cloudBackupLastSuccessMillis = longPreferencesKey("cloud_backup_last_success_millis")
 
     val dataStore: DataStore<Preferences> get() = prefs
 

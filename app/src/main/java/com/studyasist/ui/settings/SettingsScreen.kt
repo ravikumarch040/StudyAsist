@@ -48,6 +48,7 @@ import com.studyasist.R
 import com.studyasist.data.repository.AppSettings
 import com.studyasist.notification.openUsageAccessSettings
 import com.studyasist.util.VoiceOption
+import com.studyasist.util.formatRelativeTimeAgo
 import com.studyasist.util.loadAvailableVoicesIndia
 import java.io.InputStreamReader
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +67,7 @@ fun SettingsScreen(
     val backupExportJson by viewModel.backupExportJson.collectAsState(initial = null)
     val backupImportResult by viewModel.backupImportResult.collectAsState(initial = null)
     val cloudBackupResult by viewModel.cloudBackupResult.collectAsState(initial = null)
+    val cloudBackupLastSuccess by viewModel.cloudBackupLastSuccess.collectAsState(initial = null)
     val context = LocalContext.current
 
     val backupFolderLauncher = rememberLauncherForActivityResult(
@@ -314,6 +316,13 @@ fun SettingsScreen(
                     "Folder set",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
+                )
+            }
+            cloudBackupLastSuccess?.let { millis ->
+                Text(
+                    stringResource(R.string.cloud_backup_last, formatRelativeTimeAgo(millis)),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Button(

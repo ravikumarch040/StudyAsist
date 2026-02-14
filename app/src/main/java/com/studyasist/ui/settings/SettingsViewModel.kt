@@ -37,6 +37,9 @@ class SettingsViewModel @Inject constructor(
             AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, false)
         )
 
+    val cloudBackupLastSuccess: StateFlow<Long?> = settingsRepository.cloudBackupLastSuccessFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), null)
+
     private val _apiKeyTestMessage = MutableStateFlow<String?>(null)
     val apiKeyTestMessage: StateFlow<String?> = _apiKeyTestMessage.asStateFlow()
 

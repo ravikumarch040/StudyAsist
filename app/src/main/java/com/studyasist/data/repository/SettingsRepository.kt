@@ -132,4 +132,13 @@ class SettingsRepository @Inject constructor(
     suspend fun setCloudBackupAuto(enabled: Boolean) {
         dataStore.dataStore.edit { it[dataStore.cloudBackupAuto] = enabled }
     }
+
+    val cloudBackupLastSuccessFlow: Flow<Long?> = dataStore.getPreferencesFlow().map { prefs ->
+        val ms = prefs[dataStore.cloudBackupLastSuccessMillis] ?: 0L
+        if (ms <= 0) null else ms
+    }
+
+    suspend fun setCloudBackupLastSuccessMillis(millis: Long) {
+        dataStore.dataStore.edit { it[dataStore.cloudBackupLastSuccessMillis] = millis }
+    }
 }

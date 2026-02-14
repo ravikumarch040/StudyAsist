@@ -19,6 +19,9 @@ import com.studyasist.data.repository.SettingsRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * WorkManager worker for scheduled cloud backup.
@@ -45,7 +48,8 @@ class CloudBackupWorker @AssistedInject constructor(
         return try {
             val treeUri = Uri.parse(uriStr)
             val json = backupRepository.exportToJson()
-            val filename = "studyasist_backup_${System.currentTimeMillis()}.json"
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.US)
+            val filename = "StudyAsist_Backup_${dateFormat.format(Date())}.json"
             val docUri = DocumentsContract.createDocument(
                 applicationContext.contentResolver,
                 treeUri,
@@ -57,31 +61,34 @@ class CloudBackupWorker @AssistedInject constructor(
                     os.write(json.toByteArray(Charsets.UTF_8))
                 }
                 Log.d(TAG, "Cloud backup: saved to $filename")
-                showCompletionNotification(applicationContext, success = true)
+                settingsRepository.setCloudBackupLastSuccessMillis(System.currentTimeMillis())
+                showCompletionNotification(applicationContext, success = true, errorMessage = null)
                 Result.success()
             } else {
                 Log.e(TAG, "Cloud backup: failed to create document")
-                showCompletionNotification(applicationContext, success = false)
+                showCompletionNotification(applicationContext, success = false, errorMessage = "Could not create file in folder")
                 Result.failure()
             }
         } catch (e: Exception) {
             Log.e(TAG, "Cloud backup failed", e)
-            showCompletionNotification(applicationContext, success = false)
+            val errMsg = e.message?.take(100) ?: e.javaClass.simpleName
+            showCompletionNotification(applicationContext, success = false, errorMessage = errMsg)
             Result.failure()
         }
     }
 
-    private fun showCompletionNotification(context: Context, success: Boolean) {
+    private fun showCompletionNotification(context: Context, success: Boolean, errorMessage: String?) {
         createChannel(context)
         val title = if (success) context.getString(R.string.cloud_backup_completed)
         else context.getString(R.string.cloud_backup_failed)
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID_CLOUD_BACKUP)
+        val contentText = if (!success && !errorMessage.isNullOrBlank()) errorMessage else null
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID_CLOUD_BACKUP)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(title)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setAutoCancel(true)
-            .build()
-        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_CLOUD_BACKUP, notification)
+        if (contentText != null) builder.setContentText(contentText)
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_CLOUD_BACKUP, builder.build())
     }
 
     private fun createChannel(context: Context) {
