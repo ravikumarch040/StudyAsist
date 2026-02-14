@@ -243,4 +243,10 @@
     <string name="gemini_api_key_hint_long">Gemini API key from Google AI Studio. Required for Explain and Solve.</string>
     <string name="use_speech_sound">Use speech sound</string>
     <string name="saving">Saving…</string>
+    <string name="cd_previous">Previous question</string>
+    <string name="cd_next">Next question</string>
+    <string name="cd_edit">Edit</string>
+    <string name="cd_start">Start assessment</string>
+    <string name="cd_decrease">Decrease</string>
+    <string name="cd_increase">Increase</string>
 </resources>

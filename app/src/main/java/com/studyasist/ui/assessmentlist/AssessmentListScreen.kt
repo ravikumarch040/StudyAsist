@@ -163,7 +163,7 @@ private fun AssessmentCard(
             }
             Row {
                 IconButton(onClick = onPlay) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = "Start")
+                    Icon(Icons.Default.PlayArrow, contentDescription = stringResource(R.string.cd_start))
                 }
                 IconButton(onClick = onEdit) {
                     Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_goal))

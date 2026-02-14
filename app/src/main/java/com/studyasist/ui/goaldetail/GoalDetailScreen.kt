@@ -74,7 +74,7 @@ fun GoalDetailScreen(
                 actions = {
                     if (uiState.goal != null) {
                         IconButton(onClick = { onEditGoal(uiState.goal!!.id) }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Edit")
+                            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.cd_edit))
                         }
                     }
                 },

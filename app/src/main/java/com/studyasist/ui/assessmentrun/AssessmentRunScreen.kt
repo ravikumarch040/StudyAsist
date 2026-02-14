@@ -248,11 +248,11 @@ fun AssessmentRunScreen(
                     onClick = { viewModel.prevQuestion() },
                     enabled = uiState.currentIndex > 0
                 ) {
-                    Icon(Icons.Default.NavigateBefore, contentDescription = "Previous")
+                    Icon(Icons.Default.NavigateBefore, contentDescription = stringResource(R.string.cd_previous))
                 }
                 if (uiState.currentIndex < uiState.questions.size - 1) {
                     IconButton(onClick = { viewModel.nextQuestion() }) {
-                        Icon(Icons.Default.NavigateNext, contentDescription = "Next")
+                        Icon(Icons.Default.NavigateNext, contentDescription = stringResource(R.string.cd_next))
                     }
                 } else {
                     Button(onClick = { viewModel.submitAnswers() }) {
