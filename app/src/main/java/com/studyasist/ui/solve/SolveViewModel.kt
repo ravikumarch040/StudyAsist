@@ -93,7 +93,7 @@ class SolveViewModel @Inject constructor(
     fun solve() {
         val text = _uiState.value.problemText.trim()
         if (text.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Enter or capture a problem to solve") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_enter_problem)) }
             return
         }
         viewModelScope.launch {

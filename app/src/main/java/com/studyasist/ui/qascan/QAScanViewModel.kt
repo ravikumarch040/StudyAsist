@@ -89,7 +89,7 @@ class QAScanViewModel @Inject constructor(
 
     fun extractAndParse() {
         val uri = _uiState.value.imageUri ?: run {
-            _uiState.update { it.copy(errorMessage = "Add an image first") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.add_image_first)) }
             return
         }
         viewModelScope.launch {
@@ -114,7 +114,7 @@ class QAScanViewModel @Inject constructor(
                                     it.copy(
                                         isLoading = false,
                                         parsedRows = fallbackRows.ifEmpty { listOf(EditableQARow("", "", QuestionType.SHORT)) },
-                                        errorMessage = "AI extraction failed; used OCR fallback. ${e.message}"
+                                        errorMessage = context.getString(com.studyasist.R.string.err_ai_extraction_fallback, e.message ?: "")
                                     )
                                 }
                             },
@@ -122,7 +122,7 @@ class QAScanViewModel @Inject constructor(
                                 _uiState.update {
                                     it.copy(
                                         isLoading = false,
-                                        errorMessage = ocrErr.message ?: "Extraction failed"
+                                        errorMessage = ocrErr.message ?: context.getString(com.studyasist.R.string.err_extraction_failed)
                                     )
                                 }
                             }
@@ -131,7 +131,7 @@ class QAScanViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                errorMessage = e.message ?: "Extraction failed"
+                                errorMessage = e.message ?: context.getString(com.studyasist.R.string.err_extraction_failed)
                             )
                         }
                     }
@@ -141,7 +141,7 @@ class QAScanViewModel @Inject constructor(
     }
 
     private suspend fun extractWithAi(context: Context, uri: Uri, apiKey: String): Result<List<EditableQARow>> {
-        val bytes = context.contentResolver.openInputStream(uri)?.readBytes() ?: return Result.failure(Exception("Could not read image"))
+        val bytes = context.contentResolver.openInputStream(uri)?.readBytes() ?: return Result.failure(Exception(context.getString(com.studyasist.R.string.err_could_not_read_image)))
         val mimeType = when {
             uri.toString().contains(".png", ignoreCase = true) -> "image/png"
             else -> "image/jpeg"
@@ -221,7 +221,7 @@ class QAScanViewModel @Inject constructor(
         val state = _uiState.value
         val valid = state.parsedRows.filter { it.question.isNotBlank() }
         if (valid.isEmpty()) {
-            _uiState.update { it.copy(errorMessage = "Add at least one question") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_add_at_least_one_question)) }
             return
         }
         val subject = state.subject.takeIf { it.isNotBlank() }
@@ -247,7 +247,7 @@ class QAScanViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = e.message ?: "Save failed"
+                        errorMessage = e.message ?: context.getString(com.studyasist.R.string.err_save_failed)
                     )
                 }
             }
@@ -264,13 +264,13 @@ class QAScanViewModel @Inject constructor(
      */
     fun improveWithAi() {
         val uri = _uiState.value.imageUri ?: run {
-            _uiState.update { it.copy(errorMessage = "Add an image first") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.add_image_first)) }
             return
         }
         viewModelScope.launch {
             val apiKey = settingsRepository.settingsFlow.first().geminiApiKey
             if (apiKey.isBlank()) {
-                _uiState.update { it.copy(errorMessage = "Add Gemini API key in Settings to use AI improvement") }
+                _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_gemini_api_key_for_ai)) }
                 return@launch
             }
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
@@ -287,7 +287,7 @@ class QAScanViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = e.message ?: "AI improvement failed"
+                            errorMessage = e.message ?: context.getString(com.studyasist.R.string.err_ai_improvement_failed)
                         )
                     }
                 }

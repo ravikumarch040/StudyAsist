@@ -78,7 +78,7 @@ class AssessmentRunViewModel @Inject constructor(
             val withQuestions = assessmentRepository.getAssessmentWithQuestions(assessmentId)
             if (withQuestions == null) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = "Assessment not found")
+                    it.copy(isLoading = false, errorMessage = context.getString(com.studyasist.R.string.err_assessment_not_found))
                 }
                 return@launch
             }
@@ -174,7 +174,7 @@ class AssessmentRunViewModel @Inject constructor(
                 }
                 .onFailure { e ->
                     _uiState.update {
-                        it.copy(errorMessage = e.message ?: "Could not read image")
+                        it.copy(errorMessage = e.message ?: context.getString(com.studyasist.R.string.err_could_not_read_image))
                     }
                 }
             _uiState.update { it.copy(isExtractingFromImage = false) }

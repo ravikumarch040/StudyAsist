@@ -202,6 +202,7 @@ fun AssessmentResultScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            val revisionLabel = stringResource(R.string.revision)
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
@@ -251,7 +252,7 @@ fun AssessmentResultScreen(
                             val sc = uiState.subjectChapter!!
                             if ((sc.subject ?: "").isNotBlank() || !sc.chapter.isNullOrBlank()) {
                                 Button(
-                                    onClick = { onAddToTimetable((sc.subject ?: "").ifBlank { "Revision" }, sc.chapter) },
+                                    onClick = { onAddToTimetable((sc.subject ?: "").ifBlank { revisionLabel }, sc.chapter) },
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                                 ) {
                                     Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.cd_add_to_timetable), modifier = Modifier.padding(end = 8.dp))
@@ -343,14 +344,14 @@ fun AssessmentResultScreen(
                         }
                         if (item.userAnswer != null) {
                             Text(
-                                "Your answer: ${item.userAnswer}",
+                                stringResource(R.string.your_answer_format, item.userAnswer),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
                         }
                         Text(
-                            "Correct: ${item.modelAnswer}",
+                            stringResource(R.string.correct_answer_format, item.modelAnswer),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 2.dp)
@@ -377,7 +378,7 @@ fun AssessmentResultScreen(
                                 }
                                 Button(
                                     onClick = {
-                                        val subj = item.subject?.takeIf { it.isNotBlank() } ?: "Revision"
+                                        val subj = item.subject?.takeIf { it.isNotBlank() } ?: revisionLabel
                                         onAddToTimetable(subj, item.chapter)
                                     },
                                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),

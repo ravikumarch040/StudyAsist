@@ -1,7 +1,9 @@
 package com.studyasist.ui.manualreview
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.AttemptRepository
 import com.studyasist.data.repository.ResultRepository
@@ -28,6 +30,7 @@ data class ManualReviewListUiState(
 
 @HiltViewModel
 class ManualReviewListViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val attemptRepository: AttemptRepository,
     private val resultRepository: ResultRepository,
     private val assessmentRepository: AssessmentRepository
@@ -65,7 +68,7 @@ class ManualReviewListViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = e.message ?: "Failed to load"
+                        errorMessage = e.message ?: context.getString(com.studyasist.R.string.err_failed_to_load)
                     )
                 }
             }

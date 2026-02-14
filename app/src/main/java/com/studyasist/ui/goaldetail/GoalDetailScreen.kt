@@ -87,7 +87,7 @@ fun GoalDetailScreen(
     ) { paddingValues ->
         if (uiState.goal == null && !uiState.isLoading) {
             Text(
-                "Goal not found",
+                stringResource(R.string.goal_not_found),
                 Modifier.padding(paddingValues).padding(16.dp),
                 style = MaterialTheme.typography.bodyLarge
             )
@@ -262,7 +262,7 @@ fun GoalDetailScreen(
             }
             if (uiState.recentAttempts.isNotEmpty()) {
                 Text(
-                    "Recent attempts",
+                    stringResource(R.string.recent_attempts),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -341,7 +341,7 @@ fun GoalDetailScreen(
                         )
                         progress.targetHours?.let { hours ->
                             Text(
-                                "Target: $hours h",
+                                stringResource(R.string.target_hours_display, hours),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 4.dp)

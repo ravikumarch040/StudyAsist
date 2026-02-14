@@ -88,7 +88,7 @@ fun TimetableListScreen(
         ) {
             if (uiState.timetables.isEmpty()) {
                 Text(
-                    "No timetables yet.\nTap + to create one.",
+                    stringResource(R.string.no_timetables),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier

@@ -1,9 +1,11 @@
 package com.studyasist.ui.assessmentedit
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.local.entity.Assessment
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.repository.AssessmentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +25,7 @@ data class AssessmentEditUiState(
 
 @HiltViewModel
 class AssessmentEditViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val assessmentRepository: AssessmentRepository
 ) : ViewModel() {
@@ -50,7 +53,7 @@ class AssessmentEditViewModel @Inject constructor(
                 }
             } else {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = "Assessment not found")
+                    it.copy(isLoading = false, errorMessage = context.getString(com.studyasist.R.string.err_assessment_not_found))
                 }
             }
         }
@@ -71,7 +74,7 @@ class AssessmentEditViewModel @Inject constructor(
     fun save(onSaved: () -> Unit) {
         val state = _uiState.value
         if (state.title.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Enter title") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_enter_title)) }
             return
         }
         viewModelScope.launch {

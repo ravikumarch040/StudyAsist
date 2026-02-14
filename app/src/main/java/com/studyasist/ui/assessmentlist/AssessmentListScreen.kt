@@ -100,7 +100,7 @@ fun AssessmentListScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "No assessments yet",
+                    stringResource(R.string.no_assessments),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -1,8 +1,10 @@
 package com.studyasist.ui.manualreview
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.repository.AttemptRepository
 import com.studyasist.data.repository.ResultRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +30,7 @@ data class ManualOverrideUiState(
 
 @HiltViewModel
 class ManualOverrideViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val resultRepository: ResultRepository,
     private val attemptRepository: AttemptRepository,
@@ -49,7 +52,7 @@ class ManualOverrideViewModel @Inject constructor(
             val attempt = attemptRepository.getAttempt(attemptId)
             if (result == null || attempt == null) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = "Result not found")
+                    it.copy(isLoading = false, errorMessage = context.getString(com.studyasist.R.string.err_result_not_found))
                 }
                 return@launch
             }

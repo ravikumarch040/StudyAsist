@@ -42,7 +42,7 @@ fun ActivityEditScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState.isEdit) "Edit activity" else "Add activity") },
+                title = { Text(if (uiState.isEdit) stringResource(R.string.edit_activity) else stringResource(R.string.add_activity)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(

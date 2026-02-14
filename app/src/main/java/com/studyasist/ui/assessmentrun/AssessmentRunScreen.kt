@@ -49,7 +49,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
@@ -69,6 +71,7 @@ fun AssessmentRunScreen(
     onSubmitted: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(uiState.isSubmitted, uiState.attemptId) {
         if (uiState.isSubmitted && uiState.attemptId != null) {
@@ -255,7 +258,10 @@ fun AssessmentRunScreen(
                         Icon(Icons.Default.NavigateNext, contentDescription = stringResource(R.string.cd_next))
                     }
                 } else {
-                    Button(onClick = { viewModel.submitAnswers() }) {
+                    Button(onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        viewModel.submitAnswers()
+                    }) {
                         Text(stringResource(R.string.submit))
                     }
                 }
@@ -273,6 +279,7 @@ private fun StartScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val haptic = LocalHapticFeedback.current
     Column(
         modifier
             .fillMaxSize()
@@ -281,18 +288,21 @@ private fun StartScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "$questionCount questions",
+            stringResource(R.string.questions_count, questionCount),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-            "Time limit: $timeMinutes minutes",
+            stringResource(R.string.time_limit_minutes, timeMinutes),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp)
         )
         Button(
-            onClick = onStart,
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onStart()
+            },
             modifier = Modifier.padding(top = 24.dp)
         ) {
             Text(stringResource(R.string.start))

@@ -1,9 +1,11 @@
 package com.studyasist.ui.assessmentcreate
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.local.entity.Goal
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.GoalRepository
 import com.studyasist.data.repository.QABankRepository
@@ -45,6 +47,7 @@ enum class SourceMode { BY_GOAL, BY_SUBJECT_CHAPTER, MANUAL }
 
 @HiltViewModel
 class AssessmentCreateViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val assessmentRepository: AssessmentRepository,
     private val goalRepository: GoalRepository,
@@ -271,11 +274,11 @@ class AssessmentCreateViewModel @Inject constructor(
     fun createAssessment(onCreated: (Long) -> Unit) {
         val state = _uiState.value
         if (state.title.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Enter assessment title") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_enter_assessment_title)) }
             return
         }
         if (state.availableCount == 0) {
-            _uiState.update { it.copy(errorMessage = "No questions available for selected criteria") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_no_questions_available)) }
             return
         }
 
@@ -286,7 +289,7 @@ class AssessmentCreateViewModel @Inject constructor(
                     SourceMode.BY_GOAL -> {
                         val goalId = state.selectedGoalId
                             ?: run {
-                                _uiState.update { it.copy(isLoading = false, errorMessage = "Select a goal") }
+                                _uiState.update { it.copy(isLoading = false, errorMessage = context.getString(com.studyasist.R.string.err_select_goal)) }
                                 return@launch
                             }
                         val count = state.questionCount.coerceAtMost(state.availableCount)
@@ -313,7 +316,7 @@ class AssessmentCreateViewModel @Inject constructor(
                     SourceMode.MANUAL -> {
                         val qaIds = state.selectedQas.map { it.id }
                         if (qaIds.isEmpty()) {
-                            _uiState.update { it.copy(isLoading = false, errorMessage = "Select at least one question") }
+                            _uiState.update { it.copy(isLoading = false, errorMessage = context.getString(com.studyasist.R.string.err_select_at_least_one_question)) }
                             return@launch
                         }
                         assessmentRepository.createAssessment(
@@ -335,7 +338,7 @@ class AssessmentCreateViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = e.message ?: "Failed to create assessment"
+                        errorMessage = e.message ?: context.getString(com.studyasist.R.string.err_failed_to_create_assessment)
                     )
                 }
             }

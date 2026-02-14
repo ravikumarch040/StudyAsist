@@ -1,7 +1,9 @@
 package com.studyasist.ui.resultlist
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.repository.ResultListItem
 import com.studyasist.data.repository.ResultRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +22,7 @@ data class ResultListUiState(
 
 @HiltViewModel
 class ResultListViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val resultRepository: ResultRepository
 ) : ViewModel() {
 
@@ -48,7 +51,7 @@ class ResultListViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = e.message ?: "Failed to load results"
+                        errorMessage = e.message ?: context.getString(com.studyasist.R.string.err_failed_to_load_results)
                     )
                 }
             }

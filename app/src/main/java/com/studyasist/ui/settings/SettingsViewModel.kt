@@ -107,12 +107,12 @@ class SettingsViewModel @Inject constructor(
 
     fun testApiKey() {
         viewModelScope.launch {
-            _apiKeyTestMessage.value = "Testing…"
+            _apiKeyTestMessage.value = context.getString(com.studyasist.R.string.testing)
             val apiKey = settingsRepository.settingsFlow.first().geminiApiKey
             val result = geminiRepository.generateContent(apiKey, "Reply with exactly: OK")
             _apiKeyTestMessage.value = result.fold(
-                onSuccess = { "OK – API key works." },
-                onFailure = { "Failed: ${it.message}" }
+                onSuccess = { context.getString(com.studyasist.R.string.ok_api_key_works) },
+                onFailure = { context.getString(com.studyasist.R.string.api_key_failed_format, it.message ?: "") }
             )
         }
     }
@@ -136,8 +136,8 @@ class SettingsViewModel @Inject constructor(
             _backupImportResult.value = null
             val result = backupRepository.importFromJson(json)
             _backupImportResult.value = result.fold(
-                onSuccess = { "Restore successful." },
-                onFailure = { "Restore failed: ${it.message}" }
+                onSuccess = { context.getString(com.studyasist.R.string.restore_successful) },
+                onFailure = { context.getString(com.studyasist.R.string.restore_failed_format, it.message ?: "") }
             )
         }
     }
@@ -198,7 +198,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _backupImportResult.value = null
             val json = readDocumentAsText(context.contentResolver, uri) ?: run {
-                _backupImportResult.value = "Could not read file"
+                _backupImportResult.value = context.getString(com.studyasist.R.string.err_could_not_read_file)
                 return@launch
             }
             importBackup(json)
@@ -214,14 +214,14 @@ class SettingsViewModel @Inject constructor(
             _cloudBackupResult.value = null
             val uriStr = settingsRepository.settingsFlow.first().cloudBackupFolderUri
             if (uriStr.isNullOrBlank()) {
-                _cloudBackupResult.value = "Set cloud backup folder first"
+                _cloudBackupResult.value = context.getString(com.studyasist.R.string.err_set_cloud_backup_folder_first)
                 return@launch
             }
             val request = OneTimeWorkRequestBuilder<CloudBackupWorker>()
                 .setInputData(CloudBackupWorker.manualWorkData())
                 .build()
             workManager.enqueue(request)
-            _cloudBackupResult.value = "Backup started in background"
+            _cloudBackupResult.value = context.getString(com.studyasist.R.string.backup_started_in_background)
         }
     }
 

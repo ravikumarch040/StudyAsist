@@ -66,7 +66,7 @@ class DictateViewModel @Inject constructor(
 
     fun extractText() {
         val uri = _uiState.value.imageUri ?: run {
-            _uiState.update { it.copy(errorMessage = "Add an image first") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.add_image_first)) }
             return
         }
         viewModelScope.launch {
@@ -113,7 +113,7 @@ class DictateViewModel @Inject constructor(
     fun speak() {
         val text = _uiState.value.extractedText
         if (text.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "No text to read. Extract text first.") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_no_text_to_read)) }
             return
         }
         val sentences = text.trim().split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }

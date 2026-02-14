@@ -1,8 +1,10 @@
 package com.studyasist.ui.addrevision
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityType
 import com.studyasist.data.repository.ActivityRepository
@@ -36,6 +38,7 @@ data class AddRevisionUiState(
 
 @HiltViewModel
 class AddRevisionViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val activityRepository: ActivityRepository,
     private val settingsRepository: SettingsRepository
@@ -88,7 +91,7 @@ class AddRevisionViewModel @Inject constructor(
         val state = _uiState.value
         val timetableId = state.activeTimetableId
         if (timetableId == null || timetableId <= 0) {
-            _uiState.update { it.copy(errorMessage = "No active timetable") }
+            _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_no_active_timetable)) }
             return
         }
         viewModelScope.launch {
@@ -111,7 +114,7 @@ class AddRevisionViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isSaving = false,
-                        errorMessage = e.message ?: "Failed to add"
+                        errorMessage = e.message ?: context.getString(com.studyasist.R.string.err_failed_to_add)
                     )
                 }
             }

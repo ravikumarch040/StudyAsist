@@ -195,7 +195,7 @@ fun AssessmentCreateScreen(
                     ) {
                         Column(Modifier.padding(12.dp)) {
                             Text(
-                                "Tap « Select questions » to choose from QA bank",
+                                stringResource(R.string.tap_select_questions_hint),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -208,7 +208,7 @@ fun AssessmentCreateScreen(
                 ) {
                     Column(Modifier.padding(12.dp)) {
                         Text(
-                            "${uiState.availableCount} questions available",
+                            stringResource(R.string.questions_available_format, uiState.availableCount),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -229,7 +229,7 @@ fun AssessmentCreateScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !uiState.isLoading
             ) {
-                Text(if (uiState.isLoading) "…" else stringResource(R.string.create))
+                Text(if (uiState.isLoading) stringResource(R.string.creating) else stringResource(R.string.create))
             }
             }
             if (uiState.showQaSelector) {
@@ -259,7 +259,7 @@ private fun ManualSelectionSection(
         }
         if (selectedCount > 0) {
             Text(
-                "$selectedCount selected",
+                stringResource(R.string.selected_count_format, selectedCount),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -286,7 +286,7 @@ private fun SelectedQAPreview(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "${qas.size} questions selected",
+                    stringResource(R.string.questions_selected_format, qas.size),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -310,7 +310,7 @@ private fun SelectedQAPreview(
                 if (qas.size > 5) {
                     item {
                         Text(
-                            "… and ${qas.size - 5} more",
+                            stringResource(R.string.and_more_format, qas.size - 5),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -347,7 +347,7 @@ private fun QASelectorOverlay(
                     Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel))
                 }
                 Text(
-                    "Select questions (${uiState.selectedQaIds.size} selected)",
+                    stringResource(R.string.select_questions_selected_format, uiState.selectedQaIds.size),
                     style = MaterialTheme.typography.titleMedium
                 )
                 IconButton(onClick = onConfirm) {

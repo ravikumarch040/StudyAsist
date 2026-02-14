@@ -374,7 +374,7 @@ fun SettingsScreen(
             }
             if (!settings.cloudBackupFolderUri.isNullOrBlank()) {
                 Text(
-                    "Folder set",
+                    stringResource(R.string.folder_set),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -464,7 +464,7 @@ fun SettingsScreen(
                     Text(
                         msg,
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (msg.startsWith("Backup started")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        color = if (msg == stringResource(R.string.backup_started_in_background)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         maxLines = Int.MAX_VALUE
                     )
                 }
@@ -494,7 +494,7 @@ fun SettingsScreen(
                     Text(
                         msg,
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (msg.startsWith("Restore successful")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        color = if (msg == stringResource(R.string.restore_successful)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         maxLines = Int.MAX_VALUE
                     )
                 }
