@@ -18,12 +18,12 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.NavigateBefore
+import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.NavigateNext
+import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -251,11 +251,11 @@ fun AssessmentRunScreen(
                     onClick = { viewModel.prevQuestion() },
                     enabled = uiState.currentIndex > 0
                 ) {
-                    Icon(Icons.Default.NavigateBefore, contentDescription = stringResource(R.string.cd_previous))
+                    Icon(Icons.AutoMirrored.Filled.NavigateBefore, contentDescription = stringResource(R.string.cd_previous))
                 }
                 if (uiState.currentIndex < uiState.questions.size - 1) {
                     IconButton(onClick = { viewModel.nextQuestion() }) {
-                        Icon(Icons.Default.NavigateNext, contentDescription = stringResource(R.string.cd_next))
+                        Icon(Icons.AutoMirrored.Filled.NavigateNext, contentDescription = stringResource(R.string.cd_next))
                     }
                 } else {
                     Button(onClick = {
@@ -345,7 +345,7 @@ private fun QuestionCard(
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
                     Icon(
-                        Icons.Default.VolumeUp,
+                        Icons.AutoMirrored.Filled.VolumeUp,
                         contentDescription = stringResource(R.string.read_aloud)
                     )
                 }

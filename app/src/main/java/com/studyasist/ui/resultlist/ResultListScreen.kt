@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -174,7 +174,7 @@ fun ResultListScreen(
                 },
                 actions = {
                     IconButton(onClick = onManualReview) {
-                        Icon(Icons.Default.Assignment, contentDescription = stringResource(R.string.manual_review_list))
+                        Icon(Icons.AutoMirrored.Filled.Assignment, contentDescription = stringResource(R.string.manual_review_list))
                     }
                     Box {
                         IconButton(

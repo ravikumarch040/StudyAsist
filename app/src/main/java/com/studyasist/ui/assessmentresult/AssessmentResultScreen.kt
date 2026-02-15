@@ -16,7 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Share
@@ -245,7 +245,7 @@ fun AssessmentResultScreen(
                                 onRevise(sc?.subject, sc?.chapter)
                             }
                         ) {
-                            Icon(Icons.Default.MenuBook, contentDescription = stringResource(R.string.cd_revise), modifier = Modifier.padding(end = 8.dp))
+                            Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = stringResource(R.string.cd_revise), modifier = Modifier.padding(end = 8.dp))
                             Text(stringResource(R.string.revise))
                         }
                         if (uiState.subjectChapter != null) {
@@ -373,7 +373,7 @@ fun AssessmentResultScreen(
                                     onClick = { onRevise(item.subject, item.chapter) },
                                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                                 ) {
-                                    Icon(Icons.Default.MenuBook, contentDescription = stringResource(R.string.cd_revise), modifier = Modifier.padding(end = 4.dp))
+                                    Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = stringResource(R.string.cd_revise), modifier = Modifier.padding(end = 4.dp))
                                     Text(stringResource(R.string.revise))
                                 }
                                 Button(

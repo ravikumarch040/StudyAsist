@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Score
@@ -69,7 +69,7 @@ fun QABankScreen(
                 },
                 actions = {
                     IconButton(onClick = onViewAssessments) {
-                        Icon(Icons.Default.Assignment, contentDescription = stringResource(R.string.assessments))
+                        Icon(Icons.AutoMirrored.Filled.Assignment, contentDescription = stringResource(R.string.assessments))
                     }
                     IconButton(onClick = onViewResults) {
                         Icon(Icons.Default.Score, contentDescription = stringResource(R.string.results))

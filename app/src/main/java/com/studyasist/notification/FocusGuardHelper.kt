@@ -61,6 +61,7 @@ fun getAppDisplayName(context: Context, packageName: String): String {
 fun hasUsageStatsPermission(context: Context): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return false
     val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as? AppOpsManager ?: return false
+    @Suppress("DEPRECATION")
     val mode = appOps.checkOpNoThrow(
         AppOpsManager.OPSTR_GET_USAGE_STATS,
         Process.myUid(),

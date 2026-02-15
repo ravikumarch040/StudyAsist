@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,7 +57,7 @@ fun GoalListScreen(
                 },
                 actions = {
                     IconButton(onClick = onQABank) {
-                        Icon(Icons.Default.LibraryBooks, contentDescription = stringResource(R.string.qa_bank))
+                        Icon(Icons.AutoMirrored.Filled.LibraryBooks, contentDescription = stringResource(R.string.qa_bank))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

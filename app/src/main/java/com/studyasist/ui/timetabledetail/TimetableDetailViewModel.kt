@@ -31,7 +31,7 @@ data class TimetableDetailUiState(
     /** Total minutes per activity type for the week (simple analytics). */
     val minutesByType: Map<ActivityType, Int>
         get() = activities.groupBy { it.type }.mapValues { (_, list) ->
-            list.sumBy { act -> act.endTimeMinutes - act.startTimeMinutes }
+            list.sumOf { act -> act.endTimeMinutes - act.startTimeMinutes }
         }
 }
 
