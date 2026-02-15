@@ -284,6 +284,16 @@ class SettingsViewModel @Inject constructor(
     fun getGoogleSignInIntent(): Intent =
         GoogleSignIn.getClient(context, DriveApiBackupProvider.getSignInOptions()).signInIntent
 
-    /** Whether user is signed in to Google for Drive backup. */
-    fun isDriveSignedIn(): Boolean = driveApiBackupProvider.isSignedIn()
+    private val _driveSignedIn = MutableStateFlow(driveApiBackupProvider.isSignedIn())
+    val driveSignedIn: StateFlow<Boolean> = _driveSignedIn.asStateFlow()
+
+    /** Refresh sign-in state (call after sign-in result or when screen appears). */
+    fun refreshDriveSignInState() {
+        _driveSignedIn.value = driveApiBackupProvider.isSignedIn()
+    }
+
+    fun signOutFromDrive() {
+        GoogleSignIn.getClient(context, DriveApiBackupProvider.getSignInOptions()).signOut()
+            .addOnCompleteListener { _driveSignedIn.value = false }
+    }
 }

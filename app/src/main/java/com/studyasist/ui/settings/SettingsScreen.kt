@@ -84,7 +84,7 @@ fun SettingsScreen(
     var showRestoreFromFolderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val isDriveSignedIn = viewModel.isDriveSignedIn()
+    val driveSignedIn by viewModel.driveSignedIn.collectAsState(initial = false)
 
     val backupFolderLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -110,10 +110,12 @@ fun SettingsScreen(
         }
         viewModel.clearBackupExport()
     }
+    LaunchedEffect(Unit) { viewModel.refreshDriveSignInState() }
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
+            viewModel.refreshDriveSignInState()
             viewModel.loadCloudBackupFiles()
         }
     }
@@ -423,12 +425,19 @@ fun SettingsScreen(
                     )
                 }
             } else {
-                if (isDriveSignedIn) {
-                    Text(
-                        stringResource(R.string.signed_in_as, com.google.android.gms.auth.api.signin.GoogleSignIn.getLastSignedInAccount(context)?.email ?: ""),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                if (driveSignedIn) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            stringResource(R.string.signed_in_as, com.google.android.gms.auth.api.signin.GoogleSignIn.getLastSignedInAccount(context)?.email ?: ""),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        androidx.compose.material3.TextButton(
+                            onClick = { viewModel.signOutFromDrive() }
+                        ) {
+                            Text(stringResource(R.string.sign_out))
+                        }
+                    }
                 } else {
                     Button(
                         onClick = { googleSignInLauncher.launch(viewModel.getGoogleSignInIntent()) },
@@ -446,7 +455,7 @@ fun SettingsScreen(
                 )
             }
             val backupRestoreEnabled = when (settings.cloudBackupTarget) {
-                "google_drive" -> isDriveSignedIn
+                "google_drive" -> driveSignedIn
                 else -> !settings.cloudBackupFolderUri.isNullOrBlank()
             }
             Button(

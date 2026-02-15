@@ -180,6 +180,7 @@
     <string name="cloud_backup_target_folder">Folder (e.g. Drive app)</string>
     <string name="cloud_backup_target_google_drive">Google Drive (direct)</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_out">Sign out</string>
     <string name="signed_in_as">Signed in as %1$s</string>
     <string name="err_sign_in_required_for_drive">Sign in with Google first</string>
     <string name="set_backup_folder">Set backup folder</string>

@@ -38,7 +38,7 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 - **Language:** In-app language selector (System default, English, Hindi, Spanish, French, German). Overrides device language for the app.
 - Default lead time, vibration, user name, TTS voice.
 - **Backup/Restore:** JSON export and import via system share/save.
-- **Cloud backup:** Pick folder (Drive, Dropbox, etc.); manual or daily auto backup; readable filenames (`StudyAsist_Backup_YYYY-MM-DD_HHmmss.json`); last backup time in Settings; completion/failure notifications with error details.
+- **Cloud backup:** Pick folder (Drive, Dropbox, etc.) or use **direct Google Drive** (Sign in with Google); manual or daily auto backup; readable filenames (`StudyAsist_Backup_YYYY-MM-DD_HHmmss.json`); last backup time in Settings; completion/failure notifications with error details.
 - Gemini API key for AI features.
 
 ### Export & Print
@@ -65,8 +65,8 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 
 ## Planned / Future
 
-- **Cloud backup:** Optional native Google Drive API for direct sync (current DocumentsProvider approach works with Drive, Dropbox, and other providers).
+- Additional features as needed. See [docs/DESIGN.md](docs/DESIGN.md) and [docs/PLAN-EXAM-GOAL.md](docs/PLAN-EXAM-GOAL.md).
 
 ---
 
-See [docs/DESIGN.md](docs/DESIGN.md) for full design and data model, [docs/PLAN-STUDY-TOOLS.md](docs/PLAN-STUDY-TOOLS.md) for study tools, [docs/PLAN-EXAM-GOAL.md](docs/PLAN-EXAM-GOAL.md) for exam goal feature.
+See [docs/DESIGN.md](docs/DESIGN.md) for full design, [docs/SETUP-DRIVE-API.md](docs/SETUP-DRIVE-API.md) for Google Drive direct backup setup, [docs/PLAN-EXAM-GOAL.md](docs/PLAN-EXAM-GOAL.md) for exam goal feature.
