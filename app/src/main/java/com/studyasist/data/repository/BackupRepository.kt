@@ -56,6 +56,19 @@ private data class BackupSettings(
     val appLocale: String? = null  // Added later; old backups omit this
 )
 
+private data class ExamBackupData(
+    val version: Int = 1,
+    val exportedAt: Long = System.currentTimeMillis(),
+    val goals: List<Goal>,
+    val goalItems: List<GoalItem>,
+    val qaBank: List<QA>,
+    val assessments: List<Assessment>,
+    val assessmentQuestions: List<AssessmentQuestion>,
+    val attempts: List<Attempt>,
+    val attemptAnswers: List<AttemptAnswer>,
+    val results: List<Result>
+)
+
 private data class BackupData(
     val version: Int = 2,
     val exportedAt: Long = System.currentTimeMillis(),
@@ -139,6 +152,56 @@ class BackupRepository @Inject constructor(
             settings = backupSettings
         )
         return gson.toJson(data)
+    }
+
+    /** Exports only exam data (goals, QA bank, assessments, attempts, results). */
+    suspend fun exportExamDataToJson(): String {
+        val data = ExamBackupData(
+            goals = goalDao.getAllOnce(),
+            goalItems = goalItemDao.getAll(),
+            qaBank = qaDao.getAllOnce(),
+            assessments = assessmentDao.getAllOnce(),
+            assessmentQuestions = assessmentQuestionDao.getAll(),
+            attempts = attemptDao.getAll(),
+            attemptAnswers = attemptAnswerDao.getAll(),
+            results = resultDao.getAll()
+        )
+        return gson.toJson(data)
+    }
+
+    /** Restores exam data only. Replaces all goals, QA bank, assessments, attempts, results. */
+    suspend fun importExamDataFromJson(json: String): kotlin.Result<Unit> = runCatching {
+        val data = gson.fromJson<ExamBackupData>(json, object : TypeToken<ExamBackupData>() {}.type)
+            ?: throw IllegalArgumentException(context.getString(R.string.err_invalid_backup_format))
+        val db = database.openHelper.writableDatabase
+        db.execSQL("PRAGMA foreign_keys = OFF")
+        try {
+            db.beginTransaction()
+            try {
+                resultDao.deleteAll()
+                attemptAnswerDao.deleteAll()
+                attemptDao.deleteAll()
+                assessmentQuestionDao.deleteAll()
+                assessmentDao.deleteAll()
+                goalItemDao.deleteAll()
+                goalDao.deleteAll()
+                qaDao.deleteAll()
+                data.goals.forEach { goalDao.insert(it) }
+                data.goalItems.forEach { goalItemDao.insert(it) }
+                data.qaBank.forEach { qaDao.insert(it) }
+                data.assessments.forEach { assessmentDao.insert(it) }
+                data.assessmentQuestions.forEach { assessmentQuestionDao.insert(it) }
+                data.attempts.forEach { attemptDao.insert(it) }
+                data.attemptAnswers.forEach { attemptAnswerDao.insert(it) }
+                data.results.forEach { resultDao.insert(it) }
+                db.setTransactionSuccessful()
+            } finally {
+                db.endTransaction()
+            }
+        } finally {
+            db.execSQL("PRAGMA foreign_keys = ON")
+        }
+        notificationScheduler.rescheduleAll()
     }
 
     suspend fun importFromJson(json: String): kotlin.Result<Unit> = runCatching {

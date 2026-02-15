@@ -138,17 +138,26 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private val _backupExportJson = MutableStateFlow<String?>(null)
-    val backupExportJson: StateFlow<String?> = _backupExportJson.asStateFlow()
+    /** Pair of (json, suggestedFilename) for export. */
+    private val _exportRequest = MutableStateFlow<Pair<String, String>?>(null)
+    val exportRequest: StateFlow<Pair<String, String>?> = _exportRequest.asStateFlow()
 
     private val _backupImportResult = MutableStateFlow<String?>(null)
     val backupImportResult: StateFlow<String?> = _backupImportResult.asStateFlow()
 
     fun exportBackup() {
         viewModelScope.launch {
-            _backupExportJson.value = null
+            _exportRequest.value = null
             val json = backupRepository.exportToJson()
-            _backupExportJson.value = json
+            _exportRequest.value = json to "studyasist_backup_${System.currentTimeMillis()}.json"
+        }
+    }
+
+    fun exportExamData() {
+        viewModelScope.launch {
+            _exportRequest.value = null
+            val json = backupRepository.exportExamDataToJson()
+            _exportRequest.value = json to "StudyAsist_ExamData_${System.currentTimeMillis()}.json"
         }
     }
 
@@ -163,8 +172,19 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun importExamData(json: String) {
+        viewModelScope.launch {
+            _backupImportResult.value = null
+            val result = backupRepository.importExamDataFromJson(json)
+            _backupImportResult.value = result.fold(
+                onSuccess = { context.getString(com.studyasist.R.string.restore_successful) },
+                onFailure = { context.getString(com.studyasist.R.string.restore_failed_format, it.message ?: "") }
+            )
+        }
+    }
+
     fun clearBackupExport() {
-        _backupExportJson.value = null
+        _exportRequest.value = null
     }
 
     fun clearBackupImportResult() {

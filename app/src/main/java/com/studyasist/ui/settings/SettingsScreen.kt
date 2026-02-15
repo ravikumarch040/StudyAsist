@@ -73,7 +73,6 @@ fun SettingsScreen(
         initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, true, true, "system")
     )
     val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
-    val backupExportJson by viewModel.backupExportJson.collectAsState(initial = null)
     val backupImportResult by viewModel.backupImportResult.collectAsState(initial = null)
     val cloudBackupResult by viewModel.cloudBackupResult.collectAsState(initial = null)
     val cloudBackupLastSuccess by viewModel.cloudBackupLastSuccess.collectAsState(initial = null)
@@ -100,11 +99,12 @@ fun SettingsScreen(
         }
     }
 
+    val exportRequest by viewModel.exportRequest.collectAsState(initial = null)
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
     ) { uri: Uri? ->
         uri?.let { u ->
-            backupExportJson?.let { json ->
+            exportRequest?.let { (json, _) ->
                 context.contentResolver.openOutputStream(u)?.use { it.write(json.toByteArray()) }
             }
         }
@@ -131,9 +131,20 @@ fun SettingsScreen(
         }
     }
 
-    LaunchedEffect(backupExportJson) {
-        backupExportJson?.let { json ->
-            exportLauncher.launch("studyasist_backup_${System.currentTimeMillis()}.json")
+    val importExamDataLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let { u ->
+            context.contentResolver.openInputStream(u)?.use { input ->
+                val json = InputStreamReader(input).readText()
+                viewModel.importExamData(json)
+            }
+        }
+    }
+
+    LaunchedEffect(exportRequest) {
+        exportRequest?.let { (_, filename) ->
+            exportLauncher.launch(filename)
         }
     }
 
@@ -580,6 +591,22 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.restore))
+            }
+            Spacer(modifier = Modifier.padding(8.dp))
+            Text(stringResource(R.string.exam_data_only), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.export_exam_data_hint), style = MaterialTheme.typography.bodySmall)
+            Button(
+                onClick = { viewModel.exportExamData() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.export_exam_data))
+            }
+            Text(stringResource(R.string.restore_exam_data_hint), style = MaterialTheme.typography.bodySmall)
+            Button(
+                onClick = { importExamDataLauncher.launch(arrayOf("application/json", "*/*")) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.restore_exam_data))
             }
             backupImportResult?.let { msg ->
                 Box(

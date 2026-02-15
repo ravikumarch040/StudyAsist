@@ -152,6 +152,11 @@
     <string name="backup_restore">Backup &amp; Restore</string>
     <string name="backup_export_hint">Export all data to a file</string>
     <string name="restore_import_hint">Import from a backup file</string>
+    <string name="exam_data_only">Exam data only</string>
+    <string name="export_exam_data">Export exam data</string>
+    <string name="export_exam_data_hint">Export goals, Q&amp;A bank, assessments, attempts, and results</string>
+    <string name="restore_exam_data">Restore exam data</string>
+    <string name="restore_exam_data_hint">Import exam data from a previous export (replaces existing)</string>
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
     <string name="theme_system">Follow system</string>
