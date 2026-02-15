@@ -45,6 +45,7 @@ import com.studyasist.R
 import com.studyasist.data.local.entity.QA
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("DEPRECATION")
 @Composable
 fun QABankScreen(
     viewModel: QABankViewModel,

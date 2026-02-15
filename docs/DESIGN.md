@@ -19,6 +19,7 @@ The following are **implemented** beyond the original Phase 1 scope:
 - **Focus guard:** During STUDY blocks, alerts when user opens games/YouTube/social apps (Usage access); built-in + custom restricted package list; nudges via notification only (no blocking).
 - **Study tools (Phase 3):** Dictate (OCR → TTS), Explain, Solve (Gemini); TTS voice selection in Settings.
 - **Exam goal:** Goals, Q&A bank, assessments, attempts, results, manual review, export.
+- **Localization:** In-app language selector (English, Hindi, Spanish, French, German). Exports, notifications, and UI use string resources. `appLocale` in backup/restore.
 
 ---
 

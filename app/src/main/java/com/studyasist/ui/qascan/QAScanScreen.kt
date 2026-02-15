@@ -58,6 +58,7 @@ import com.studyasist.util.labelResId
 import com.studyasist.ui.qascan.EditableQARow
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("DEPRECATION")
 @Composable
 fun QAScanScreen(
     viewModel: QAScanViewModel,

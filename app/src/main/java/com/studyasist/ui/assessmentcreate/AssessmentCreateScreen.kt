@@ -53,6 +53,7 @@ import com.studyasist.data.local.entity.Goal
 import com.studyasist.data.local.entity.QA
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("DEPRECATION")
 @Composable
 fun AssessmentCreateScreen(
     viewModel: AssessmentCreateViewModel,

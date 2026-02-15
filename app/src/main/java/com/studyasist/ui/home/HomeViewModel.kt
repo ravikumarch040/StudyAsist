@@ -14,6 +14,7 @@ import com.studyasist.notification.NotificationScheduler
 import com.studyasist.util.currentTimeMinutesFromMidnight
 import com.studyasist.util.todayDayOfWeek
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +36,7 @@ data class HomeUiState(
     val earnedBadges: List<EarnedBadge> = emptyList()
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val timetableRepository: TimetableRepository,

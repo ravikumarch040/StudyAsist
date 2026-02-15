@@ -58,6 +58,7 @@ import com.studyasist.ui.components.ImageCropSelector
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("DEPRECATION")
 @Composable
 fun DictateScreen(
     viewModel: DictateViewModel,

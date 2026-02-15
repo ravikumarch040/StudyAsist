@@ -1,7 +1,6 @@
 package com.studyasist.data.qa
 
 import com.studyasist.data.local.entity.QuestionType
-import com.studyasist.data.repository.QABankRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue

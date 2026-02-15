@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.studyasist.data.local.entity.QA
 import com.studyasist.data.repository.QABankRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +29,7 @@ data class QABankUiState(
     val isLoading: Boolean = false
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class QABankViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,

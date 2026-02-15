@@ -5,11 +5,17 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 ## Build
 
 - **Android Studio:** Open the project and run **Run > Run 'app'** (or build **Build > Make Project**).
-- **Command line:** Ensure you have the Gradle wrapper (e.g. let Android Studio sync once, or run `gradle wrapper` if Gradle is installed). Then:
+- **Command line:** Use the included Gradle wrapper:
   ```bash
   ./gradlew assembleDebug   # Linux/macOS
   gradlew.bat assembleDebug # Windows
   ```
+  Requires Java 17 or newer.
+
+## Test
+
+- **Unit tests:** `./gradlew :app:testDebugUnitTest` (or `gradlew.bat` on Windows)
+- **Android instrumentation:** `./gradlew :app:connectedDebugAndroidTest` (requires device/emulator)
 
 ## Implemented
 
@@ -29,6 +35,7 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 
 ### Settings
 
+- **Language:** In-app language selector (System default, English, Hindi, Spanish, French, German). Overrides device language for the app.
 - Default lead time, vibration, user name, TTS voice.
 - **Backup/Restore:** JSON export and import via system share/save.
 - **Cloud backup:** Pick folder (Drive, Dropbox, etc.); manual or daily auto backup; readable filenames (`StudyAsist_Backup_YYYY-MM-DD_HHmmss.json`); last backup time in Settings; completion/failure notifications with error details.

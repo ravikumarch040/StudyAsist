@@ -63,6 +63,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("DEPRECATION")
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
@@ -522,6 +523,7 @@ fun SettingsScreen(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Suppress("DEPRECATION")
 @Composable
 private fun VoiceDropdown(
     selectedVoiceName: String?,
