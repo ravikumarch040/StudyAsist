@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -58,7 +60,8 @@ fun GoalDetailScreen(
     onViewResults: () -> Unit = {},
     onResultClick: (Long) -> Unit = {},
     onPracticeTopic: (subject: String?, chapter: String?) -> Unit = { _, _ -> },
-    onAddToTimetable: (subject: String, chapter: String?) -> Unit = { _, _ -> }
+    onAddToTimetable: (subject: String, chapter: String?) -> Unit = { _, _ -> },
+    onQuickPractice: (assessmentId: Long) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -94,6 +97,11 @@ fun GoalDetailScreen(
             return@Scaffold
         }
         val goal = uiState.goal ?: return@Scaffold
+        LaunchedEffect(viewModel) {
+            viewModel.quickPracticeAssessmentId.collect { assessmentId ->
+                onQuickPractice(assessmentId)
+            }
+        }
         Column(
             Modifier
                 .fillMaxSize()
@@ -206,6 +214,13 @@ fun GoalDetailScreen(
                                     )
                                 }
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Button(
+                                        onClick = { viewModel.startQuickPractice(area.subject, area.chapter) },
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(Icons.Default.PlayArrow, contentDescription = stringResource(R.string.cd_start), modifier = Modifier.padding(end = 4.dp))
+                                        Text(stringResource(R.string.start))
+                                    }
                                     IconButton(
                                         onClick = { onAddToTimetable(area.subject, area.chapter) },
                                         modifier = Modifier.padding(0.dp)
@@ -217,7 +232,8 @@ fun GoalDetailScreen(
                                     }
                                     Button(
                                         onClick = { onPracticeTopic(area.subject, area.chapter) },
-                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                        colors = ButtonDefaults.outlinedButtonColors()
                                     ) {
                                         Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = stringResource(R.string.cd_revise), modifier = Modifier.padding(end = 4.dp))
                                         Text(stringResource(R.string.revise))
@@ -364,7 +380,16 @@ private fun TrackPredictionCard(prediction: TrackPrediction) {
         TrackStatus.NOT_ENOUGH_DATA -> R.string.track_not_enough_data
     }
     val subText = when (prediction.status) {
-        TrackStatus.BEHIND -> prediction.projectedPercent?.let { p ->
+        TrackStatus.ON_TRACK -> prediction.requiredHoursPerDay?.let { req ->
+            prediction.actualHoursPerDay?.let { act ->
+                stringResource(R.string.track_hours_on_track, act, req)
+            }
+        } ?: null
+        TrackStatus.BEHIND -> prediction.requiredHoursPerDay?.let { req ->
+            prediction.actualHoursPerDay?.let { act ->
+                stringResource(R.string.track_hours_behind, req, act)
+            }
+        } ?: prediction.projectedPercent?.let { p ->
             prediction.deficitPercent?.let { d ->
                 stringResource(R.string.track_behind_message, p, d)
             }

@@ -121,6 +121,8 @@
     <string name="track_exam_passed">Exam passed</string>
     <string name="track_not_enough_data">Complete an assessment to see your pace</string>
     <string name="track_behind_message">At current pace: ~%.0f%% by exam (%.0f%% short)</string>
+    <string name="track_hours_on_track">%.1f h/day study (target: %.1f h/day)</string>
+    <string name="track_hours_behind">Need %.1f h/day, you have %.1f h/day</string>
     <string name="edit_assessment">Edit assessment</string>
     <string name="score_trend">Score trend</string>
     <string name="suggested_practice">Suggested practice</string>

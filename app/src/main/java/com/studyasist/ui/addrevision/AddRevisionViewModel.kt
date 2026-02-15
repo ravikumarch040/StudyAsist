@@ -9,6 +9,8 @@ import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityType
 import com.studyasist.data.repository.ActivityRepository
 import com.studyasist.data.repository.SettingsRepository
+import com.studyasist.data.repository.TimetableRepository
+import com.studyasist.notification.NotificationScheduler
 import com.studyasist.util.todayDayOfWeek
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +43,9 @@ class AddRevisionViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
     private val activityRepository: ActivityRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val timetableRepository: TimetableRepository,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     private val subject = URLDecoder.decode(
@@ -101,6 +105,7 @@ class AddRevisionViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
             try {
+                val settings = settingsRepository.settingsFlow.first()
                 val startMinutes = state.startHour * 60 + state.startMinute
                 val endMinutes = state.endHour * 60 + state.endMinute
                 val entity = ActivityEntity(
@@ -109,9 +114,19 @@ class AddRevisionViewModel @Inject constructor(
                     startTimeMinutes = startMinutes,
                     endTimeMinutes = endMinutes,
                     title = state.title.ifBlank { buildTitle(state.subject, state.chapter) },
-                    type = ActivityType.STUDY
+                    type = ActivityType.STUDY,
+                    notifyEnabled = true,
+                    notifyLeadMinutes = settings.defaultLeadMinutes
                 )
-                activityRepository.insertActivity(entity)
+                val savedId = activityRepository.insertActivity(entity)
+                val savedEntity = entity.copy(id = savedId)
+                val activeId = settingsRepository.activeTimetableIdFlow.first()
+                if (activeId == timetableId) {
+                    val timetable = timetableRepository.getTimetable(timetableId)
+                    if (timetable != null) {
+                        notificationScheduler.scheduleActivity(savedEntity, timetable.name)
+                    }
+                }
                 _uiState.update { it.copy(isSaving = false, isSaved = true) }
                 onSaved()
             } catch (e: Exception) {

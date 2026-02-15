@@ -2,13 +2,16 @@ package com.studyasist.data.repository
 
 import android.content.Context
 import com.studyasist.R
+import com.studyasist.data.local.dao.ActivityDao
 import com.studyasist.data.local.dao.AssessmentDao
+import com.studyasist.data.local.entity.ActivityType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.local.dao.AttemptAnswerDao
 import com.studyasist.data.local.dao.AttemptDao
 import com.studyasist.data.local.dao.QADao
 import com.studyasist.data.local.dao.ResultDao
 import com.studyasist.util.daysUntil
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,7 +20,11 @@ enum class TrackStatus { ON_TRACK, BEHIND, NOT_ENOUGH_DATA, COMPLETE, EXAM_PASSE
 data class TrackPrediction(
     val status: TrackStatus,
     val projectedPercent: Float? = null,
-    val deficitPercent: Float? = null
+    val deficitPercent: Float? = null,
+    /** When using target hours: required study hours per day to hit goal. */
+    val requiredHoursPerDay: Float? = null,
+    /** When using target hours: actual average study hours per day from timetable. */
+    val actualHoursPerDay: Float? = null
 )
 
 data class SuggestedPracticeArea(
@@ -62,7 +69,9 @@ class GoalDashboardRepository @Inject constructor(
     private val assessmentDao: AssessmentDao,
     private val attemptDao: AttemptDao,
     private val attemptAnswerDao: AttemptAnswerDao,
-    private val resultDao: ResultDao
+    private val resultDao: ResultDao,
+    private val settingsRepository: SettingsRepository,
+    private val activityDao: ActivityDao
 ) {
 
     suspend fun getDashboardMetrics(goalId: Long): GoalDashboardMetrics {
@@ -137,6 +146,7 @@ class GoalDashboardRepository @Inject constructor(
 
         val trackPrediction = computeTrackPrediction(
             goal = goal,
+            items = items,
             percentComplete = percentComplete,
             assessments = assessments,
             attemptDao = attemptDao
@@ -216,6 +226,7 @@ class GoalDashboardRepository @Inject constructor(
 
     private suspend fun computeTrackPrediction(
         goal: com.studyasist.data.local.entity.Goal,
+        items: List<com.studyasist.data.local.entity.GoalItem>,
         percentComplete: Float,
         assessments: List<com.studyasist.data.local.entity.Assessment>,
         attemptDao: AttemptDao
@@ -224,6 +235,35 @@ class GoalDashboardRepository @Inject constructor(
         if (daysRemaining <= 0) return TrackPrediction(TrackStatus.EXAM_PASSED)
         if (percentComplete >= 100f) return TrackPrediction(TrackStatus.COMPLETE)
 
+        // When goal items have target hours, compare with timetable study hours
+        val totalTargetHours = items.sumOf { it.targetHours ?: 0 }
+        if (totalTargetHours > 0 && daysRemaining > 0) {
+            val activeTimetableId = settingsRepository.activeTimetableIdFlow.first()
+            if (activeTimetableId != null && activeTimetableId > 0) {
+                val activities = activityDao.getAllForTimetableOnce(activeTimetableId)
+                val studyMinutesPerWeek = activities
+                    .filter { it.type == ActivityType.STUDY }
+                    .sumOf { it.endTimeMinutes - it.startTimeMinutes }
+                val actualHoursPerDay = (studyMinutesPerWeek / 60f) / 7f
+                val requiredHoursPerDay = totalTargetHours.toFloat() / daysRemaining
+                return if (actualHoursPerDay >= requiredHoursPerDay) {
+                    TrackPrediction(
+                        TrackStatus.ON_TRACK,
+                        requiredHoursPerDay = requiredHoursPerDay,
+                        actualHoursPerDay = actualHoursPerDay
+                    )
+                } else {
+                    TrackPrediction(
+                        TrackStatus.BEHIND,
+                        deficitPercent = ((requiredHoursPerDay - actualHoursPerDay) * daysRemaining / totalTargetHours * 100f).coerceIn(0f, 100f),
+                        requiredHoursPerDay = requiredHoursPerDay,
+                        actualHoursPerDay = actualHoursPerDay
+                    )
+                }
+            }
+        }
+
+        // Fallback: velocity-based prediction from assessment attempts
         val allAttempts = assessments.flatMap { attemptDao.getByAssessmentIdOnce(it.id) }
         if (allAttempts.isEmpty()) return TrackPrediction(TrackStatus.NOT_ENOUGH_DATA)
         val firstActivityMillis = allAttempts.minOfOrNull { it.startedAt } ?: goal.createdAt

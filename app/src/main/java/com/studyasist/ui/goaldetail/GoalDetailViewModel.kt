@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.local.entity.Goal
 import com.studyasist.data.local.entity.GoalItem
+import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.GoalDashboardMetrics
 import com.studyasist.data.repository.GoalDashboardRepository
 import com.studyasist.data.repository.GoalRepository
@@ -13,9 +14,12 @@ import com.studyasist.data.repository.SuggestedPracticeArea
 import com.studyasist.data.repository.TrackPrediction
 import com.studyasist.data.repository.SubjectChapterProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -40,12 +44,15 @@ data class GoalDetailUiState(
 class GoalDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val goalRepository: GoalRepository,
-    private val dashboardRepository: GoalDashboardRepository
+    private val dashboardRepository: GoalDashboardRepository,
+    private val assessmentRepository: AssessmentRepository
 ) : ViewModel() {
 
     private val goalId: Long = checkNotNull(savedStateHandle["goalId"]) { "goalId required" }
 
     private val _dashboardMetrics = MutableStateFlow<GoalDashboardMetrics?>(null)
+    private val _quickPracticeAssessmentId = MutableSharedFlow<Long>()
+    val quickPracticeAssessmentId: SharedFlow<Long> = _quickPracticeAssessmentId.asSharedFlow()
 
     val uiState: StateFlow<GoalDetailUiState> = combine(
         goalRepository.getGoalFlow(goalId),
@@ -83,6 +90,22 @@ class GoalDetailViewModel @Inject constructor(
         viewModelScope.launch {
             goalRepository.deleteGoal(goalId)
             onDeleted()
+        }
+    }
+
+    /** Creates a 5-question assessment from the given subject/chapter and emits the assessment ID for navigation. */
+    fun startQuickPractice(subject: String, chapter: String?) {
+        viewModelScope.launch {
+            val assessmentId = assessmentRepository.createAssessmentFromRandom(
+                title = "Practice: $subject${chapter?.let { " - $it" } ?: ""}",
+                goalId = goalId,
+                subject = subject.takeIf { it.isNotBlank() },
+                chapter = chapter?.takeIf { it.isNotBlank() },
+                totalTimeSeconds = 5 * 60,
+                randomizeQuestions = true,
+                count = 5
+            )
+            _quickPracticeAssessmentId.emit(assessmentId)
         }
     }
 }

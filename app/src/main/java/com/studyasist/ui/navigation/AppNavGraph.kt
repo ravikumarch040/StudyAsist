@@ -214,6 +214,9 @@ fun AppNavGraph(
                 },
                 onAddToTimetable = { subject, chapter ->
                     navController.navigate(NavRoutes.addRevision(subject, chapter))
+                },
+                onQuickPractice = { assessmentId ->
+                    navController.navigate(NavRoutes.assessmentRun(assessmentId))
                 }
             )
         }

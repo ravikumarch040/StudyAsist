@@ -54,6 +54,14 @@ class QAScanViewModel @Inject constructor(
 
     init {
         loadDistinctValues()
+        syncUseAiFromSettings()
+    }
+
+    private fun syncUseAiFromSettings() {
+        viewModelScope.launch {
+            val useCloud = settingsRepository.settingsFlow.first().useCloudForParsing
+            _uiState.update { it.copy(useAiExtraction = useCloud) }
+        }
     }
 
     private fun loadDistinctValues() {
