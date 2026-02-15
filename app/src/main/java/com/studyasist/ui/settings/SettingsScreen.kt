@@ -70,7 +70,7 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState(
-        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, false, "system")
+        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, "system")
     )
     val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
     val backupExportJson by viewModel.backupExportJson.collectAsState(initial = null)
@@ -83,6 +83,8 @@ fun SettingsScreen(
     val appLocale by viewModel.appLocale.collectAsState(initial = "system")
     var showRestoreFromFolderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    val isDriveSignedIn = viewModel.isDriveSignedIn()
 
     val backupFolderLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -108,6 +110,14 @@ fun SettingsScreen(
         }
         viewModel.clearBackupExport()
     }
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            viewModel.loadCloudBackupFiles()
+        }
+    }
+
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -384,19 +394,49 @@ fun SettingsScreen(
             }
             Text(stringResource(R.string.cloud_backup), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.cloud_backup_summary), style = MaterialTheme.typography.bodySmall)
-            Text(stringResource(R.string.backup_folder_hint), style = MaterialTheme.typography.bodySmall)
-            Button(
-                onClick = { backupFolderLauncher.launch(null) },
-                modifier = Modifier.fillMaxWidth()
+            Text(stringResource(R.string.cloud_backup_target), style = MaterialTheme.typography.bodySmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(stringResource(R.string.set_backup_folder))
+                listOf("folder" to R.string.cloud_backup_target_folder, "google_drive" to R.string.cloud_backup_target_google_drive).forEach { (target, labelRes) ->
+                    androidx.compose.material3.FilterChip(
+                        selected = settings.cloudBackupTarget == target,
+                        onClick = { viewModel.setCloudBackupTarget(target) },
+                        label = { Text(stringResource(labelRes)) }
+                    )
+                }
             }
-            if (!settings.cloudBackupFolderUri.isNullOrBlank()) {
-                Text(
-                    stringResource(R.string.folder_set),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
+            if (settings.cloudBackupTarget == "folder") {
+                Text(stringResource(R.string.backup_folder_hint), style = MaterialTheme.typography.bodySmall)
+                Button(
+                    onClick = { backupFolderLauncher.launch(null) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.set_backup_folder))
+                }
+                if (!settings.cloudBackupFolderUri.isNullOrBlank()) {
+                    Text(
+                        stringResource(R.string.folder_set),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            } else {
+                if (isDriveSignedIn) {
+                    Text(
+                        stringResource(R.string.signed_in_as, com.google.android.gms.auth.api.signin.GoogleSignIn.getLastSignedInAccount(context)?.email ?: ""),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    Button(
+                        onClick = { googleSignInLauncher.launch(viewModel.getGoogleSignInIntent()) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.sign_in_with_google))
+                    }
+                }
             }
             cloudBackupLastSuccess?.let { millis ->
                 Text(
@@ -405,10 +445,14 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            val backupRestoreEnabled = when (settings.cloudBackupTarget) {
+                "google_drive" -> isDriveSignedIn
+                else -> !settings.cloudBackupFolderUri.isNullOrBlank()
+            }
             Button(
                 onClick = { viewModel.backupToCloud() },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !settings.cloudBackupFolderUri.isNullOrBlank()
+                enabled = backupRestoreEnabled
             ) {
                 Text(stringResource(R.string.backup_to_cloud))
             }
@@ -418,7 +462,7 @@ fun SettingsScreen(
                     showRestoreFromFolderDialog = true
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !settings.cloudBackupFolderUri.isNullOrBlank()
+                enabled = backupRestoreEnabled
             ) {
                 Text(stringResource(R.string.restore_from_backup_folder))
             }

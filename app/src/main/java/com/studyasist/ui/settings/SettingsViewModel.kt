@@ -10,6 +10,8 @@ import com.studyasist.data.repository.AppSettings
 import com.studyasist.data.repository.GeminiRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.notification.CloudBackupWorker
+import com.studyasist.data.cloud.DRIVE_BACKUP_URI_SCHEME
+import com.studyasist.data.cloud.DriveApiBackupProvider
 import com.studyasist.util.listBackupFilesInFolder
 import com.studyasist.util.readDocumentAsText
 import com.studyasist.notification.NotificationScheduler
@@ -22,7 +24,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -35,14 +39,15 @@ class SettingsViewModel @Inject constructor(
     private val geminiRepository: GeminiRepository,
     private val notificationScheduler: NotificationScheduler,
     private val backupRepository: com.studyasist.data.repository.BackupRepository,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val driveApiBackupProvider: DriveApiBackupProvider
 ) : ViewModel() {
 
     val settings: StateFlow<AppSettings> = settingsRepository.settingsFlow
         .stateIn(
             viewModelScope,
             kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, false, "system")
+            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, "system")
         )
 
     val cloudBackupLastSuccess: StateFlow<Long?> = settingsRepository.cloudBackupLastSuccessFlow
@@ -172,6 +177,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setCloudBackupTarget(target: String) {
+        viewModelScope.launch {
+            settingsRepository.setCloudBackupTarget(target)
+        }
+    }
+
     fun setCloudBackupAuto(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.setCloudBackupAuto(enabled)
@@ -201,10 +212,19 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _cloudBackupFilesLoading.value = true
             _cloudBackupFiles.value = emptyList()
-            val uriStr = settingsRepository.settingsFlow.first().cloudBackupFolderUri
-            if (!uriStr.isNullOrBlank()) {
-                val files = listBackupFilesInFolder(context.contentResolver, uriStr)
-                _cloudBackupFiles.value = files
+            val settings = settingsRepository.settingsFlow.first()
+            when (settings.cloudBackupTarget) {
+                "google_drive" -> {
+                    if (driveApiBackupProvider.isSignedIn()) {
+                        _cloudBackupFiles.value = driveApiBackupProvider.listBackups()
+                    }
+                }
+                else -> {
+                    val uriStr = settings.cloudBackupFolderUri
+                    if (!uriStr.isNullOrBlank()) {
+                        _cloudBackupFiles.value = listBackupFilesInFolder(context.contentResolver, uriStr)
+                    }
+                }
             }
             _cloudBackupFilesLoading.value = false
         }
@@ -213,7 +233,11 @@ class SettingsViewModel @Inject constructor(
     fun restoreFromCloudBackup(uri: Uri) {
         viewModelScope.launch {
             _backupImportResult.value = null
-            val json = readDocumentAsText(context.contentResolver, uri) ?: run {
+            val json = if (uri.scheme == DRIVE_BACKUP_URI_SCHEME) {
+                driveApiBackupProvider.readBackup(uri)
+            } else {
+                readDocumentAsText(context.contentResolver, uri)
+            } ?: run {
                 _backupImportResult.value = context.getString(com.studyasist.R.string.err_could_not_read_file)
                 return@launch
             }
@@ -228,10 +252,21 @@ class SettingsViewModel @Inject constructor(
     fun backupToCloud() {
         viewModelScope.launch {
             _cloudBackupResult.value = null
-            val uriStr = settingsRepository.settingsFlow.first().cloudBackupFolderUri
-            if (uriStr.isNullOrBlank()) {
-                _cloudBackupResult.value = context.getString(com.studyasist.R.string.err_set_cloud_backup_folder_first)
-                return@launch
+            val settings = settingsRepository.settingsFlow.first()
+            when (settings.cloudBackupTarget) {
+                "google_drive" -> {
+                    if (!driveApiBackupProvider.isSignedIn()) {
+                        _cloudBackupResult.value = context.getString(com.studyasist.R.string.err_sign_in_required_for_drive)
+                        return@launch
+                    }
+                }
+                else -> {
+                    val uriStr = settings.cloudBackupFolderUri
+                    if (uriStr.isNullOrBlank()) {
+                        _cloudBackupResult.value = context.getString(com.studyasist.R.string.err_set_cloud_backup_folder_first)
+                        return@launch
+                    }
+                }
             }
             val request = OneTimeWorkRequestBuilder<CloudBackupWorker>()
                 .setInputData(CloudBackupWorker.manualWorkData())
@@ -244,4 +279,11 @@ class SettingsViewModel @Inject constructor(
     fun clearCloudBackupResult() {
         _cloudBackupResult.value = null
     }
+
+    /** Intent to launch Google Sign-In for Drive backup. */
+    fun getGoogleSignInIntent(): Intent =
+        GoogleSignIn.getClient(context, DriveApiBackupProvider.getSignInOptions()).signInIntent
+
+    /** Whether user is signed in to Google for Drive backup. */
+    fun isDriveSignedIn(): Boolean = driveApiBackupProvider.isSignedIn()
 }

@@ -32,6 +32,7 @@ class SettingsDataStore @Inject constructor(
     val focusGuardRestrictedExtra = stringPreferencesKey("focus_guard_restricted_extra") // comma-separated package names
     val blockOverlap = booleanPreferencesKey("block_overlap")
     val cloudBackupFolderUri = stringPreferencesKey("cloud_backup_folder_uri")
+    val cloudBackupTarget = stringPreferencesKey("cloud_backup_target") // "folder" | "google_drive"
     val cloudBackupAuto = booleanPreferencesKey("cloud_backup_auto")
     val cloudBackupLastSuccessMillis = longPreferencesKey("cloud_backup_last_success_millis")
     val dictateLanguage = stringPreferencesKey("dictate_language")

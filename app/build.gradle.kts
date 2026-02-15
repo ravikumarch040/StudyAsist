@@ -17,6 +17,9 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "com.studyasist.HiltTestRunner"
+        // Optional: set DRIVE_WEB_CLIENT_ID in local.properties for backend; empty = Android client only
+        val driveClientId = project.findProperty("DRIVE_WEB_CLIENT_ID") as? String ?: ""
+        buildConfigField("String", "DRIVE_WEB_CLIENT_ID", "\"$driveClientId\"")
     }
 
     buildTypes {
@@ -37,10 +40,13 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/DEPENDENCIES"
         }
     }
 }
@@ -72,6 +78,10 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
+    // Optional: Google Drive API for direct backup (see docs/PLAN-DRIVE-BACKUP.md)
+    implementation(libs.play.services.auth)
+    implementation(libs.google.api.services.drive)
+    implementation(libs.google.api.client.android)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     androidTestImplementation(libs.junit)

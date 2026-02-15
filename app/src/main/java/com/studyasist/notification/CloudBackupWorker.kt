@@ -14,6 +14,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.studyasist.R
+import com.studyasist.data.cloud.DriveApiBackupProvider
 import com.studyasist.data.repository.BackupRepository
 import com.studyasist.data.repository.SettingsRepository
 import dagger.assisted.Assisted
@@ -32,17 +33,26 @@ class CloudBackupWorker @AssistedInject constructor(
     @Assisted context: android.content.Context,
     @Assisted params: WorkerParameters,
     private val backupRepository: BackupRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val driveApiBackupProvider: DriveApiBackupProvider
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val uriStr = settingsRepository.settingsFlow.first().cloudBackupFolderUri ?: run {
-            Log.d(TAG, "Cloud backup: no folder set, skipping")
+        val settings = settingsRepository.settingsFlow.first()
+        val isManual = inputData.getBoolean(KEY_MANUAL, false)
+        if (!isManual && !settings.cloudBackupAuto) {
+            Log.d(TAG, "Cloud backup: auto backup disabled, skipping")
             return Result.success()
         }
-        val isManual = inputData.getBoolean(KEY_MANUAL, false)
-        if (!isManual && !settingsRepository.settingsFlow.first().cloudBackupAuto) {
-            Log.d(TAG, "Cloud backup: auto backup disabled, skipping")
+        return when (settings.cloudBackupTarget) {
+            "google_drive" -> doWorkDrive(settings)
+            else -> doWorkFolder(settings)
+        }
+    }
+
+    private suspend fun doWorkFolder(settings: com.studyasist.data.repository.AppSettings): Result {
+        val uriStr = settings.cloudBackupFolderUri ?: run {
+            Log.d(TAG, "Cloud backup: no folder set, skipping")
             return Result.success()
         }
         return try {
@@ -66,6 +76,34 @@ class CloudBackupWorker @AssistedInject constructor(
                 Result.success()
             } else {
                 Log.e(TAG, "Cloud backup: failed to create document")
+                showCompletionNotification(applicationContext, success = false, errorMessage = applicationContext.getString(R.string.err_could_not_create_file_in_folder))
+                Result.failure()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Cloud backup failed", e)
+            val errMsg = e.message?.take(100) ?: e.javaClass.simpleName
+            showCompletionNotification(applicationContext, success = false, errorMessage = errMsg)
+            Result.failure()
+        }
+    }
+
+    private suspend fun doWorkDrive(settings: com.studyasist.data.repository.AppSettings): Result {
+        if (!driveApiBackupProvider.isSignedIn()) {
+            Log.d(TAG, "Cloud backup: not signed in to Google, skipping")
+            return Result.success()
+        }
+        return try {
+            val json = backupRepository.exportToJson()
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.US)
+            val filename = "StudyAsist_Backup_${dateFormat.format(Date())}.json"
+            val fileId = driveApiBackupProvider.writeBackup(json, filename)
+            if (fileId != null) {
+                Log.d(TAG, "Cloud backup: saved to Drive $filename")
+                settingsRepository.setCloudBackupLastSuccessMillis(System.currentTimeMillis())
+                showCompletionNotification(applicationContext, success = true, errorMessage = null)
+                Result.success()
+            } else {
+                Log.e(TAG, "Cloud backup: Drive upload failed")
                 showCompletionNotification(applicationContext, success = false, errorMessage = applicationContext.getString(R.string.err_could_not_create_file_in_folder))
                 Result.failure()
             }

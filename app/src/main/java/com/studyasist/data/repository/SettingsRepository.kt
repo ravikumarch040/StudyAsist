@@ -19,6 +19,7 @@ data class AppSettings(
     val focusGuardEnabled: Boolean,
     val blockOverlap: Boolean = false,
     val cloudBackupFolderUri: String? = null,
+    val cloudBackupTarget: String = "folder",
     val cloudBackupAuto: Boolean = false,
     val appLocale: String = "system"
 ) {
@@ -43,6 +44,7 @@ class SettingsRepository @Inject constructor(
             focusGuardEnabled = prefs[dataStore.focusGuardEnabled] ?: false,
             blockOverlap = prefs[dataStore.blockOverlap] ?: false,
             cloudBackupFolderUri = prefs[dataStore.cloudBackupFolderUri]?.takeIf { it.isNotEmpty() },
+            cloudBackupTarget = prefs[dataStore.cloudBackupTarget]?.takeIf { it.isNotEmpty() } ?: "folder",
             cloudBackupAuto = prefs[dataStore.cloudBackupAuto] ?: false,
             appLocale = prefs[dataStore.appLocale] ?: "system"
         )
@@ -129,6 +131,14 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setCloudBackupFolderUri(uri: String?) {
         dataStore.dataStore.edit { it[dataStore.cloudBackupFolderUri] = uri ?: "" }
+    }
+
+    suspend fun setCloudBackupTarget(target: String) {
+        dataStore.dataStore.edit { it[dataStore.cloudBackupTarget] = target }
+    }
+
+    fun getCloudBackupTargetFlow(): Flow<String> = dataStore.getPreferencesFlow().map { prefs ->
+        prefs[dataStore.cloudBackupTarget]?.takeIf { it.isNotEmpty() } ?: "folder"
     }
 
     suspend fun setCloudBackupAuto(enabled: Boolean) {

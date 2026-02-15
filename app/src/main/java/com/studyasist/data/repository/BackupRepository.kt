@@ -45,6 +45,7 @@ private data class BackupSettings(
     val focusGuardRestrictedExtra: String = "",
     val blockOverlap: Boolean = false,
     val cloudBackupFolderUri: String? = null,
+    val cloudBackupTarget: String? = null,
     val cloudBackupAuto: Boolean = false,
     val dictateLanguage: String = "en",
     val explainLanguage: String = "en",
@@ -110,6 +111,7 @@ class BackupRepository @Inject constructor(
             focusGuardRestrictedExtra = focusExtra,
             blockOverlap = appSettings.blockOverlap,
             cloudBackupFolderUri = appSettings.cloudBackupFolderUri,
+            cloudBackupTarget = appSettings.cloudBackupTarget,
             cloudBackupAuto = appSettings.cloudBackupAuto,
             dictateLanguage = dictLang,
             explainLanguage = explLang,
@@ -189,6 +191,7 @@ class BackupRepository @Inject constructor(
         )
         settingsRepository.setBlockOverlap(s.blockOverlap)
         settingsRepository.setCloudBackupFolderUri(s.cloudBackupFolderUri)
+        s.cloudBackupTarget?.takeIf { it.isNotEmpty() }?.let { settingsRepository.setCloudBackupTarget(it) }
         settingsRepository.setCloudBackupAuto(s.cloudBackupAuto)
         settingsRepository.setDictateLanguage(s.dictateLanguage)
         settingsRepository.setExplainLanguage(s.explainLanguage)
