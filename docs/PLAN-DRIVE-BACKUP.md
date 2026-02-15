@@ -1,6 +1,6 @@
 # Google Drive API – Direct Backup (Optional)
 
-**Status:** Planned  
+**Status:** Implemented  
 **Prerequisite:** Current cloud backup works via DocumentsProvider (Drive, Dropbox, etc.). This adds an optional direct Google Drive API path.
 
 ---

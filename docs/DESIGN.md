@@ -273,7 +273,7 @@ The following are **implemented** beyond the original Phase 1 scope:
 
 **Done:** Share as image (timetable PDF rendered to PNG, shared via system sheet).
 
-**Future:** Optional native Google Drive API.
+**Done:** Optional native Google Drive API (direct sign-in, app folder).
 
 ---
 
