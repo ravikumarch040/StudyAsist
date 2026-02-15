@@ -19,7 +19,8 @@ data class AppSettings(
     val focusGuardEnabled: Boolean,
     val blockOverlap: Boolean = false,
     val cloudBackupFolderUri: String? = null,
-    val cloudBackupAuto: Boolean = false
+    val cloudBackupAuto: Boolean = false,
+    val appLocale: String = "system"
 ) {
     companion object {
         const val DEFAULT_LEAD_MINUTES = 5
@@ -42,7 +43,8 @@ class SettingsRepository @Inject constructor(
             focusGuardEnabled = prefs[dataStore.focusGuardEnabled] ?: false,
             blockOverlap = prefs[dataStore.blockOverlap] ?: false,
             cloudBackupFolderUri = prefs[dataStore.cloudBackupFolderUri]?.takeIf { it.isNotEmpty() },
-            cloudBackupAuto = prefs[dataStore.cloudBackupAuto] ?: false
+            cloudBackupAuto = prefs[dataStore.cloudBackupAuto] ?: false,
+            appLocale = prefs[dataStore.appLocale] ?: "system"
         )
     }
 
@@ -172,5 +174,13 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setDarkMode(mode: String) {
         dataStore.dataStore.edit { it[dataStore.darkMode] = mode }
+    }
+
+    val appLocaleFlow: Flow<String> = dataStore.getPreferencesFlow().map {
+        it[dataStore.appLocale] ?: "system"
+    }
+
+    suspend fun setAppLocale(localeTag: String) {
+        dataStore.dataStore.edit { it[dataStore.appLocale] = localeTag }
     }
 }

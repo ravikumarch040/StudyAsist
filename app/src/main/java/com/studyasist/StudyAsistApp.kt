@@ -1,6 +1,8 @@
 package com.studyasist
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.Constraints
@@ -34,6 +36,7 @@ class StudyAsistApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
+        applyAppLocale()
         scheduleExamGoalAlert()
         scheduleDeferredGrading()
         scheduleCloudBackupIfEnabled()
@@ -49,6 +52,17 @@ class StudyAsistApp : Application(), Configuration.Provider {
                     request
                 )
             }
+        }
+    }
+
+    private fun applyAppLocale() {
+        runBlocking {
+            val locale = settingsRepository.settingsFlow.first().appLocale
+            val locales = when (locale) {
+                "en", "hi", "es", "fr", "de" -> LocaleListCompat.forLanguageTags(locale)
+                else -> LocaleListCompat.getEmptyLocaleList()
+            }
+            AppCompatDelegate.setApplicationLocales(locales)
         }
     }
 

@@ -16,7 +16,7 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.studyasist.HiltTestRunner"
     }
 
     buildTypes {
@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.hilt.work)
     implementation(libs.mlkit.text.recognition)
@@ -77,4 +78,5 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.hilt.android.testing)
 }

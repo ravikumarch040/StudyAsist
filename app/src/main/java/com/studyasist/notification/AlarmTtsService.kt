@@ -67,11 +67,12 @@ class AlarmTtsService : Service() {
             this, notificationId + 1, dismissIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        val contentText = getString(R.string.reminder_title_body_format, title, body)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID_ALARM_TTS)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(timetableName)
-            .setContentText("$title – $body")
-            .setStyle(NotificationCompat.BigTextStyle().bigText("$title – $body"))
+            .setContentText(contentText)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             .setContentIntent(contentPending)
             .setFullScreenIntent(contentPending, true)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.dismiss), dismissPending)

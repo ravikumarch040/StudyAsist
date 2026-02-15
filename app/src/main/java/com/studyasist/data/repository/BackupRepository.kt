@@ -49,7 +49,8 @@ private data class BackupSettings(
     val dictateLanguage: String = "en",
     val explainLanguage: String = "en",
     val solveLanguage: String = "en",
-    val darkMode: String = "system"
+    val darkMode: String = "system",
+    val appLocale: String? = null  // Added later; old backups omit this
 )
 
 private data class BackupData(
@@ -98,6 +99,7 @@ class BackupRepository @Inject constructor(
         val explLang = settingsRepository.getExplainLanguage()
         val solvLang = settingsRepository.getSolveLanguage()
         val darkMode = settingsRepository.getDarkMode()
+        val appLocale = appSettings.appLocale
         val backupSettings = BackupSettings(
             defaultLeadMinutes = appSettings.defaultLeadMinutes,
             vibrationEnabled = appSettings.vibrationEnabled,
@@ -112,7 +114,8 @@ class BackupRepository @Inject constructor(
             dictateLanguage = dictLang,
             explainLanguage = explLang,
             solveLanguage = solvLang,
-            darkMode = darkMode
+            darkMode = darkMode,
+            appLocale = appLocale
         )
         val data = BackupData(
             timetables = timetableDao.getAllOnce(),
@@ -191,6 +194,7 @@ class BackupRepository @Inject constructor(
         settingsRepository.setExplainLanguage(s.explainLanguage)
         settingsRepository.setSolveLanguage(s.solveLanguage)
         settingsRepository.setDarkMode(s.darkMode)
+        settingsRepository.setAppLocale(s.appLocale?.takeIf { it.isNotBlank() } ?: "system")
         notificationScheduler.rescheduleAll()
     }
 }

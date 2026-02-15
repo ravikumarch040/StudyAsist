@@ -375,6 +375,8 @@
     <string name="feedback_expected_answer">Expected: %1$s</string>
     <string name="activity_fallback">Study</string>
     <string name="reminder_title_body_format">%1$s – %2$s</string>
+    <string name="reminder_body_format">%1$s – %2$s %3$s</string>
+    <string name="reminder_note_suffix"> (%1$s)</string>
     <string name="results_report_title_format">%1$s - Results Report</string>
     <string name="generated_format">Generated: %1$s</string>
     <string name="csv_header_results">Assessment,Attempt,Date,Score,Max Score,Percent</string>
@@ -420,4 +422,7 @@
     <string name="duration_hours_mins">%1$dh %2$dm</string>
     <string name="duration_hours">%1$dh</string>
     <string name="duration_mins">%1$dm</string>
+    <string name="language">Language</string>
+    <string name="language_app_summary">Override device language for this app</string>
+    <string name="language_system">System default</string>
 </resources>

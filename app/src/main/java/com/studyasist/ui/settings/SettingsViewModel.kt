@@ -23,6 +23,8 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import android.content.Context
 import android.net.Uri
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -40,7 +42,7 @@ class SettingsViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, false)
+            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, false, "system")
         )
 
     val cloudBackupLastSuccess: StateFlow<Long?> = settingsRepository.cloudBackupLastSuccessFlow
@@ -49,8 +51,22 @@ class SettingsViewModel @Inject constructor(
     val darkMode: StateFlow<String> = settingsRepository.darkModeFlow
         .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), "system")
 
+    val appLocale: StateFlow<String> = settingsRepository.appLocaleFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), "system")
+
     fun setDarkMode(mode: String) {
         viewModelScope.launch { settingsRepository.setDarkMode(mode) }
+    }
+
+    fun setAppLocale(localeTag: String) {
+        viewModelScope.launch {
+            settingsRepository.setAppLocale(localeTag)
+            val locales = when (localeTag) {
+                "en", "hi", "es", "fr", "de" -> LocaleListCompat.forLanguageTags(localeTag)
+                else -> LocaleListCompat.getEmptyLocaleList()
+            }
+            AppCompatDelegate.setApplicationLocales(locales)
+        }
     }
 
     private val _apiKeyTestMessage = MutableStateFlow<String?>(null)

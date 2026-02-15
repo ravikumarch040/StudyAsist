@@ -99,4 +99,21 @@
     <string name="clear_recent">Borrar reciente</string>
     <string name="no_timetables">Aún no hay horarios.\nToca + para crear uno.</string>
     <string name="err_invalid_backup_format">Formato de copia de seguridad no válido</string>
+    <string name="language">Idioma</string>
+    <string name="language_app_summary">Anular el idioma del dispositivo para esta aplicación</string>
+    <string name="language_system">Predeterminado del sistema</string>
+    <string name="lang_english">Inglés</string>
+    <string name="lang_hindi">Hindi</string>
+    <string name="lang_spanish">Español</string>
+    <string name="lang_french">Francés</string>
+    <string name="lang_german">Alemán</string>
+    <string name="cloud_backup_last">Última copia: %1$s</string>
+    <string name="default_reminder_minutes">Recordatorio predeterminado (minutos antes de la actividad)</string>
+    <string name="reminder_title_body_format">%1$s – %2$s</string>
+    <string name="reminder_body_format">%1$s – %2$s %3$s</string>
+    <string name="reminder_note_suffix"> (%1$s)</string>
+    <string name="just_now">Ahora mismo</string>
+    <string name="min_ago_format">Hace %1$d min</string>
+    <string name="hr_ago_format">Hace %1$d h</string>
+    <string name="days_ago_format">Hace %1$d días</string>
 </resources>

@@ -99,4 +99,21 @@
     <string name="clear_recent">हाल का साफ करें</string>
     <string name="no_timetables">अभी तक कोई समय सारणी नहीं।\nबनाने के लिए + दबाएं।</string>
     <string name="err_invalid_backup_format">अमान्य बैकअप प्रारूप</string>
+    <string name="language">भाषा</string>
+    <string name="language_app_summary">इस ऐप के लिए डिवाइस भाषा ओवरराइड करें</string>
+    <string name="language_system">सिस्टम डिफ़ॉल्ट</string>
+    <string name="lang_english">अंग्रेज़ी</string>
+    <string name="lang_hindi">हिंदी</string>
+    <string name="lang_spanish">स्पेनिश</string>
+    <string name="lang_french">फ़्रेंच</string>
+    <string name="lang_german">जर्मन</string>
+    <string name="cloud_backup_last">अंतिम बैकअप: %1$s</string>
+    <string name="default_reminder_minutes">डिफ़ॉल्ट अनुस्मारक (गतिविधि से मिनट पहले)</string>
+    <string name="reminder_title_body_format">%1$s – %2$s</string>
+    <string name="reminder_body_format">%1$s – %2$s %3$s</string>
+    <string name="reminder_note_suffix"> (%1$s)</string>
+    <string name="just_now">अभी</string>
+    <string name="min_ago_format">%1$d मिनट पहले</string>
+    <string name="hr_ago_format">%1$d घंटे पहले</string>
+    <string name="days_ago_format">%1$d दिन पहले</string>
 </resources>

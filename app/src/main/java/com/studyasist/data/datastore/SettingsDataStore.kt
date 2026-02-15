@@ -38,6 +38,7 @@ class SettingsDataStore @Inject constructor(
     val explainLanguage = stringPreferencesKey("explain_language")
     val solveLanguage = stringPreferencesKey("solve_language")
     val darkMode = stringPreferencesKey("dark_mode") // "system", "light", "dark"
+    val appLocale = stringPreferencesKey("app_locale") // "system", "en", "hi", "es", "fr", "de"
 
     val dataStore: DataStore<Preferences> get() = prefs
 

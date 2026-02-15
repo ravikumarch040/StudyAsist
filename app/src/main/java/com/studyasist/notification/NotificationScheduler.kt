@@ -11,6 +11,7 @@ import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityType
 import com.studyasist.data.repository.ActivityRepository
 import com.studyasist.data.repository.SettingsRepository
+import com.studyasist.R
 import com.studyasist.data.repository.TimetableRepository
 import com.studyasist.util.formatTimeMinutes
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -61,7 +62,11 @@ class NotificationScheduler @Inject constructor(
             putExtra(EXTRA_TIMETABLE_ID, activity.timetableId)
             putExtra(EXTRA_TIMETABLE_NAME, timetableName)
             putExtra(EXTRA_TITLE, activity.title)
-            putExtra(EXTRA_BODY, "${formatTimeMinutes(activity.startTimeMinutes)}–${formatTimeMinutes(activity.endTimeMinutes)} ${activity.title}" + (activity.note?.let { " ($it)" } ?: ""))
+            putExtra(EXTRA_BODY, context.getString(R.string.reminder_body_format,
+                formatTimeMinutes(activity.startTimeMinutes),
+                formatTimeMinutes(activity.endTimeMinutes),
+                activity.title
+            ) + (activity.note?.let { context.getString(R.string.reminder_note_suffix, it) } ?: ""))
             putExtra(EXTRA_DAY_OF_WEEK, activity.dayOfWeek)
             putExtra(EXTRA_USE_SPEECH_SOUND, activity.useSpeechSound)
             putExtra(EXTRA_ALARM_TTS_MESSAGE, activity.alarmTtsMessage ?: "")

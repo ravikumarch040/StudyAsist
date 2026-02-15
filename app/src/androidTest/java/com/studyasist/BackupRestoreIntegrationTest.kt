@@ -1,10 +1,6 @@
 package com.studyasist
 
-import android.content.Context
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.gson.Gson
 import com.studyasist.data.local.db.AppDatabase
 import com.studyasist.data.local.entity.Assessment
 import com.studyasist.data.local.entity.AssessmentQuestion
@@ -18,46 +14,38 @@ import com.studyasist.data.local.entity.StudyToolHistoryEntity
 import com.studyasist.data.local.entity.TimetableEntity
 import com.studyasist.data.local.entity.WeekType
 import com.studyasist.data.repository.BackupRepository
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 /**
  * Integration test: full flow of backup export and restore.
  * Verifies that data round-trips correctly through JSON backup.
  */
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class BackupRestoreIntegrationTest {
 
-    private lateinit var database: AppDatabase
-    private lateinit var backupRepository: BackupRepository
+    @get:Rule
+    val hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    lateinit var backupRepository: BackupRepository
+
+    @Inject
+    lateinit var database: AppDatabase
 
     @Before
     fun setup() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .fallbackToDestructiveMigration()
-            .build()
-        backupRepository = BackupRepository(
-            context = context,
-            timetableDao = database.timetableDao(),
-            activityDao = database.activityDao(),
-            goalDao = database.goalDao(),
-            goalItemDao = database.goalItemDao(),
-            qaDao = database.qaDao(),
-            assessmentDao = database.assessmentDao(),
-            assessmentQuestionDao = database.assessmentQuestionDao(),
-            attemptDao = database.attemptDao(),
-            attemptAnswerDao = database.attemptAnswerDao(),
-            resultDao = database.resultDao(),
-            studyToolHistoryDao = database.studyToolHistoryDao(),
-            database = database,
-            gson = Gson()
-        )
+        hiltRule.inject()
     }
 
     @After

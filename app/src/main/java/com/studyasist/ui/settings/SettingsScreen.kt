@@ -69,7 +69,7 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState(
-        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, false)
+        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, false, "system")
     )
     val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
     val backupExportJson by viewModel.backupExportJson.collectAsState(initial = null)
@@ -79,6 +79,7 @@ fun SettingsScreen(
     val cloudBackupFiles by viewModel.cloudBackupFiles.collectAsState(initial = emptyList())
     val cloudBackupFilesLoading by viewModel.cloudBackupFilesLoading.collectAsState(initial = false)
     val darkMode by viewModel.darkMode.collectAsState(initial = "system")
+    val appLocale by viewModel.appLocale.collectAsState(initial = "system")
     var showRestoreFromFolderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -148,6 +149,23 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(stringResource(R.string.appearance), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.language), style = MaterialTheme.typography.bodySmall)
+            Text(
+                stringResource(R.string.language_app_summary),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf("system" to R.string.language_system, "en" to R.string.lang_english, "hi" to R.string.lang_hindi, "es" to R.string.lang_spanish, "fr" to R.string.lang_french, "de" to R.string.lang_german).forEach { (tag, labelRes) ->
+                    androidx.compose.material3.FilterChip(
+                        selected = appLocale == tag,
+                        onClick = { viewModel.setAppLocale(tag) },
+                        label = { Text(stringResource(labelRes)) }
+                    )
+                }
+            }
             Text(stringResource(R.string.theme), style = MaterialTheme.typography.bodySmall)
             Row(
                 modifier = Modifier.fillMaxWidth(),
