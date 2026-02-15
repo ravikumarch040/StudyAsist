@@ -40,6 +40,8 @@ class SettingsDataStore @Inject constructor(
     val solveLanguage = stringPreferencesKey("solve_language")
     val darkMode = stringPreferencesKey("dark_mode") // "system", "light", "dark"
     val appLocale = stringPreferencesKey("app_locale") // "system", "en", "hi", "es", "fr", "de"
+    val useCloudForParsing = booleanPreferencesKey("use_cloud_for_parsing") // Improve with AI on Q&A scan
+    val useCloudForGrading = booleanPreferencesKey("use_cloud_for_grading") // LLM subjective grading
 
     val dataStore: DataStore<Preferences> get() = prefs
 

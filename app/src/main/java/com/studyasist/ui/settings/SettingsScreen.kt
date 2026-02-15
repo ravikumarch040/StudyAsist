@@ -70,7 +70,7 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     val settings by viewModel.settings.collectAsState(
-        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, "system")
+        initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, true, true, "system")
     )
     val apiKeyTestMessage by viewModel.apiKeyTestMessage.collectAsState(initial = null)
     val backupExportJson by viewModel.backupExportJson.collectAsState(initial = null)
@@ -393,6 +393,30 @@ fun SettingsScreen(
                         maxLines = Int.MAX_VALUE
                     )
                 }
+            }
+            Text(stringResource(R.string.ai_privacy), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ai_privacy_hint), style = MaterialTheme.typography.bodySmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.use_cloud_for_parsing), modifier = Modifier.weight(1f))
+                Switch(
+                    checked = settings.useCloudForParsing,
+                    onCheckedChange = viewModel::setUseCloudForParsing
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.use_cloud_for_grading), modifier = Modifier.weight(1f))
+                Switch(
+                    checked = settings.useCloudForGrading,
+                    onCheckedChange = viewModel::setUseCloudForGrading
+                )
             }
             Text(stringResource(R.string.cloud_backup), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.cloud_backup_summary), style = MaterialTheme.typography.bodySmall)

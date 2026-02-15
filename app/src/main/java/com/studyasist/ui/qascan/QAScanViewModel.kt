@@ -268,7 +268,12 @@ class QAScanViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
-            val apiKey = settingsRepository.settingsFlow.first().geminiApiKey
+            val settings = settingsRepository.settingsFlow.first()
+            if (!settings.useCloudForParsing) {
+                _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_enable_ai_parsing)) }
+                return@launch
+            }
+            val apiKey = settings.geminiApiKey
             if (apiKey.isBlank()) {
                 _uiState.update { it.copy(errorMessage = context.getString(com.studyasist.R.string.err_gemini_api_key_for_ai)) }
                 return@launch

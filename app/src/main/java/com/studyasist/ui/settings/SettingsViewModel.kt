@@ -47,7 +47,7 @@ class SettingsViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, "system")
+            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, true, true, "system")
         )
 
     val cloudBackupLastSuccess: StateFlow<Long?> = settingsRepository.cloudBackupLastSuccessFlow
@@ -181,6 +181,14 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.setCloudBackupTarget(target)
         }
+    }
+
+    fun setUseCloudForParsing(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setUseCloudForParsing(enabled) }
+    }
+
+    fun setUseCloudForGrading(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setUseCloudForGrading(enabled) }
     }
 
     fun setCloudBackupAuto(enabled: Boolean) {

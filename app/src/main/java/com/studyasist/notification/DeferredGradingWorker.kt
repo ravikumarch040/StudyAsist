@@ -27,7 +27,12 @@ class DeferredGradingWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            val apiKey = settingsRepository.settingsFlow.first().geminiApiKey
+            val settings = settingsRepository.settingsFlow.first()
+            if (!settings.useCloudForGrading) {
+                Log.d(TAG, "Deferred grading: AI grading disabled in settings, skipping")
+                return Result.success()
+            }
+            val apiKey = settings.geminiApiKey
             if (apiKey.isBlank()) {
                 Log.d(TAG, "Deferred grading: no API key, skipping")
                 return Result.success()

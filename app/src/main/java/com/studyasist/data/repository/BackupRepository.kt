@@ -47,6 +47,8 @@ private data class BackupSettings(
     val cloudBackupFolderUri: String? = null,
     val cloudBackupTarget: String? = null,
     val cloudBackupAuto: Boolean = false,
+    val useCloudForParsing: Boolean = true,
+    val useCloudForGrading: Boolean = true,
     val dictateLanguage: String = "en",
     val explainLanguage: String = "en",
     val solveLanguage: String = "en",
@@ -113,6 +115,8 @@ class BackupRepository @Inject constructor(
             cloudBackupFolderUri = appSettings.cloudBackupFolderUri,
             cloudBackupTarget = appSettings.cloudBackupTarget,
             cloudBackupAuto = appSettings.cloudBackupAuto,
+            useCloudForParsing = appSettings.useCloudForParsing,
+            useCloudForGrading = appSettings.useCloudForGrading,
             dictateLanguage = dictLang,
             explainLanguage = explLang,
             solveLanguage = solvLang,
@@ -193,6 +197,8 @@ class BackupRepository @Inject constructor(
         settingsRepository.setCloudBackupFolderUri(s.cloudBackupFolderUri)
         s.cloudBackupTarget?.takeIf { it.isNotEmpty() }?.let { settingsRepository.setCloudBackupTarget(it) }
         settingsRepository.setCloudBackupAuto(s.cloudBackupAuto)
+        settingsRepository.setUseCloudForParsing(s.useCloudForParsing)
+        settingsRepository.setUseCloudForGrading(s.useCloudForGrading)
         settingsRepository.setDictateLanguage(s.dictateLanguage)
         settingsRepository.setExplainLanguage(s.explainLanguage)
         settingsRepository.setSolveLanguage(s.solveLanguage)

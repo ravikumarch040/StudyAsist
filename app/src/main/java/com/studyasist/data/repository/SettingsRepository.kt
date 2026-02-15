@@ -21,6 +21,8 @@ data class AppSettings(
     val cloudBackupFolderUri: String? = null,
     val cloudBackupTarget: String = "folder",
     val cloudBackupAuto: Boolean = false,
+    val useCloudForParsing: Boolean = true,
+    val useCloudForGrading: Boolean = true,
     val appLocale: String = "system"
 ) {
     companion object {
@@ -46,6 +48,8 @@ class SettingsRepository @Inject constructor(
             cloudBackupFolderUri = prefs[dataStore.cloudBackupFolderUri]?.takeIf { it.isNotEmpty() },
             cloudBackupTarget = prefs[dataStore.cloudBackupTarget]?.takeIf { it.isNotEmpty() } ?: "folder",
             cloudBackupAuto = prefs[dataStore.cloudBackupAuto] ?: false,
+            useCloudForParsing = prefs[dataStore.useCloudForParsing] ?: true,
+            useCloudForGrading = prefs[dataStore.useCloudForGrading] ?: true,
             appLocale = prefs[dataStore.appLocale] ?: "system"
         )
     }
@@ -139,6 +143,14 @@ class SettingsRepository @Inject constructor(
 
     fun getCloudBackupTargetFlow(): Flow<String> = dataStore.getPreferencesFlow().map { prefs ->
         prefs[dataStore.cloudBackupTarget]?.takeIf { it.isNotEmpty() } ?: "folder"
+    }
+
+    suspend fun setUseCloudForParsing(enabled: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.useCloudForParsing] = enabled }
+    }
+
+    suspend fun setUseCloudForGrading(enabled: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.useCloudForGrading] = enabled }
     }
 
     suspend fun setCloudBackupAuto(enabled: Boolean) {
