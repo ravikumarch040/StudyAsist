@@ -48,6 +48,7 @@ import com.studyasist.ui.components.colorForActivityType
 import com.studyasist.ui.timetablelist.TimetableListScreen
 import com.studyasist.ui.timetablelist.TimetableListViewModel
 import com.studyasist.util.formatTimeMinutes
+import com.studyasist.util.labelResId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,19 +95,19 @@ fun HomeScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    icon = { Icon(Icons.Default.Today, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Today, contentDescription = stringResource(R.string.today)) },
                     text = { Text(stringResource(R.string.today)) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = null) },
+                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.timetables)) },
                     text = { Text(stringResource(R.string.timetables)) }
                 )
                 Tab(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.Default.School, contentDescription = null) },
+                    icon = { Icon(Icons.Default.School, contentDescription = stringResource(R.string.study_tools)) },
                     text = { Text(stringResource(R.string.study_tools)) }
                 )
             }
@@ -413,7 +414,7 @@ private fun TodayTabContent(
                         color = textColor
                     )
                     Text(
-                        text = "${formatTimeMinutes(activity.startTimeMinutes)} – ${formatTimeMinutes(activity.endTimeMinutes)} · ${activity.type.name}",
+                        text = "${formatTimeMinutes(activity.startTimeMinutes)} – ${formatTimeMinutes(activity.endTimeMinutes)} · ${stringResource(activity.type.labelResId())}",
                         style = MaterialTheme.typography.bodySmall,
                         color = textColor.copy(alpha = 0.85f)
                     )

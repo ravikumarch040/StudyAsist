@@ -40,7 +40,7 @@ class AlarmTtsService : Service() {
         val message = intent?.getStringExtra(EXTRA_ALARM_TTS_MESSAGE)?.trim() ?: return START_NOT_STICKY
         val title = intent.getStringExtra(EXTRA_TITLE) ?: ""
         val body = intent.getStringExtra(EXTRA_BODY) ?: ""
-        val timetableName = intent.getStringExtra(EXTRA_TIMETABLE_NAME) ?: "StudyAsist"
+        val timetableName = intent.getStringExtra(EXTRA_TIMETABLE_NAME) ?: getString(R.string.app_name)
         val activityId = intent.getLongExtra(EXTRA_ACTIVITY_ID, 0L)
         val voiceName = intent.getStringExtra(EXTRA_TTS_VOICE_NAME)?.takeIf { it.isNotEmpty() }
         val notificationId = activityId.toInt().and(0x7FFFFFFF)
@@ -96,10 +96,10 @@ class AlarmTtsService : Service() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
             CHANNEL_ID_ALARM_TTS,
-            CHANNEL_NAME_ALARM_TTS,
+            getString(R.string.channel_study_alarm_tts),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Custom spoken message plays when reminder fires"
+            description = getString(R.string.channel_alarm_tts_description)
             setSound(null, null)
             enableVibration(true)
         }

@@ -28,6 +28,7 @@ import com.studyasist.R
 import com.studyasist.data.local.entity.ActivityType
 import com.studyasist.data.repository.AppSettings
 import com.studyasist.ui.components.colorForActivityType
+import com.studyasist.util.labelResId
 import com.studyasist.ui.components.NumberPicker
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -169,7 +170,7 @@ fun ActivityEditScreen(
                     androidx.compose.material3.FilterChip(
                         selected = uiState.type == type,
                         onClick = { viewModel.updateType(type) },
-                        label = { Text(type.name) },
+                        label = { Text(stringResource(type.labelResId())) },
                         colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
                             selectedContainerColor = containerColor,
                             selectedLabelColor = contentColor

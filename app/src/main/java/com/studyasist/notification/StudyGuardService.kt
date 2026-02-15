@@ -34,7 +34,7 @@ class StudyGuardService : Service() {
             return START_NOT_STICKY
         }
         endTimeMillis = intent.getLongExtra(EXTRA_END_TIME, 0)
-        activityTitle = intent.getStringExtra(EXTRA_ACTIVITY_TITLE) ?: "Study"
+        activityTitle = intent.getStringExtra(EXTRA_ACTIVITY_TITLE) ?: getString(R.string.activity_fallback)
 
         if (endTimeMillis <= System.currentTimeMillis()) {
             stopSelf()
@@ -112,7 +112,7 @@ class StudyGuardService : Service() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val channel = NotificationChannel(
             CHANNEL_ID_FOCUS_GUARD,
-            CHANNEL_NAME_FOCUS_GUARD,
+            getString(R.string.focus_guard),
             NotificationManager.IMPORTANCE_LOW
         ).apply {
             description = getString(R.string.focus_guard_channel_description)

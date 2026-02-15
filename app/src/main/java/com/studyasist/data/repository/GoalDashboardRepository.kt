@@ -1,6 +1,9 @@
 package com.studyasist.data.repository
 
+import android.content.Context
+import com.studyasist.R
 import com.studyasist.data.local.dao.AssessmentDao
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.local.dao.AttemptAnswerDao
 import com.studyasist.data.local.dao.AttemptDao
 import com.studyasist.data.local.dao.QADao
@@ -53,6 +56,7 @@ data class RecentAttemptSummary(
 
 @Singleton
 class GoalDashboardRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val goalRepository: com.studyasist.data.repository.GoalRepository,
     private val qaDao: QADao,
     private val assessmentDao: AssessmentDao,
@@ -94,8 +98,8 @@ class GoalDashboardRepository @Inject constructor(
                 val attempts = attemptDao.getByAssessmentIdOnce(row.assessmentId).sortedBy { it.startedAt }
                 val attemptNum = attempts.indexOfFirst { it.id == row.attemptId }.let { if (it >= 0) it + 1 else 1 }
                 RecentAttemptSummary(
-                    assessmentTitle = assessment?.title ?: "Assessment",
-                    attemptLabel = "Attempt $attemptNum",
+                    assessmentTitle = assessment?.title ?: context.getString(R.string.assessment_fallback),
+                    attemptLabel = context.getString(R.string.attempt_label_format, attemptNum),
                     percent = row.percent,
                     attemptId = row.attemptId
                 )
@@ -120,7 +124,7 @@ class GoalDashboardRepository @Inject constructor(
                 }
             }
             val itemPercent = if (itemTotal > 0) (itemPracticed.toFloat() / itemTotal * 100f).coerceIn(0f, 100f) else 0f
-            val chapterLabel = if (chapters.isEmpty()) "All" else chapters.joinToString(", ")
+            val chapterLabel = if (chapters.isEmpty()) context.getString(R.string.chapter_all) else chapters.joinToString(", ")
             SubjectChapterProgress(
                 subject = item.subject,
                 chapterLabel = chapterLabel,

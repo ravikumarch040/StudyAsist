@@ -1,5 +1,8 @@
 package com.studyasist.data.repository
 
+import android.content.Context
+import com.studyasist.R
+import dagger.hilt.android.qualifiers.ApplicationContext
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
@@ -9,6 +12,7 @@ import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.TimetableEntity
 import com.studyasist.data.local.entity.WeekType
 import com.studyasist.util.formatTimeMinutes
+import com.studyasist.util.labelResId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -16,6 +20,7 @@ import javax.inject.Singleton
 
 @Singleton
 class TimetableRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val timetableDao: TimetableDao,
     private val activityDao: ActivityDao
 ) {
@@ -96,18 +101,18 @@ class TimetableRepository @Inject constructor(
     }
 
     private fun buildTimetableExportCsv(timetableName: String, activities: List<ActivityEntity>): String {
-        val dayNames = listOf("", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-        val header = "Timetable: $timetableName\nDay,Start,End,Title,Type,Note,Notify"
+        val dayNames = listOf("", context.getString(R.string.day_mon), context.getString(R.string.day_tue), context.getString(R.string.day_wed), context.getString(R.string.day_thu), context.getString(R.string.day_fri), context.getString(R.string.day_sat), context.getString(R.string.day_sun))
+        val header = context.getString(R.string.timetable_csv_header_format, timetableName)
         val lines = mutableListOf(header)
         for (act in activities) {
-            val day = if (act.dayOfWeek in 1..7) dayNames[act.dayOfWeek] else "Day${act.dayOfWeek}"
-            lines.add("$day,${formatTimeMinutes(act.startTimeMinutes)},${formatTimeMinutes(act.endTimeMinutes)},${act.title.escapeCsv()},${act.type.name},${(act.note ?: "").escapeCsv()},${act.notifyEnabled}")
+            val day = if (act.dayOfWeek in 1..7) dayNames[act.dayOfWeek] else context.getString(R.string.day_format, act.dayOfWeek)
+            lines.add("$day,${formatTimeMinutes(act.startTimeMinutes)},${formatTimeMinutes(act.endTimeMinutes)},${act.title.escapeCsv()},${context.getString(act.type.labelResId()).escapeCsv()},${(act.note ?: "").escapeCsv()},${act.notifyEnabled}")
         }
         return lines.joinToString("\n")
     }
 
     private fun buildTimetablePdf(timetableName: String, activities: List<ActivityEntity>): ByteArray {
-        val dayNames = listOf("", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        val dayNames = listOf("", context.getString(R.string.day_mon), context.getString(R.string.day_tue), context.getString(R.string.day_wed), context.getString(R.string.day_thu), context.getString(R.string.day_fri), context.getString(R.string.day_sat), context.getString(R.string.day_sun))
         val pageWidth = 595
         val pageHeight = 842
         val margin = 40
@@ -133,7 +138,7 @@ class TimetableRepository @Inject constructor(
         var canvas = page.canvas
         canvas.drawText(timetableName, margin.toFloat(), y.toFloat(), titlePaint)
         y += lineHeight * 2
-        canvas.drawText("Day | Start | End | Title | Type | Note", margin.toFloat(), y.toFloat(), headerPaint)
+        canvas.drawText(context.getString(R.string.timetable_pdf_header), margin.toFloat(), y.toFloat(), headerPaint)
         y += lineHeight
         for (act in activities) {
             if (y > pageHeight - margin - lineHeight * 2) {
@@ -143,9 +148,10 @@ class TimetableRepository @Inject constructor(
                 canvas = page.canvas
                 y = margin
             }
-            val day = if (act.dayOfWeek in 1..7) dayNames[act.dayOfWeek] else "D${act.dayOfWeek}"
+            val day = if (act.dayOfWeek in 1..7) dayNames[act.dayOfWeek] else context.getString(R.string.day_format, act.dayOfWeek)
             val note = act.note?.take(30)?.plus(if ((act.note?.length ?: 0) > 30) "…" else "") ?: ""
-            val line = "$day | ${formatTimeMinutes(act.startTimeMinutes)} | ${formatTimeMinutes(act.endTimeMinutes)} | ${act.title.take(25)} | ${act.type.name} | $note"
+            val typeStr = context.getString(act.type.labelResId())
+            val line = "$day | ${formatTimeMinutes(act.startTimeMinutes)} | ${formatTimeMinutes(act.endTimeMinutes)} | ${act.title.take(25)} | $typeStr | $note"
             canvas.drawText(line, margin.toFloat(), y.toFloat(), normalPaint)
             y += lineHeight
         }
@@ -157,20 +163,28 @@ class TimetableRepository @Inject constructor(
     }
 
     private fun buildTimetableExcel(timetableName: String, activities: List<ActivityEntity>): ByteArray {
-        val dayNames = listOf("", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        val dayNames = listOf("", context.getString(R.string.day_mon), context.getString(R.string.day_tue), context.getString(R.string.day_wed), context.getString(R.string.day_thu), context.getString(R.string.day_fri), context.getString(R.string.day_sat), context.getString(R.string.day_sun))
+        val hDay = context.getString(R.string.excel_header_day)
+        val hStart = context.getString(R.string.excel_header_start)
+        val hEnd = context.getString(R.string.excel_header_end)
+        val hTitle = context.getString(R.string.excel_header_title)
+        val hType = context.getString(R.string.excel_header_type)
+        val hNote = context.getString(R.string.excel_header_note)
+        val hNotify = context.getString(R.string.excel_header_notify)
         val sb = StringBuilder()
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
         sb.append("<?mso-application progid=\"Excel.Sheet\"?>\n")
         sb.append("<Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\">\n")
-        val sheetName = timetableName.replace(Regex("[:\\\\/?*\\[\\]]"), "").take(31).ifEmpty { "Timetable" }
+        val sheetName = timetableName.replace(Regex("[:\\\\/?*\\[\\]]"), "").take(31).ifEmpty { context.getString(R.string.timetables) }
         sb.append("  <Worksheet ss:Name=\"${sheetName.escapeXml()}\">\n")
         sb.append("    <Table>\n")
-        sb.append("      <Row><Cell><Data ss:Type=\"String\">Day</Data></Cell><Cell><Data ss:Type=\"String\">Start</Data></Cell><Cell><Data ss:Type=\"String\">End</Data></Cell><Cell><Data ss:Type=\"String\">Title</Data></Cell><Cell><Data ss:Type=\"String\">Type</Data></Cell><Cell><Data ss:Type=\"String\">Note</Data></Cell><Cell><Data ss:Type=\"String\">Notify</Data></Cell></Row>\n")
+        sb.append("      <Row><Cell><Data ss:Type=\"String\">$hDay</Data></Cell><Cell><Data ss:Type=\"String\">$hStart</Data></Cell><Cell><Data ss:Type=\"String\">$hEnd</Data></Cell><Cell><Data ss:Type=\"String\">$hTitle</Data></Cell><Cell><Data ss:Type=\"String\">$hType</Data></Cell><Cell><Data ss:Type=\"String\">$hNote</Data></Cell><Cell><Data ss:Type=\"String\">$hNotify</Data></Cell></Row>\n")
         for (act in activities) {
-            val day = if (act.dayOfWeek in 1..7) dayNames[act.dayOfWeek] else "Day${act.dayOfWeek}"
+            val day = if (act.dayOfWeek in 1..7) dayNames[act.dayOfWeek] else context.getString(R.string.day_format, act.dayOfWeek)
             val title = act.title.escapeXml()
             val note = (act.note ?: "").escapeXml()
-            sb.append("      <Row><Cell><Data ss:Type=\"String\">$day</Data></Cell><Cell><Data ss:Type=\"String\">${formatTimeMinutes(act.startTimeMinutes)}</Data></Cell><Cell><Data ss:Type=\"String\">${formatTimeMinutes(act.endTimeMinutes)}</Data></Cell><Cell><Data ss:Type=\"String\">$title</Data></Cell><Cell><Data ss:Type=\"String\">${act.type.name}</Data></Cell><Cell><Data ss:Type=\"String\">$note</Data></Cell><Cell><Data ss:Type=\"String\">${act.notifyEnabled}</Data></Cell></Row>\n")
+            val typeStr = context.getString(act.type.labelResId())
+            sb.append("      <Row><Cell><Data ss:Type=\"String\">$day</Data></Cell><Cell><Data ss:Type=\"String\">${formatTimeMinutes(act.startTimeMinutes)}</Data></Cell><Cell><Data ss:Type=\"String\">${formatTimeMinutes(act.endTimeMinutes)}</Data></Cell><Cell><Data ss:Type=\"String\">$title</Data></Cell><Cell><Data ss:Type=\"String\">$typeStr</Data></Cell><Cell><Data ss:Type=\"String\">$note</Data></Cell><Cell><Data ss:Type=\"String\">${act.notifyEnabled}</Data></Cell></Row>\n")
         }
         sb.append("    </Table>\n")
         sb.append("  </Worksheet>\n")

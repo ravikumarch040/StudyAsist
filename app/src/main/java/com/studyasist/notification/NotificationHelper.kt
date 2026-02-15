@@ -107,11 +107,12 @@ object NotificationHelper {
             intent,
             android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
         )
+        val titleBody = context.getString(R.string.reminder_title_body_format, title, body)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(timetableName)
-            .setContentText("$title – $body")
-            .setStyle(NotificationCompat.BigTextStyle().bigText("$title – $body"))
+            .setContentText(titleBody)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(titleBody))
             .setContentIntent(pending)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -135,11 +136,12 @@ object NotificationHelper {
         useTtsMessage: Boolean = false
     ) {
         val channelId = if (useTtsMessage) CHANNEL_ID_ALARM_TTS else CHANNEL_ID_ALARM
+        val titleBody = context.getString(R.string.reminder_title_body_format, title, body)
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(timetableName)
-            .setContentText("$title – $body")
-            .setStyle(NotificationCompat.BigTextStyle().bigText("$title – $body"))
+            .setContentText(titleBody)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(titleBody))
             .setContentIntent(fullScreenIntent)
             .setFullScreenIntent(fullScreenIntent, true)
             .setAutoCancel(true)

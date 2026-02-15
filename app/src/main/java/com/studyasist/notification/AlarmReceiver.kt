@@ -1,5 +1,6 @@
 package com.studyasist.notification
 
+import com.studyasist.R
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -15,7 +16,7 @@ import kotlinx.coroutines.runBlocking
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != ACTION_SHOW_REMINDER) return
-        val timetableName = intent.getStringExtra(EXTRA_TIMETABLE_NAME) ?: "StudyAsist"
+        val timetableName = intent.getStringExtra(EXTRA_TIMETABLE_NAME) ?: context.getString(R.string.app_name)
         val title = intent.getStringExtra(EXTRA_TITLE) ?: ""
         val body = intent.getStringExtra(EXTRA_BODY) ?: ""
         val activityId = intent.getLongExtra(EXTRA_ACTIVITY_ID, 0L)

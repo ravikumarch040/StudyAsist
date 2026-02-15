@@ -1,5 +1,8 @@
 package com.studyasist.data.repository
 
+import android.content.Context
+import com.studyasist.R
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.local.db.AppDatabase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -69,6 +72,7 @@ private data class BackupData(
 
 @Singleton
 class BackupRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val timetableDao: TimetableDao,
     private val activityDao: ActivityDao,
     private val goalDao: GoalDao,
@@ -130,7 +134,7 @@ class BackupRepository @Inject constructor(
 
     suspend fun importFromJson(json: String): kotlin.Result<Unit> = runCatching {
         val data = gson.fromJson<BackupData>(json, object : TypeToken<BackupData>() {}.type)
-            ?: throw IllegalArgumentException("Invalid backup format")
+            ?: throw IllegalArgumentException(context.getString(R.string.err_invalid_backup_format))
         val db = database.openHelper.writableDatabase
         db.execSQL("PRAGMA foreign_keys = OFF")
         try {

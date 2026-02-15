@@ -55,6 +55,7 @@ import com.studyasist.data.local.entity.ActivityType
 import androidx.core.content.FileProvider
 import com.studyasist.ui.components.colorForActivityType
 import com.studyasist.util.formatTimeMinutes
+import com.studyasist.util.labelResId
 import com.studyasist.util.sharePdfAsImage
 import kotlinx.coroutines.launch
 
@@ -256,7 +257,7 @@ fun TimetableDetailScreen(
                     androidx.compose.material3.FilterChip(
                         selected = uiState.filterType == type,
                         onClick = { viewModel.setFilterType(type) },
-                        label = { Text(type.name) },
+                        label = { Text(stringResource(type.labelResId())) },
                         colors = androidx.compose.material3.FilterChipDefaults.filterChipColors(
                             selectedContainerColor = containerColor,
                             selectedLabelColor = contentColor
@@ -286,12 +287,12 @@ fun TimetableDetailScreen(
                             val minsPart = mins % 60
                             val (_, contentColor) = MaterialTheme.colorScheme.colorForActivityType(type)
                             val durationStr = when {
-                                hours > 0 && minsPart > 0 -> "${hours}h ${minsPart}m"
-                                hours > 0 -> "${hours}h"
-                                else -> "${minsPart}m"
+                                hours > 0 && minsPart > 0 -> stringResource(R.string.duration_hours_mins, hours, minsPart)
+                                hours > 0 -> stringResource(R.string.duration_hours, hours)
+                                else -> stringResource(R.string.duration_mins, minsPart)
                             }
                             Text(
-                                "${type.name}: $durationStr",
+                                "${stringResource(type.labelResId())}: $durationStr",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = contentColor
                             )
@@ -457,7 +458,7 @@ private fun ActivityCard(
                     color = contentColor
                 )
                 Text(
-                    text = "${formatTimeMinutes(activity.startTimeMinutes)} – ${formatTimeMinutes(activity.endTimeMinutes)} · ${activity.type.name}",
+                        text = "${formatTimeMinutes(activity.startTimeMinutes)} – ${formatTimeMinutes(activity.endTimeMinutes)} · ${stringResource(activity.type.labelResId())}",
                     style = MaterialTheme.typography.bodySmall,
                     color = contentColor.copy(alpha = 0.8f)
                 )

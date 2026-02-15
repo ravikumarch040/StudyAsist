@@ -1,9 +1,12 @@
 package com.studyasist.data.repository
 
+import android.content.Context
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
+import com.studyasist.R
 import com.studyasist.data.local.dao.AttemptDao
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.local.dao.ResultDao
 import com.studyasist.data.local.dao.AssessmentDao
 import com.studyasist.data.local.entity.Result
@@ -28,6 +31,7 @@ data class ResultListItem(
 
 @Singleton
 class ResultRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val resultDao: ResultDao,
     private val attemptDao: AttemptDao,
     private val assessmentDao: AssessmentDao
@@ -48,8 +52,8 @@ class ResultRepository @Inject constructor(
                 resultId = row.resultId,
                 attemptId = row.attemptId,
                 assessmentId = row.assessmentId,
-                assessmentTitle = assessment?.title ?: "Assessment",
-                attemptLabel = "Attempt $attemptNum",
+                assessmentTitle = assessment?.title ?: context.getString(R.string.assessment_fallback),
+                attemptLabel = context.getString(R.string.attempt_label_format, attemptNum),
                 percent = row.percent,
                 score = row.score,
                 maxScore = row.maxScore
@@ -92,16 +96,16 @@ class ResultRepository @Inject constructor(
      */
     suspend fun getExportCsv(): String {
         val rows = resultDao.getAllResultsWithAttempt()
-        val header = "Assessment,Attempt,Date,Score,Max Score,Percent"
+        val header = context.getString(R.string.csv_header_results)
         val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US)
         val lines = mutableListOf(header)
         for (row in rows) {
             val assessment = assessmentDao.getById(row.assessmentId)
             val attempts = attemptDao.getByAssessmentIdOnce(row.assessmentId).sortedBy { it.startedAt }
             val attemptNum = attempts.indexOfFirst { it.id == row.attemptId }.let { if (it >= 0) it + 1 else 1 }
-            val title = assessment?.title?.escapeCsv() ?: "Assessment"
+            val title = assessment?.title?.escapeCsv() ?: context.getString(R.string.assessment_fallback)
             val dateStr = dateFormat.format(java.util.Date(row.startedAt))
-            lines.add("$title,Attempt $attemptNum,$dateStr,${row.score},${row.maxScore},${row.percent}")
+            lines.add("$title,${context.getString(R.string.attempt_label_format, attemptNum)},$dateStr,${row.score},${row.maxScore},${row.percent}")
         }
         return lines.joinToString("\n")
     }
@@ -136,11 +140,11 @@ class ResultRepository @Inject constructor(
         val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
         var page = document.startPage(pageInfo)
         var canvas = page.canvas
-        canvas.drawText("StudyAsist - Results Report", margin.toFloat(), y.toFloat(), titlePaint)
+        canvas.drawText(context.getString(R.string.results_report_title_format, context.getString(R.string.app_name)), margin.toFloat(), y.toFloat(), titlePaint)
         y += lineHeight * 2
-        canvas.drawText("Generated: ${dateFormat.format(java.util.Date())}", margin.toFloat(), y.toFloat(), normalPaint)
+        canvas.drawText(context.getString(R.string.generated_format, dateFormat.format(java.util.Date())), margin.toFloat(), y.toFloat(), normalPaint)
         y += lineHeight * 2
-        canvas.drawText("Assessment | Attempt | Date | Score | Max | %", margin.toFloat(), y.toFloat(), headerPaint)
+        canvas.drawText(context.getString(R.string.pdf_header_results), margin.toFloat(), y.toFloat(), headerPaint)
         y += lineHeight
         for (row in rows) {
             if (y > pageHeight - margin - lineHeight * 2) {
@@ -153,9 +157,9 @@ class ResultRepository @Inject constructor(
             val assessment = assessmentDao.getById(row.assessmentId)
             val attempts = attemptDao.getByAssessmentIdOnce(row.assessmentId).sortedBy { it.startedAt }
             val attemptNum = attempts.indexOfFirst { it.id == row.attemptId }.let { if (it >= 0) it + 1 else 1 }
-            val title = assessment?.title ?: "Assessment"
+            val title = assessment?.title ?: context.getString(R.string.assessment_fallback)
             val dateStr = dateFormat.format(java.util.Date(row.startedAt))
-            val line = "$title | Attempt $attemptNum | $dateStr | ${row.score} | ${row.maxScore} | ${row.percent}%"
+            val line = "$title | ${context.getString(R.string.attempt_label_format, attemptNum)} | $dateStr | ${row.score} | ${row.maxScore} | ${row.percent}%"
             canvas.drawText(line, margin.toFloat(), y.toFloat(), normalPaint)
             y += lineHeight
         }
@@ -176,7 +180,7 @@ class ResultRepository @Inject constructor(
         val assessment = assessmentDao.getById(attempt.assessmentId)
         val attempts = attemptDao.getByAssessmentIdOnce(attempt.assessmentId).sortedBy { it.startedAt }
         val attemptNum = attempts.indexOfFirst { it.id == attemptId }.let { if (it >= 0) it + 1 else 1 }
-        val title = assessment?.title ?: "Assessment"
+        val title = assessment?.title ?: context.getString(R.string.assessment_fallback)
         val subject = assessment?.subject?.takeIf { it.isNotBlank() }
         val chapter = assessment?.chapter?.takeIf { it.isNotBlank() }
         val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US)
@@ -223,19 +227,19 @@ class ResultRepository @Inject constructor(
         var page = document.startPage(pageInfo)
         var canvas = page.canvas
 
-        canvas.drawText("$title - Attempt $attemptNum", margin.toFloat(), y.toFloat(), titlePaint)
+        canvas.drawText(context.getString(R.string.result_title_attempt_format, title, context.getString(R.string.attempt_label_format, attemptNum)), margin.toFloat(), y.toFloat(), titlePaint)
         y += lineHeight * 2
-        canvas.drawText("Score: %.0f / %.0f (%.0f%%)".format(result.score, result.maxScore, result.percent), margin.toFloat(), y.toFloat(), normalPaint)
+        canvas.drawText(context.getString(R.string.score_percent_format, result.score, result.maxScore, result.percent), margin.toFloat(), y.toFloat(), normalPaint)
         y += lineHeight
-        canvas.drawText("Date: $dateStr", margin.toFloat(), y.toFloat(), normalPaint)
+        canvas.drawText(context.getString(R.string.date_label_format, dateStr), margin.toFloat(), y.toFloat(), normalPaint)
         y += lineHeight
         if (subject != null || chapter != null) {
-            canvas.drawText("Subject: ${subject ?: "-"} | Chapter: ${chapter ?: "-"}", margin.toFloat(), y.toFloat(), normalPaint)
+            canvas.drawText(context.getString(R.string.subject_chapter_format, subject ?: "-", chapter ?: "-"), margin.toFloat(), y.toFloat(), normalPaint)
             y += lineHeight
         }
         y += lineHeight
 
-        canvas.drawText("Details", margin.toFloat(), y.toFloat(), headerPaint)
+        canvas.drawText(context.getString(R.string.details), margin.toFloat(), y.toFloat(), headerPaint)
         y += lineHeight
 
         for ((idx, d) in details.withIndex()) {
@@ -249,15 +253,15 @@ class ResultRepository @Inject constructor(
             val icon = when { d.correct -> "OK"; d.partialCredit -> "~"; else -> "X" }
             canvas.drawText("#${idx + 1} $icon (${d.questionScore}/1)", margin.toFloat(), y.toFloat(), normalPaint)
             y += lineHeight
-            y = drawWrapped(canvas, "Q: ${d.questionText}", margin.toFloat(), y, normalPaint, pageWidth - margin * 2)
+            y = drawWrapped(canvas, context.getString(R.string.question_label_format, d.questionText), margin.toFloat(), y, normalPaint, pageWidth - margin * 2)
             if (d.userAnswer != null) {
-                canvas.drawText("Your answer: ${d.userAnswer.take(100)}", margin.toFloat(), y.toFloat(), normalPaint)
+                canvas.drawText(context.getString(R.string.your_answer_format, d.userAnswer.take(100)), margin.toFloat(), y.toFloat(), normalPaint)
                 y += lineHeight
             }
-            canvas.drawText("Correct: ${d.modelAnswer.take(80)}", margin.toFloat(), y.toFloat(), normalPaint)
+            canvas.drawText(context.getString(R.string.correct_answer_format, d.modelAnswer.take(80)), margin.toFloat(), y.toFloat(), normalPaint)
             y += lineHeight
             if (d.feedback.isNotBlank()) {
-                canvas.drawText("Feedback: ${d.feedback.take(120)}", margin.toFloat(), y.toFloat(), normalPaint)
+                canvas.drawText(context.getString(R.string.pdf_feedback_format, d.feedback.take(120)), margin.toFloat(), y.toFloat(), normalPaint)
                 y += lineHeight
             }
             y += lineHeight / 2
@@ -304,16 +308,23 @@ class ResultRepository @Inject constructor(
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
         sb.append("<?mso-application progid=\"Excel.Sheet\"?>\n")
         sb.append("<Workbook xmlns=\"urn:schemas-microsoft-com:office:spreadsheet\" xmlns:ss=\"urn:schemas-microsoft-com:office:spreadsheet\">\n")
-        sb.append("  <Worksheet ss:Name=\"Results\">\n")
+        val sheetName = context.getString(R.string.excel_sheet_results).replace(Regex("[:\\\\/?*\\[\\]]"), "").take(31).ifEmpty { "Results" }
+        sb.append("  <Worksheet ss:Name=\"${sheetName.escapeXml()}\">\n")
         sb.append("    <Table>\n")
-        sb.append("      <Row><Cell><Data ss:Type=\"String\">Assessment</Data></Cell><Cell><Data ss:Type=\"String\">Attempt</Data></Cell><Cell><Data ss:Type=\"String\">Date</Data></Cell><Cell><Data ss:Type=\"String\">Score</Data></Cell><Cell><Data ss:Type=\"String\">Max Score</Data></Cell><Cell><Data ss:Type=\"String\">Percent</Data></Cell></Row>\n")
+        val ah = context.getString(R.string.excel_header_assessment)
+        val at = context.getString(R.string.excel_header_attempt)
+        val ad = context.getString(R.string.excel_header_date)
+        val as_ = context.getString(R.string.excel_header_score)
+        val am = context.getString(R.string.excel_header_max_score)
+        val ap = context.getString(R.string.excel_header_percent)
+        sb.append("      <Row><Cell><Data ss:Type=\"String\">$ah</Data></Cell><Cell><Data ss:Type=\"String\">$at</Data></Cell><Cell><Data ss:Type=\"String\">$ad</Data></Cell><Cell><Data ss:Type=\"String\">$as_</Data></Cell><Cell><Data ss:Type=\"String\">$am</Data></Cell><Cell><Data ss:Type=\"String\">$ap</Data></Cell></Row>\n")
         for (row in rows) {
             val assessment = assessmentDao.getById(row.assessmentId)
             val attempts = attemptDao.getByAssessmentIdOnce(row.assessmentId).sortedBy { it.startedAt }
             val attemptNum = attempts.indexOfFirst { it.id == row.attemptId }.let { if (it >= 0) it + 1 else 1 }
-            val title = assessment?.title?.escapeXml() ?: "Assessment"
+            val title = assessment?.title?.escapeXml() ?: context.getString(R.string.assessment_fallback)
             val dateStr = dateFormat.format(java.util.Date(row.startedAt))
-            sb.append("      <Row><Cell><Data ss:Type=\"String\">$title</Data></Cell><Cell><Data ss:Type=\"String\">Attempt $attemptNum</Data></Cell><Cell><Data ss:Type=\"String\">$dateStr</Data></Cell><Cell><Data ss:Type=\"Number\">${row.score}</Data></Cell><Cell><Data ss:Type=\"Number\">${row.maxScore}</Data></Cell><Cell><Data ss:Type=\"Number\">${row.percent}</Data></Cell></Row>\n")
+            sb.append("      <Row><Cell><Data ss:Type=\"String\">$title</Data></Cell><Cell><Data ss:Type=\"String\">${context.getString(R.string.attempt_label_format, attemptNum)}</Data></Cell><Cell><Data ss:Type=\"String\">$dateStr</Data></Cell><Cell><Data ss:Type=\"Number\">${row.score}</Data></Cell><Cell><Data ss:Type=\"Number\">${row.maxScore}</Data></Cell><Cell><Data ss:Type=\"Number\">${row.percent}</Data></Cell></Row>\n")
         }
         sb.append("    </Table>\n")
         sb.append("  </Worksheet>\n")

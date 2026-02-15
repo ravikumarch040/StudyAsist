@@ -54,6 +54,7 @@ import com.studyasist.R
 import com.studyasist.ui.components.ImageCropSelector
 import java.io.File
 import com.studyasist.data.local.entity.QuestionType
+import com.studyasist.util.labelResId
 import com.studyasist.ui.qascan.EditableQARow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -352,7 +353,7 @@ private fun EditableQARowCard(
                 onExpandedChange = { expanded = it }
             ) {
                 OutlinedTextField(
-                    value = row.type.name,
+                    value = stringResource(row.type.labelResId()),
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(stringResource(R.string.type)) },
@@ -367,7 +368,7 @@ private fun EditableQARowCard(
                 ) {
                     QuestionType.entries.forEach { type ->
                         DropdownMenuItem(
-                            text = { Text(type.name) },
+                            text = { Text(stringResource(type.labelResId())) },
                             onClick = {
                                 onUpdate(row.question, row.answer, type)
                                 expanded = false

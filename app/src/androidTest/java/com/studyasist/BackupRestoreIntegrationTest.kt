@@ -43,6 +43,7 @@ class BackupRestoreIntegrationTest {
             .fallbackToDestructiveMigration()
             .build()
         backupRepository = BackupRepository(
+            context = context,
             timetableDao = database.timetableDao(),
             activityDao = database.activityDao(),
             goalDao = database.goalDao(),
