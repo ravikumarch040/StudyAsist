@@ -32,9 +32,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -64,6 +68,22 @@ fun GoalDetailScreen(
     onQuickPractice: (assessmentId: Long) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val noQuestionsMsg = stringResource(R.string.err_no_questions_available)
+
+    LaunchedEffect(viewModel) {
+        viewModel.quickPracticeEvent.collect { event ->
+            when (event) {
+                is GoalDetailViewModel.QuickPracticeEvent.Navigate -> onQuickPractice(event.assessmentId)
+                GoalDetailViewModel.QuickPracticeEvent.NoQuestions -> {
+                    snackbarHostState.showSnackbar(
+                        message = noQuestionsMsg,
+                        withDismissAction = true
+                    )
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -86,6 +106,14 @@ fun GoalDetailScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    actionOnNewLine = true
+                )
+            }
         }
     ) { paddingValues ->
         if (uiState.goal == null && !uiState.isLoading) {
@@ -97,11 +125,6 @@ fun GoalDetailScreen(
             return@Scaffold
         }
         val goal = uiState.goal ?: return@Scaffold
-        LaunchedEffect(viewModel) {
-            viewModel.quickPracticeAssessmentId.collect { assessmentId ->
-                onQuickPractice(assessmentId)
-            }
-        }
         Column(
             Modifier
                 .fillMaxSize()

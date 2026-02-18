@@ -8,9 +8,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -21,6 +24,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -179,7 +183,7 @@ fun ResultListScreen(
                     Box {
                         IconButton(
                             onClick = { showExportMenu = true },
-                            enabled = uiState.items.isNotEmpty()
+                            enabled = uiState.sortedFilteredItems.isNotEmpty()
                         ) {
                             Icon(Icons.Default.Share, contentDescription = stringResource(R.string.export_results))
                         }
@@ -232,7 +236,7 @@ fun ResultListScreen(
             )
         }
     ) { paddingValues ->
-        if (uiState.items.isEmpty() && !uiState.isLoading) {
+        if (uiState.sortedFilteredItems.isEmpty() && !uiState.isLoading) {
             Column(
                 Modifier
                     .fillMaxSize()
@@ -248,20 +252,68 @@ fun ResultListScreen(
                 )
             }
         } else {
-            LazyColumn(
+            Column(
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(uiState.items, key = { it.resultId }) { item ->
-                    ResultCard(
-                        assessmentTitle = item.assessmentTitle,
-                        attemptLabel = item.attemptLabel,
-                        percent = item.percent,
-                        onClick = { onResultClick(item.attemptId) }
-                    )
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(
+                        ResultSortOrder.DATE_DESC to R.string.sort_newest,
+                        ResultSortOrder.DATE_ASC to R.string.sort_oldest,
+                        ResultSortOrder.SCORE_DESC to R.string.sort_best_score,
+                        ResultSortOrder.SCORE_ASC to R.string.sort_lowest_score
+                    ).forEach { (order, labelRes) ->
+                        FilterChip(
+                            selected = uiState.sortOrder == order,
+                            onClick = { viewModel.setSortOrder(order) },
+                            label = { Text(stringResource(labelRes)) }
+                        )
+                    }
+                }
+                if (uiState.distinctAssessments.isNotEmpty()) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = uiState.filterAssessmentId == null,
+                            onClick = { viewModel.setFilterAssessment(null) },
+                            label = { Text(stringResource(R.string.filter_all)) }
+                        )
+                        uiState.distinctAssessments.forEach { (id, title) ->
+                            val displayTitle = title.take(20).let { if (title.length > 20) "$it…" else it }
+                            FilterChip(
+                                selected = uiState.filterAssessmentId == id,
+                                onClick = { viewModel.setFilterAssessment(id) },
+                                label = { Text(displayTitle) }
+                            )
+                        }
+                    }
+                }
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(uiState.sortedFilteredItems, key = { it.resultId }) { item ->
+                        ResultCard(
+                            assessmentTitle = item.assessmentTitle,
+                            attemptLabel = item.attemptLabel,
+                            percent = item.percent,
+                            onClick = { onResultClick(item.attemptId) }
+                        )
+                    }
                 }
             }
         }

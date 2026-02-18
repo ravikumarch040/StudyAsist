@@ -242,6 +242,39 @@ fun SettingsScreen(
                     onCheckedChange = viewModel::setBlockOverlap
                 )
             }
+            Text(stringResource(R.string.exam_goal_alert_settings), style = MaterialTheme.typography.titleMedium)
+            Text(
+                stringResource(R.string.exam_goal_alert_days_hint),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AppSettings.EXAM_ALERT_DAYS_OPTIONS.forEach { days ->
+                    androidx.compose.material3.FilterChip(
+                        selected = settings.examGoalAlertDaysThreshold == days,
+                        onClick = { viewModel.setExamGoalAlertDaysThreshold(days) },
+                        label = { Text(if (days == 1) "1 day" else "$days days") }
+                    )
+                }
+            }
+            Text(
+                stringResource(R.string.exam_goal_alert_percent_hint),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AppSettings.EXAM_ALERT_PERCENT_OPTIONS.forEach { percent ->
+                    androidx.compose.material3.FilterChip(
+                        selected = settings.examGoalAlertPercentThreshold == percent,
+                        onClick = { viewModel.setExamGoalAlertPercentThreshold(percent) },
+                        label = { Text("$percent%") }
+                    )
+                }
+            }
             Text(stringResource(R.string.focus_guard), style = MaterialTheme.typography.titleMedium)
             Text(
                 stringResource(R.string.focus_guard_summary),

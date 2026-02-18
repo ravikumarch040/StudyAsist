@@ -47,7 +47,7 @@ class SettingsViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
-            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, true, true, "system")
+            AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, true, true, "system", AppSettings.DEFAULT_EXAM_ALERT_DAYS, AppSettings.DEFAULT_EXAM_ALERT_PERCENT)
         )
 
     val cloudBackupLastSuccess: StateFlow<Long?> = settingsRepository.cloudBackupLastSuccessFlow
@@ -79,6 +79,14 @@ class SettingsViewModel @Inject constructor(
 
     fun setDefaultLeadMinutes(minutes: Int) {
         viewModelScope.launch { settingsRepository.setDefaultLeadMinutes(minutes) }
+    }
+
+    fun setExamGoalAlertDaysThreshold(days: Int) {
+        viewModelScope.launch { settingsRepository.setExamGoalAlertDaysThreshold(days) }
+    }
+
+    fun setExamGoalAlertPercentThreshold(percent: Int) {
+        viewModelScope.launch { settingsRepository.setExamGoalAlertPercentThreshold(percent) }
     }
 
     fun setVibrationEnabled(enabled: Boolean) {

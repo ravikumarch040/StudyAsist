@@ -295,6 +295,11 @@
     <string name="time_limit_minutes">Time limit: %1$d minutes</string>
     <string name="no_timetables">No timetables yet.\nTap + to create one.</string>
     <string name="no_results">No results yet</string>
+    <string name="sort_newest">Newest first</string>
+    <string name="sort_oldest">Oldest first</string>
+    <string name="sort_best_score">Best score</string>
+    <string name="sort_lowest_score">Lowest score</string>
+    <string name="filter_by_assessment">Filter by assessment</string>
     <string name="no_assessments">No assessments yet</string>
     <string name="goal_not_found">Goal not found</string>
     <string name="recent_attempts">Recent attempts</string>
@@ -354,6 +359,9 @@
     <string name="channel_study_alarm">Study reminder alarm</string>
     <string name="channel_study_alarm_tts">Study reminder (custom message)</string>
     <string name="channel_exam_goal_alert">Exam Goal Alert</string>
+    <string name="exam_goal_alert_settings">Exam goal alerts</string>
+    <string name="exam_goal_alert_days_hint">Alert when exam is within … days</string>
+    <string name="exam_goal_alert_percent_hint">Alert when coverage is below … %%</string>
     <string name="channel_cloud_backup">Cloud backup</string>
     <string name="channel_reminders_description">Reminders for timetable activities</string>
     <string name="channel_alarm_description">Alarm-style reminders that ring until you dismiss</string>

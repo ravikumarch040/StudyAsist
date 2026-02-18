@@ -6,7 +6,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.studyasist.data.repository.GoalDashboardRepository
 import com.studyasist.data.repository.GoalRepository
+import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.util.daysUntil
+import kotlinx.coroutines.flow.first
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -15,19 +17,23 @@ class ExamGoalAlertWorker @AssistedInject constructor(
     @Assisted context: android.content.Context,
     @Assisted params: WorkerParameters,
     private val goalRepository: GoalRepository,
-    private val dashboardRepository: GoalDashboardRepository
+    private val dashboardRepository: GoalDashboardRepository,
+    private val settingsRepository: SettingsRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         return try {
             NotificationHelper.createChannel(applicationContext)
+            val settings = settingsRepository.settingsFlow.first()
+            val daysThreshold = settings.examGoalAlertDaysThreshold
+            val percentThreshold = settings.examGoalAlertPercentThreshold.toFloat()
             val goals = goalRepository.getActiveGoalsOnce()
             var notifiedCount = 0
             for (goal in goals) {
                 val daysRemaining = daysUntil(goal.examDate).toInt()
-                if (daysRemaining > DAYS_THRESHOLD) continue
+                if (daysRemaining > daysThreshold) continue
                 val metrics = dashboardRepository.getDashboardMetrics(goal.id)
-                if (metrics.percentComplete >= PERCENT_THRESHOLD) continue
+                if (metrics.percentComplete >= percentThreshold) continue
                 val notificationId = NOTIFICATION_ID_EXAM_GOAL_ALERT_BASE + goal.id.toInt().coerceIn(0, 99)
                 NotificationHelper.showExamGoalAlert(
                     context = applicationContext,
@@ -48,7 +54,5 @@ class ExamGoalAlertWorker @AssistedInject constructor(
 
     companion object {
         private const val TAG = "ExamGoalAlertWorker"
-        private const val DAYS_THRESHOLD = 7
-        private const val PERCENT_THRESHOLD = 50f
     }
 }

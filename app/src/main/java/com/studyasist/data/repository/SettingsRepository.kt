@@ -23,11 +23,17 @@ data class AppSettings(
     val cloudBackupAuto: Boolean = false,
     val useCloudForParsing: Boolean = true,
     val useCloudForGrading: Boolean = true,
-    val appLocale: String = "system"
+    val appLocale: String = "system",
+    val examGoalAlertDaysThreshold: Int = 7,
+    val examGoalAlertPercentThreshold: Int = 50
 ) {
     companion object {
         const val DEFAULT_LEAD_MINUTES = 5
         val LEAD_OPTIONS = listOf(0, 5, 10)
+        const val DEFAULT_EXAM_ALERT_DAYS = 7
+        const val DEFAULT_EXAM_ALERT_PERCENT = 50
+        val EXAM_ALERT_DAYS_OPTIONS = listOf(1, 3, 7, 14, 21)
+        val EXAM_ALERT_PERCENT_OPTIONS = listOf(25, 50, 75)
     }
 }
 
@@ -50,7 +56,9 @@ class SettingsRepository @Inject constructor(
             cloudBackupAuto = prefs[dataStore.cloudBackupAuto] ?: false,
             useCloudForParsing = prefs[dataStore.useCloudForParsing] ?: true,
             useCloudForGrading = prefs[dataStore.useCloudForGrading] ?: true,
-            appLocale = prefs[dataStore.appLocale] ?: "system"
+            appLocale = prefs[dataStore.appLocale] ?: "system",
+            examGoalAlertDaysThreshold = prefs[dataStore.examGoalAlertDaysThreshold] ?: AppSettings.DEFAULT_EXAM_ALERT_DAYS,
+            examGoalAlertPercentThreshold = prefs[dataStore.examGoalAlertPercentThreshold] ?: AppSettings.DEFAULT_EXAM_ALERT_PERCENT
         )
     }
 
@@ -204,5 +212,13 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setAppLocale(localeTag: String) {
         dataStore.dataStore.edit { it[dataStore.appLocale] = localeTag }
+    }
+
+    suspend fun setExamGoalAlertDaysThreshold(days: Int) {
+        dataStore.dataStore.edit { it[dataStore.examGoalAlertDaysThreshold] = days }
+    }
+
+    suspend fun setExamGoalAlertPercentThreshold(percent: Int) {
+        dataStore.dataStore.edit { it[dataStore.examGoalAlertPercentThreshold] = percent }
     }
 }

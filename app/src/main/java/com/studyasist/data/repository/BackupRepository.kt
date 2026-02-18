@@ -53,7 +53,9 @@ private data class BackupSettings(
     val explainLanguage: String = "en",
     val solveLanguage: String = "en",
     val darkMode: String = "system",
-    val appLocale: String? = null  // Added later; old backups omit this
+    val appLocale: String? = null,  // Added later; old backups omit this
+    val examGoalAlertDaysThreshold: Int? = null,
+    val examGoalAlertPercentThreshold: Int? = null
 )
 
 private data class ExamBackupData(
@@ -134,7 +136,9 @@ class BackupRepository @Inject constructor(
             explainLanguage = explLang,
             solveLanguage = solvLang,
             darkMode = darkMode,
-            appLocale = appLocale
+            appLocale = appLocale,
+            examGoalAlertDaysThreshold = appSettings.examGoalAlertDaysThreshold,
+            examGoalAlertPercentThreshold = appSettings.examGoalAlertPercentThreshold
         )
         val data = BackupData(
             timetables = timetableDao.getAllOnce(),
@@ -267,6 +271,8 @@ class BackupRepository @Inject constructor(
         settingsRepository.setSolveLanguage(s.solveLanguage)
         settingsRepository.setDarkMode(s.darkMode)
         settingsRepository.setAppLocale(s.appLocale?.takeIf { it.isNotBlank() } ?: "system")
+        s.examGoalAlertDaysThreshold?.let { settingsRepository.setExamGoalAlertDaysThreshold(it) }
+        s.examGoalAlertPercentThreshold?.let { settingsRepository.setExamGoalAlertPercentThreshold(it) }
         notificationScheduler.rescheduleAll()
     }
 }

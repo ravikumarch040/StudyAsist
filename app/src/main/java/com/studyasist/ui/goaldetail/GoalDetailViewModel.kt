@@ -7,6 +7,7 @@ import com.studyasist.data.local.entity.Goal
 import com.studyasist.data.local.entity.GoalItem
 import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.GoalDashboardMetrics
+import com.studyasist.data.repository.QABankRepository
 import com.studyasist.data.repository.GoalDashboardRepository
 import com.studyasist.data.repository.GoalRepository
 import com.studyasist.data.repository.RecentAttemptSummary
@@ -45,14 +46,19 @@ class GoalDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val goalRepository: GoalRepository,
     private val dashboardRepository: GoalDashboardRepository,
-    private val assessmentRepository: AssessmentRepository
+    private val assessmentRepository: AssessmentRepository,
+    private val qaBankRepository: QABankRepository
 ) : ViewModel() {
 
     private val goalId: Long = checkNotNull(savedStateHandle["goalId"]) { "goalId required" }
 
     private val _dashboardMetrics = MutableStateFlow<GoalDashboardMetrics?>(null)
-    private val _quickPracticeAssessmentId = MutableSharedFlow<Long>()
-    val quickPracticeAssessmentId: SharedFlow<Long> = _quickPracticeAssessmentId.asSharedFlow()
+    sealed class QuickPracticeEvent {
+        data class Navigate(val assessmentId: Long) : QuickPracticeEvent()
+        object NoQuestions : QuickPracticeEvent()
+    }
+    private val _quickPracticeEvent = MutableSharedFlow<QuickPracticeEvent>()
+    val quickPracticeEvent: SharedFlow<QuickPracticeEvent> = _quickPracticeEvent.asSharedFlow()
 
     val uiState: StateFlow<GoalDetailUiState> = combine(
         goalRepository.getGoalFlow(goalId),
@@ -93,19 +99,26 @@ class GoalDetailViewModel @Inject constructor(
         }
     }
 
-    /** Creates a 5-question assessment from the given subject/chapter and emits the assessment ID for navigation. */
+    /** Creates a 5-question assessment from the given subject/chapter and emits the assessment ID for navigation, or NoQuestions if none available. */
     fun startQuickPractice(subject: String, chapter: String?) {
         viewModelScope.launch {
+            val subj = subject.takeIf { it.isNotBlank() }
+            val ch = chapter?.takeIf { it.isNotBlank() }
+            val count = qaBankRepository.countQA(subj, ch)
+            if (count == 0) {
+                _quickPracticeEvent.emit(QuickPracticeEvent.NoQuestions)
+                return@launch
+            }
             val assessmentId = assessmentRepository.createAssessmentFromRandom(
                 title = "Practice: $subject${chapter?.let { " - $it" } ?: ""}",
                 goalId = goalId,
-                subject = subject.takeIf { it.isNotBlank() },
-                chapter = chapter?.takeIf { it.isNotBlank() },
+                subject = subj,
+                chapter = ch,
                 totalTimeSeconds = 5 * 60,
                 randomizeQuestions = true,
-                count = 5
+                count = minOf(5, count)
             )
-            _quickPracticeAssessmentId.emit(assessmentId)
+            _quickPracticeEvent.emit(QuickPracticeEvent.Navigate(assessmentId))
         }
     }
 }

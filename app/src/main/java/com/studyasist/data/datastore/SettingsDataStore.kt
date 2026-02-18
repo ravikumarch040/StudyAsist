@@ -42,6 +42,8 @@ class SettingsDataStore @Inject constructor(
     val appLocale = stringPreferencesKey("app_locale") // "system", "en", "hi", "es", "fr", "de"
     val useCloudForParsing = booleanPreferencesKey("use_cloud_for_parsing") // Improve with AI on Q&A scan
     val useCloudForGrading = booleanPreferencesKey("use_cloud_for_grading") // LLM subjective grading
+    val examGoalAlertDaysThreshold = intPreferencesKey("exam_goal_alert_days_threshold")
+    val examGoalAlertPercentThreshold = intPreferencesKey("exam_goal_alert_percent_threshold")
 
     val dataStore: DataStore<Preferences> get() = prefs
 

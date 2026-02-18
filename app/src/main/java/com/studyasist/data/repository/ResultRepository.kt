@@ -26,7 +26,8 @@ data class ResultListItem(
     val attemptLabel: String,
     val percent: Float,
     val score: Float,
-    val maxScore: Float
+    val maxScore: Float,
+    val startedAt: Long
 )
 
 @Singleton
@@ -62,7 +63,8 @@ class ResultRepository @Inject constructor(
                 attemptLabel = context.getString(R.string.attempt_label_format, attemptNum),
                 percent = row.percent,
                 score = row.score,
-                maxScore = row.maxScore
+                maxScore = row.maxScore,
+                startedAt = row.startedAt
             )
         }
     }
