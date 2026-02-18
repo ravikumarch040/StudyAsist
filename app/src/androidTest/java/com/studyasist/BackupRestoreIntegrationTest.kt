@@ -59,7 +59,7 @@ class BackupRestoreIntegrationTest {
         val timetable = TimetableEntity(
             id = 0,
             name = "Test Timetable",
-            weekType = WeekType.ONE_WEEK,
+            weekType = WeekType.MON_SUN,
             startDate = System.currentTimeMillis(),
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis()

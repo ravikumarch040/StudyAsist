@@ -85,7 +85,10 @@ fun AppNavGraph(
                 onExamGoals = { navController.navigate(NavRoutes.GOAL_LIST) },
                 onQABank = { navController.navigate(NavRoutes.QA_BANK) },
                 onAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
-                onResults = { navController.navigate(NavRoutes.RESULT_LIST) }
+                onResults = { navController.navigate(NavRoutes.RESULT_LIST) },
+                onResultClick = { attemptId ->
+                    navController.navigate(NavRoutes.assessmentResult(attemptId))
+                }
             )
         }
 

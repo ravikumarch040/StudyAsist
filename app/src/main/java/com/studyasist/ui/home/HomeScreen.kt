@@ -65,7 +65,8 @@ fun HomeScreen(
     onExamGoals: () -> Unit = {},
     onQABank: () -> Unit = {},
     onAssessments: () -> Unit = {},
-    onResults: () -> Unit = {}
+    onResults: () -> Unit = {},
+    onResultClick: (Long) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -112,7 +113,10 @@ fun HomeScreen(
                 )
             }
             LaunchedEffect(selectedTab) {
-                if (selectedTab == 2) viewModel.refreshStreak()
+                if (selectedTab == 2) {
+                    viewModel.refreshStreak()
+                    viewModel.refreshTopResults()
+                }
             }
             when (selectedTab) {
                 0 -> TodayTabContent(
@@ -133,13 +137,15 @@ fun HomeScreen(
                 2 -> StudyToolsTabContent(
                     studyStreak = uiState.studyStreak,
                     earnedBadges = uiState.earnedBadges,
+                    topResults = uiState.topResults,
                     onDictate = onDictate,
                     onExplain = onExplain,
                     onSolve = onSolve,
                     onExamGoals = onExamGoals,
                     onQABank = onQABank,
                     onAssessments = onAssessments,
-                    onResults = onResults
+                    onResults = onResults,
+                    onResultClick = onResultClick
                 )
             }
         }
@@ -150,13 +156,15 @@ fun HomeScreen(
 private fun StudyToolsTabContent(
     studyStreak: Int = 0,
     earnedBadges: List<com.studyasist.data.repository.EarnedBadge> = emptyList(),
+    topResults: List<com.studyasist.data.repository.ResultListItem> = emptyList(),
     onDictate: () -> Unit,
     onExplain: () -> Unit,
     onSolve: () -> Unit,
     onExamGoals: () -> Unit,
     onQABank: () -> Unit,
     onAssessments: () -> Unit = {},
-    onResults: () -> Unit = {}
+    onResults: () -> Unit = {},
+    onResultClick: (Long) -> Unit = {}
 ) {
     LazyColumn(
         Modifier
@@ -211,6 +219,63 @@ private fun StudyToolsTabContent(
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
+                        }
+                    }
+                }
+            }
+        }
+        if (topResults.isNotEmpty()) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text(
+                            stringResource(R.string.personal_bests),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            stringResource(R.string.personal_bests_subtitle),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        topResults.forEach { result ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onResultClick(result.attemptId) }
+                                    .padding(top = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        result.assessmentTitle,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1
+                                    )
+                                    Text(
+                                        result.attemptLabel,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Text(
+                                    stringResource(R.string.percent_format, result.percent),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                        androidx.compose.material3.TextButton(
+                            onClick = onResults,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.view_all_results))
                         }
                     }
                 }

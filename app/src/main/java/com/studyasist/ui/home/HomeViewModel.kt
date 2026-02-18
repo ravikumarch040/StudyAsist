@@ -7,6 +7,8 @@ import com.studyasist.data.local.entity.TimetableEntity
 import com.studyasist.data.repository.ActivityRepository
 import com.studyasist.data.repository.BadgeRepository
 import com.studyasist.data.repository.EarnedBadge
+import com.studyasist.data.repository.ResultListItem
+import com.studyasist.data.repository.ResultRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.data.repository.StreakRepository
 import com.studyasist.data.repository.TimetableRepository
@@ -33,7 +35,8 @@ data class HomeUiState(
     val timetables: List<TimetableEntity> = emptyList(),
     val activeTimetableId: Long? = null,
     val studyStreak: Int = 0,
-    val earnedBadges: List<EarnedBadge> = emptyList()
+    val earnedBadges: List<EarnedBadge> = emptyList(),
+    val topResults: List<ResultListItem> = emptyList()
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,15 +47,20 @@ class HomeViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val notificationScheduler: NotificationScheduler,
     private val streakRepository: StreakRepository,
-    private val badgeRepository: BadgeRepository
+    private val badgeRepository: BadgeRepository,
+    private val resultRepository: ResultRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private val _streak = MutableStateFlow(0)
+    private val _topResults = MutableStateFlow<List<ResultListItem>>(emptyList())
 
     init {
+        viewModelScope.launch {
+            _topResults.value = resultRepository.getTopResultListItems(5)
+        }
         viewModelScope.launch {
             val streak = streakRepository.getCurrentStreak()
             _streak.value = streak
@@ -64,27 +72,33 @@ class HomeViewModel @Inject constructor(
                 else flowOf(emptyList())
             }
             combine(
-                settingsRepository.activeTimetableIdFlow,
-                timetableRepository.getAllTimetables(),
-                activitiesFlow,
-                _streak,
-                badgeRepository.getEarnedBadgesFlow()
-            ) { activeId, timetables, allActivities, streak, badges ->
-                val active = if (activeId != null && activeId > 0) timetables.find { it.id == activeId } else null
-                val today = if (active != null) {
-                    allActivities.filter { it.dayOfWeek == todayDayOfWeek() }.sortedBy { it.startTimeMinutes }
-                } else emptyList()
-                val now = currentTimeMinutesFromMidnight()
-                val currentId = today.firstOrNull { now >= it.startTimeMinutes && now < it.endTimeMinutes }?.id
-                HomeUiState(
-                    activeTimetable = active,
-                    todayActivities = today,
-                    currentActivityId = currentId,
-                    timetables = timetables,
-                    activeTimetableId = activeId,
-                    studyStreak = streak,
-                    earnedBadges = badges
-                )
+                combine(
+                    settingsRepository.activeTimetableIdFlow,
+                    timetableRepository.getAllTimetables(),
+                    activitiesFlow,
+                    _streak,
+                    badgeRepository.getEarnedBadgesFlow()
+                ) { activeId, timetables, allActivities, streak, badges ->
+                    val active = if (activeId != null && activeId > 0) timetables.find { it.id == activeId } else null
+                    val today = if (active != null) {
+                        allActivities.filter { it.dayOfWeek == todayDayOfWeek() }.sortedBy { it.startTimeMinutes }
+                    } else emptyList()
+                    val now = currentTimeMinutesFromMidnight()
+                    val currentId = today.firstOrNull { now >= it.startTimeMinutes && now < it.endTimeMinutes }?.id
+                    HomeUiState(
+                        activeTimetable = active,
+                        todayActivities = today,
+                        currentActivityId = currentId,
+                        timetables = timetables,
+                        activeTimetableId = activeId,
+                        studyStreak = streak,
+                        earnedBadges = badges,
+                        topResults = emptyList()
+                    )
+                },
+                _topResults
+            ) { partialState, topResults ->
+                partialState.copy(topResults = topResults)
             }.collect { _uiState.value = it }
         }
     }
@@ -94,6 +108,12 @@ class HomeViewModel @Inject constructor(
             val streak = streakRepository.getCurrentStreak()
             _streak.value = streak
             badgeRepository.checkAndAwardStreakBadges(streak)
+        }
+    }
+
+    fun refreshTopResults() {
+        viewModelScope.launch {
+            _topResults.value = resultRepository.getTopResultListItems(5)
         }
     }
 

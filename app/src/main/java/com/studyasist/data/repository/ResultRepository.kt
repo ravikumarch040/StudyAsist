@@ -41,6 +41,12 @@ class ResultRepository @Inject constructor(
 
     suspend fun updateResult(result: Result) = resultDao.update(result)
 
+    /** Returns top N results by percent, sorted descending. */
+    suspend fun getTopResultListItems(limit: Int): List<ResultListItem> {
+        val items = getAllResultListItems()
+        return items.sortedByDescending { it.percent }.take(limit)
+    }
+
     suspend fun getAllResultListItems(): List<ResultListItem> {
         val rows = resultDao.getAllResultsWithAttempt()
         return rows.map { row ->
