@@ -1,17 +1,24 @@
 package com.studyasist.ui.navigation
 
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.studyasist.ui.components.AppDrawerContent
 import com.studyasist.ui.activityedit.ActivityEditScreen
 import com.studyasist.ui.activityedit.ActivityEditViewModel
 import com.studyasist.ui.home.HomeScreen
@@ -61,9 +68,11 @@ import com.studyasist.ui.manualreview.ManualOverrideViewModel
 fun AppNavGraph(
     navController: NavHostController = rememberNavController(),
     pendingGoalIdFlow: StateFlow<Long?>? = null,
-    onPendingGoalIdConsumed: () -> Unit = {}
+    onPendingGoalIdConsumed: () -> Unit = {},
+    userNameFlow: Flow<String> = flowOf(""),
+    profilePicUriFlow: Flow<String?> = flowOf(null)
 ) {
-    val pendingGoalId by (pendingGoalIdFlow ?: kotlinx.coroutines.flow.flowOf<Long?>(null)).collectAsState(initial = null)
+    val pendingGoalId by (pendingGoalIdFlow ?: flowOf<Long?>(null)).collectAsState(initial = null)
     LaunchedEffect(pendingGoalId) {
         pendingGoalId?.let { goalId ->
             navController.navigate(NavRoutes.goalDetail(goalId)) {
@@ -72,27 +81,40 @@ fun AppNavGraph(
             onPendingGoalIdConsumed()
         }
     }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            AppDrawerContent(
+                currentRoute = currentRoute,
+                drawerState = drawerState,
+                userName = userNameFlow,
+                profilePicUri = profilePicUriFlow,
+                onNavigate = { route ->
+                    if (route != currentRoute) {
+                        navController.navigate(route) {
+                            popUpTo(NavRoutes.HOME) { inclusive = false }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            )
+        }
+    ) {
     NavHost(
         navController = navController,
         startDestination = NavRoutes.HOME
     ) {
         composable(NavRoutes.HOME) {
             val homeViewModel: HomeViewModel = hiltViewModel()
-            val listViewModel: TimetableListViewModel = hiltViewModel()
             HomeScreen(
                 viewModel = homeViewModel,
-                listViewModel = listViewModel,
-                onSettingsClick = { navController.navigate(NavRoutes.SETTINGS) },
+                drawerState = drawerState,
                 onTimetableClick = { id ->
                     navController.navigate(NavRoutes.timetableDetail(id))
-                },
-                onAddActivity = { id ->
-                    navController.navigate(NavRoutes.activityAdd(id, 1))
-                },
-                onNavigateAfterCreate = { id ->
-                    navController.navigate(NavRoutes.timetableDetail(id)) {
-                        popUpTo(NavRoutes.HOME) { inclusive = false }
-                    }
                 },
                 onDictate = { navController.navigate(NavRoutes.DICTATE) },
                 onExplain = { navController.navigate(NavRoutes.EXPLAIN) },
@@ -120,7 +142,8 @@ fun AppNavGraph(
                         popUpTo(NavRoutes.TIMETABLE_LIST) { inclusive = false }
                     }
                 },
-                showTopBar = true
+                showTopBar = true,
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -453,5 +476,6 @@ fun AppNavGraph(
                 onSaved = { navController.popBackStack() }
             )
         }
+    }
     }
 }

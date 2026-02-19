@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
@@ -49,7 +50,8 @@ fun TimetableListScreen(
     onNavigateAfterCreate: (Long) -> Unit,
     activeTimetableId: Long? = null,
     onSetActive: (Long) -> Unit = {},
-    showTopBar: Boolean = true
+    showTopBar: Boolean = true,
+    onBack: (() -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showMenuForId by remember { mutableStateOf<Long?>(null) }
@@ -58,10 +60,12 @@ fun TimetableListScreen(
         topBar = {
             if (showTopBar) {
                 TopAppBar(
-                    title = { Text(stringResource(R.string.app_name)) },
-                    actions = {
-                        IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
+                    title = { Text(stringResource(R.string.timetables)) },
+                    navigationIcon = {
+                        if (onBack != null) {
+                            IconButton(onClick = onBack) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

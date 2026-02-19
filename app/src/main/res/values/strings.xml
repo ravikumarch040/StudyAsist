@@ -457,4 +457,51 @@
     <string name="language">Language</string>
     <string name="language_app_summary">Override device language for this app</string>
     <string name="language_system">System default</string>
+
+    <!-- Theme names -->
+    <string name="theme_minimal_light">Minimal Light</string>
+    <string name="theme_minimal_dark">Minimal Dark</string>
+    <string name="theme_pastel_calm">Pastel Calm</string>
+    <string name="theme_academic_paper">Academic Paper</string>
+    <string name="theme_vibrant_study">Vibrant Study</string>
+    <string name="theme_dark_high_contrast">High Contrast</string>
+    <string name="theme_neo_glass">Neo-Glass</string>
+    <string name="theme_retro_chalkboard">Retro Chalkboard</string>
+    <string name="theme_nature_earthy">Nature / Earthy</string>
+    <string name="theme_productivity_dashboard">Productivity</string>
+    <string name="dark_mode_label">Mode</string>
+
+    <!-- Drawer -->
+    <string name="drawer_dashboard">Dashboard</string>
+    <string name="drawer_timetables">Timetables</string>
+    <string name="drawer_study_tools">Study Tools</string>
+    <string name="drawer_exam_goals">Exam Goals</string>
+    <string name="drawer_qa_bank">Q&amp;A Bank</string>
+    <string name="drawer_assessments">Assessments</string>
+    <string name="drawer_results">Results</string>
+    <string name="drawer_dictate">Dictate</string>
+    <string name="drawer_explain">Explain</string>
+    <string name="drawer_solve">Solve</string>
+    <string name="drawer_open">Open menu</string>
+
+    <!-- Dashboard -->
+    <string name="greeting_morning">Good morning, %1$s</string>
+    <string name="greeting_afternoon">Good afternoon, %1$s</string>
+    <string name="greeting_evening">Good evening, %1$s</string>
+    <string name="current_task">Current Task</string>
+    <string name="no_current_task">No task right now</string>
+    <string name="next_up">Next: %1$s at %2$s</string>
+    <string name="all_done_today">All done for today!</string>
+    <string name="goal_progress">Goal Progress</string>
+    <string name="days_left">%1$d days left</string>
+    <string name="no_active_goals">No active goals — tap to create one</string>
+    <string name="last_result">Last Result</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="today_schedule">Today\'s Schedule</string>
+
+    <!-- Profile -->
+    <string name="profile">Profile</string>
+    <string name="profile_guest">Guest</string>
+    <string name="change_photo">Change photo</string>
+    <string name="enter_your_name">Enter your name</string>
 </resources>

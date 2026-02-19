@@ -7,6 +7,8 @@ import com.studyasist.data.local.entity.TimetableEntity
 import com.studyasist.data.repository.ActivityRepository
 import com.studyasist.data.repository.BadgeRepository
 import com.studyasist.data.repository.EarnedBadge
+import com.studyasist.data.repository.GoalDashboardRepository
+import com.studyasist.data.repository.GoalRepository
 import com.studyasist.data.repository.ResultListItem
 import com.studyasist.data.repository.ResultRepository
 import com.studyasist.data.repository.SettingsRepository
@@ -14,6 +16,7 @@ import com.studyasist.data.repository.StreakRepository
 import com.studyasist.data.repository.TimetableRepository
 import com.studyasist.notification.NotificationScheduler
 import com.studyasist.util.currentTimeMinutesFromMidnight
+import com.studyasist.util.daysUntil
 import com.studyasist.util.todayDayOfWeek
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +31,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class GoalProgressSummary(
+    val goalName: String,
+    val percentComplete: Int,
+    val daysUntilExam: Int
+)
+
 data class HomeUiState(
     val activeTimetable: TimetableEntity? = null,
     val todayActivities: List<ActivityEntity> = emptyList(),
@@ -36,7 +45,10 @@ data class HomeUiState(
     val activeTimetableId: Long? = null,
     val studyStreak: Int = 0,
     val earnedBadges: List<EarnedBadge> = emptyList(),
-    val topResults: List<ResultListItem> = emptyList()
+    val topResults: List<ResultListItem> = emptyList(),
+    val activeGoalProgress: GoalProgressSummary? = null,
+    val lastResult: ResultListItem? = null,
+    val userName: String = ""
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -48,7 +60,9 @@ class HomeViewModel @Inject constructor(
     private val notificationScheduler: NotificationScheduler,
     private val streakRepository: StreakRepository,
     private val badgeRepository: BadgeRepository,
-    private val resultRepository: ResultRepository
+    private val resultRepository: ResultRepository,
+    private val goalRepository: GoalRepository,
+    private val goalDashboardRepository: GoalDashboardRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -56,6 +70,8 @@ class HomeViewModel @Inject constructor(
 
     private val _streak = MutableStateFlow(0)
     private val _topResults = MutableStateFlow<List<ResultListItem>>(emptyList())
+    private val _goalProgress = MutableStateFlow<GoalProgressSummary?>(null)
+    private val _userName = MutableStateFlow("")
 
     init {
         viewModelScope.launch {
@@ -65,6 +81,12 @@ class HomeViewModel @Inject constructor(
             val streak = streakRepository.getCurrentStreak()
             _streak.value = streak
             badgeRepository.checkAndAwardStreakBadges(streak)
+        }
+        viewModelScope.launch {
+            settingsRepository.userNameFlow.collect { _userName.value = it }
+        }
+        viewModelScope.launch {
+            loadGoalProgress()
         }
         viewModelScope.launch {
             val activitiesFlow = settingsRepository.activeTimetableIdFlow.flatMapLatest { id ->
@@ -96,11 +118,31 @@ class HomeViewModel @Inject constructor(
                         topResults = emptyList()
                     )
                 },
-                _topResults
-            ) { partialState, topResults ->
-                partialState.copy(topResults = topResults)
+                _topResults,
+                _goalProgress,
+                _userName
+            ) { partialState, topResults, goalProgress, userName ->
+                partialState.copy(
+                    topResults = topResults,
+                    activeGoalProgress = goalProgress,
+                    lastResult = topResults.firstOrNull(),
+                    userName = userName
+                )
             }.collect { _uiState.value = it }
         }
+    }
+
+    private suspend fun loadGoalProgress() {
+        try {
+            val goals = goalRepository.getActiveGoalsOnce()
+            val firstGoal = goals.firstOrNull() ?: return
+            val metrics = goalDashboardRepository.getDashboardMetrics(firstGoal.id)
+            _goalProgress.value = GoalProgressSummary(
+                goalName = firstGoal.name,
+                percentComplete = metrics.percentComplete.toInt(),
+                daysUntilExam = daysUntil(firstGoal.examDate).toInt()
+            )
+        } catch (_: Exception) { }
     }
 
     fun refreshStreak() {
@@ -115,6 +157,12 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _topResults.value = resultRepository.getTopResultListItems(5)
         }
+    }
+
+    fun refreshDashboard() {
+        refreshStreak()
+        refreshTopResults()
+        viewModelScope.launch { loadGoalProgress() }
     }
 
     fun setActiveTimetableId(id: Long) {

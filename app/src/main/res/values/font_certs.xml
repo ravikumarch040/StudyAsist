@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="com_google_android_gms_fonts_certs">
+        <item>@array/com_google_android_gms_fonts_certs_dev</item>
+        <item>@array/com_google_android_gms_fonts_certs_prod</item>
+    </array>
+    <string-array name="com_google_android_gms_fonts_certs_dev">
+        <item>
+            MIIEqDCCA5CgAwIBAgIJANWFuGx90071MA0GCSqGSIb3DQEBBAUAMIGUMQswCQYD
+            VQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4g
+            VmlldzEQma4GA1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UE
+            AxMHQW5kcm9pZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbTAe
+            Fw0wODA0MTUyMzM2NTZaFw0zNjA5MDEyMzM2NTZaMIGUMQswCQYDVQQGEwJVUzET
+            MBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEQMA4G
+            A1UEChMHQW5kcm9pZDEQMA4GA1UECxMHQW5kcm9pZDEQMA4GA1UEAxMHQW5kcm9p
+            ZDEiMCAGCSqGSIb3DQEJARYTYW5kcm9pZEBhbmRyb2lkLmNvbTCCASAwDQYJKoZI
+            hvcNAQEBBQADggENADCCAQgCggEBANbOLggKv+IxTdGNs8/TGFy0PTP6DHThvbbR
+            24kT9ixcOd9W+EaBPWW+wPPKQmsHxajtWjmQwWfna8mZuSeJS48LIgAZlKkpFeVy
+            xW0qMBujb8X8ETrWy550NaFtI6t9+u7hZeTfHwqNvacKhp1RbE6dBRGWynwMVX8X
+            W8N1+UjFaq6GCJukv4SgYw7b2B4zhT5B/gQKUl+dQ1xHdOQFoOKnMu9QgT/RBDQN
+            gvGPhOkKRqFn3EvAMB0gY2q2ECOhKOIcLdGe0PPmLCPCK9rLBnVpI6lPNn9fSJRD
+            hBXJ5JP+N8M/MsuMCSGMCRxAHKjUmE2KeD+jsbXadRIZXSmGb0UCAwEAAaOB/DCB
+            +TAdBgNVHQ4EFgQUhHnbQa0XU3AB0Y7eA546+UVntH8wgckGA1UdIwSBwTCBvoAU
+            hHnbQa0XU3AB0Y7eA546+UVntH+hgZqkgZcwgZQxCzAJBgNVBAYTAlVTMRMwEQYD
+            VQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRAwDgYDVQQK
+            EwdBbmRyb2lkMRAwDgYDVQQLEwdBbmRyb2lkMRAwDgYDVQQDEwdBbmRyb2lkMSIw
+            IAYJKoZIhvcNAQkBFhNhbmRyb2lkQGFuZHJvaWQuY29tggkA1YW4bH3TTvcwDAYD
+            VR0TBAUwAwEB/zANBgkqhkiG9w0BAQQFAAOCAQEARqdXBalKgkIUkME4SMT+1YFZ
+            AvIlSDflYsH+BL9S0dAI2kDMjfSnFviOPxMk4tCnmXPlNKG2fGIC8FBBdQG1JvJG
+            BOMdBxIe4DAFR0lQ/MJDh95CcPFNsZNJPAMZHMHSNVIEIZJAC2ZAql7sNJhIMiAh
+            l1IS2PI8SWTM1kgCKBi+YdlFEPLiCNGvo8W0s2fSjkfZpPJBHxOP+JM0AWSz0bUP
+            JghSr3oXOCi4gZk/KC3BkMsW9RIDPbnsNbJYnwkZdMIu9lWPZqzFTyBJHAiFRw7D
+            3/FMqhJ7Z+hBKmkQkYJIO9jDOD8kpVe7ztpkN+MNaVvOQ0WSwCsmzN/U1irxA==
+        </item>
+    </string-array>
+    <string-array name="com_google_android_gms_fonts_certs_prod">
+        <item>
+            MIIEQzCCAyugAwIBAgIJAMLgh0ZkSjCNMA0GCSqGSIb3DQEBBAUAMHQxCzAJBgNV
+            BAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3VudGFpbiBW
+            aWV3MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9pZDEQMA4G
+            A1UEAxMHQW5kcm9pZDAeFw0wODA4MjEyMzEzMzRaFw0zNjAxMDcyMzEzMzRaMHQx
+            CzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1Nb3Vu
+            dGFpbiBWaWV3MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEQMA4GA1UECxMHQW5kcm9p
+            ZDEQMA4GA1UEAxMHQW5kcm9pZDCCASAwDQYJKoZIhvcNAQEBBQADggENADCCAQgC
+            ggEBAKtWLgDYO6IIrgqWbxJOKdoR8qtW0I9Y4sypEwPpt1TTcvZApxsdyxMJZ2JO
+            RGPHGnkqWtXHA39jNiCnqSwHzJRhCVNp959f1MKP0GTJ+ICSjXhEsEaVOzUDiKGX
+            kccBWUTpKBERG2SUiNy8FNQEoJCjF+8bBoBKFSJIPHF/GMBNnEcBOzTReSm/hAbj
+            TRQml+UVqyTM/XAQiNJthC+HrEflUvOW3u4RCsiahXFGBnqQkUKXuAb2UzJ3DCY7
+            P/sI7T+9GhFo+jDyqdYkQ4Li4XcYy/Je4fJMKtLTJaQj5yvBO7E0xGt2CIo/cPX+
+            9qQwMGBqFGIlRBaYNViLzjcCAwEAAaOBnDCBmTAdBgNVHQ4EFgQU5TwNJ9RVbddw
+            0HVIBBJbQ/RcJeswajcGA1UdIwRjMGGAFOU8DSfUVW3XcNB1SACSW0P0XCXroVik
+            VjB0MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEWMBQGA1UEBxMN
+            TW91bnRhaW4gVmlldzEUMBIGA1UEChMLR29vZ2xlIEluYy4xEDAOBgNVBAsTB0Fu
+            ZHJvaWQxEDAOBgNVBAMTB0FuZHJvaWSCCQDC4IdGZEowjTAMBgNVHRMEBTADAQH/
+            MA0GCSqGSIb3DQEBBAUAAgIQcDBJBgNVHREEQjBAhh5odHRwOi8vY29kZS5nb29n
+            bGUuY29tL2FuZHJvaWSGHmh0dHA6Ly9zb3VyY2UuYW5kcm9pZC5jb20vMA0GCSqG
+            SIb3DQEBBAUAAgIQcDBJBgNVHREEQjBAhh5odHRwOi8vY29kZS5nb29nbGUuY29t
+            L2FuZHJvaWSGHmh0dHA6Ly9zb3VyY2UuYW5kcm9pZC5jb20v
+        </item>
+    </string-array>
+</resources>

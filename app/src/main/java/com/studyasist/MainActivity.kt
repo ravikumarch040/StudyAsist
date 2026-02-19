@@ -22,6 +22,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.studyasist.ui.MainViewModel
 import com.studyasist.ui.navigation.AppNavGraph
+import com.studyasist.ui.theme.AppTheme
 import com.studyasist.ui.theme.StudyAsistTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,13 +35,15 @@ class MainActivity : ComponentActivity() {
         mainViewModel.setPendingGoalIdFromIntent(intent)
         setContent {
             val darkMode by mainViewModel.darkModeFlow.collectAsState(initial = "system")
+            val themeId by mainViewModel.themeIdFlow.collectAsState(initial = "MINIMAL_LIGHT")
             val isSystemDark = isSystemInDarkTheme()
             val darkTheme = when (darkMode) {
                 "dark" -> true
                 "light" -> false
                 else -> isSystemDark
             }
-            StudyAsistTheme(darkTheme = darkTheme) {
+            val appTheme = try { AppTheme.valueOf(themeId) } catch (_: Exception) { AppTheme.MINIMAL_LIGHT }
+            StudyAsistTheme(appTheme = appTheme, darkTheme = darkTheme) {
                 val permissionLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestPermission()
                 ) { }
@@ -55,7 +58,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavGraph(
                         pendingGoalIdFlow = mainViewModel.pendingGoalIdForDeepLink,
-                        onPendingGoalIdConsumed = mainViewModel::clearPendingGoalId
+                        onPendingGoalIdConsumed = mainViewModel::clearPendingGoalId,
+                        userNameFlow = mainViewModel.userNameFlow,
+                        profilePicUriFlow = mainViewModel.profilePicUriFlow
                     )
                 }
             }

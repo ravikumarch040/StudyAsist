@@ -59,13 +59,26 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 - **Explain:** Text or image input → AI explanation (Gemini).
 - **Solve:** Problem as text or image → AI step-by-step solution.
 
-### Exam goal
+### Exam Goal
 
-- Goals, Q&A bank, assessments, attempts, results, manual review, export.
+- **Goals & Q&A bank:** Create exam goals with subjects/chapters; scan pages via OCR or AI to build a question bank (MCQ, short, numeric, true/false, essay, etc.).
+- **Assessments:** Create practice tests by goal, subject/chapter, or manual selection; timed runs; randomized questions.
+- **Grading:** Objective grading with token-overlap scoring; numeric answers with tolerance check and Gemini-powered math equivalence (e.g. "1/2" vs "0.5"); LLM subjective grading for essays.
+- **Voice & image answers:** SpeechRecognizer for voice input; camera/gallery with crop-region OCR; URIs persisted for audit.
+- **Dashboard:** Track prediction (on-track/behind with hours/day metrics), score trend sparkline, activity heatmap, suggested practice areas, personal bests, "last practiced X days ago" per subject/chapter.
+- **Notifications:** Exam goal alerts when exam is approaching and coverage is low; deep link directly to goal detail screen.
+- **Manual review:** Flag answers, override scores, provide feedback.
+- **Results:** Sort (newest, oldest, best, lowest), filter by assessment; export as PDF/CSV/Excel/image.
+
+### Localization
+
+- Full translations for **English** (base), **Hindi**, **Spanish**, **French**, and **German** (457 strings each).
 
 ## Planned / Future
 
-- Additional features as needed. See [docs/DESIGN.md](docs/DESIGN.md) and [docs/PLAN-EXAM-GOAL.md](docs/PLAN-EXAM-GOAL.md).
+- **Spaced repetition:** SM-2 algorithm for scheduling review sessions based on weak topics.
+- **Leaderboards:** Local or optional cloud leaderboards for score comparison.
+- **Integration tests:** Full end-to-end suite covering scan → parse → assess → grade → result flows; OCR dataset regression tests.
 
 ---
 

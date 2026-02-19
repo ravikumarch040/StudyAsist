@@ -1,33 +1,43 @@
 package com.studyasist.ui.home
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.EmojiObjects
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -35,30 +45,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.ui.components.colorForActivityType
-import com.studyasist.ui.timetablelist.TimetableListScreen
-import com.studyasist.ui.timetablelist.TimetableListViewModel
 import com.studyasist.util.formatTimeMinutes
 import com.studyasist.util.labelResId
+import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    listViewModel: TimetableListViewModel,
-    onSettingsClick: () -> Unit,
-    onTimetableClick: (Long) -> Unit,
-    onAddActivity: (Long) -> Unit,
-    onNavigateAfterCreate: (Long) -> Unit,
+    drawerState: DrawerState,
+    onTimetableClick: (Long) -> Unit = {},
     onDictate: () -> Unit = {},
     onExplain: () -> Unit = {},
     onSolve: () -> Unit = {},
@@ -69,15 +78,17 @@ fun HomeScreen(
     onResultClick: (Long) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var selectedTab by remember { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) { viewModel.refreshDashboard() }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
+                title = { Text(stringResource(R.string.drawer_dashboard)) },
+                navigationIcon = {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.drawer_open))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -87,65 +98,174 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            Modifier
+        LazyColumn(
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp)
         ) {
-            TabRow(selectedTabIndex = selectedTab) {
-                Tab(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    icon = { Icon(Icons.Default.Today, contentDescription = stringResource(R.string.today)) },
-                    text = { Text(stringResource(R.string.today)) }
-                )
-                Tab(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.timetables)) },
-                    text = { Text(stringResource(R.string.timetables)) }
-                )
-                Tab(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.Default.School, contentDescription = stringResource(R.string.study_tools)) },
-                    text = { Text(stringResource(R.string.study_tools)) }
+            // Greeting
+            item {
+                GreetingSection(userName = uiState.userName)
+            }
+
+            // Current timetable task
+            item {
+                CurrentTaskCard(
+                    activeTimetableName = uiState.activeTimetable?.name,
+                    currentActivity = uiState.todayActivities.firstOrNull { it.id == uiState.currentActivityId },
+                    nextActivity = findNextActivity(uiState.todayActivities, uiState.currentActivityId),
+                    onTimetableClick = { uiState.activeTimetable?.id?.let(onTimetableClick) }
                 )
             }
-            LaunchedEffect(selectedTab) {
-                if (selectedTab == 2) {
-                    viewModel.refreshStreak()
-                    viewModel.refreshTopResults()
+
+            // Goal progress
+            item {
+                GoalProgressCard(
+                    goalProgress = uiState.activeGoalProgress,
+                    onGoalClick = onExamGoals
+                )
+            }
+
+            // Last result
+            if (uiState.lastResult != null) {
+                item {
+                    LastResultCard(
+                        result = uiState.lastResult!!,
+                        onResultClick = { onResultClick(uiState.lastResult!!.attemptId) },
+                        onViewAll = onResults
+                    )
                 }
             }
-            when (selectedTab) {
-                0 -> TodayTabContent(
-                    activeTimetable = uiState.activeTimetable,
-                    todayActivities = uiState.todayActivities,
-                    currentActivityId = uiState.currentActivityId,
-                    onAddActivity = { uiState.activeTimetable?.id?.let(onAddActivity) }
+
+            // Quick actions
+            item {
+                Text(
+                    stringResource(R.string.quick_actions),
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(top = 4.dp)
                 )
-                1 -> TimetableListScreen(
-                    viewModel = listViewModel,
-                    onTimetableClick = onTimetableClick,
-                    onSettingsClick = onSettingsClick,
-                    onNavigateAfterCreate = onNavigateAfterCreate,
-                    activeTimetableId = uiState.activeTimetableId,
-                    onSetActive = viewModel::setActiveTimetableId,
-                    showTopBar = false
+            }
+            item {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    QuickActionChip(Icons.Default.Mic, stringResource(R.string.dictate), onDictate)
+                    QuickActionChip(Icons.Default.AutoStories, stringResource(R.string.explain), onExplain)
+                    QuickActionChip(Icons.Default.EmojiObjects, stringResource(R.string.solve), onSolve)
+                    QuickActionChip(Icons.Default.Assessment, stringResource(R.string.assessments), onAssessments)
+                }
+            }
+
+            // Streak + badges
+            if (uiState.studyStreak > 0 || uiState.earnedBadges.isNotEmpty()) {
+                item {
+                    StreakBadgesCard(
+                        streak = uiState.studyStreak,
+                        badges = uiState.earnedBadges
+                    )
+                }
+            }
+
+            // Today's schedule
+            if (uiState.todayActivities.isNotEmpty()) {
+                item {
+                    Text(
+                        stringResource(R.string.today_schedule),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+                items(uiState.todayActivities, key = { it.id }) { activity ->
+                    ActivityItem(
+                        activity = activity,
+                        isCurrent = activity.id == uiState.currentActivityId
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GreetingSection(userName: String) {
+    val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    val greetingRes = when {
+        hour < 12 -> R.string.greeting_morning
+        hour < 17 -> R.string.greeting_afternoon
+        else -> R.string.greeting_evening
+    }
+    val name = userName.ifBlank { stringResource(R.string.profile_guest) }
+    Text(
+        text = stringResource(greetingRes, name),
+        style = MaterialTheme.typography.headlineSmall,
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onBackground
+    )
+}
+
+@Composable
+private fun CurrentTaskCard(
+    activeTimetableName: String?,
+    currentActivity: ActivityEntity?,
+    nextActivity: ActivityEntity?,
+    onTimetableClick: () -> Unit
+) {
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onTimetableClick),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text(
+                stringResource(R.string.current_task),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+            )
+            Spacer(Modifier.height(4.dp))
+            if (currentActivity != null) {
+                Text(
+                    currentActivity.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                2 -> StudyToolsTabContent(
-                    studyStreak = uiState.studyStreak,
-                    earnedBadges = uiState.earnedBadges,
-                    topResults = uiState.topResults,
-                    onDictate = onDictate,
-                    onExplain = onExplain,
-                    onSolve = onSolve,
-                    onExamGoals = onExamGoals,
-                    onQABank = onQABank,
-                    onAssessments = onAssessments,
-                    onResults = onResults,
-                    onResultClick = onResultClick
+                Text(
+                    "${formatTimeMinutes(currentActivity.startTimeMinutes)} – ${formatTimeMinutes(currentActivity.endTimeMinutes)} · ${stringResource(currentActivity.type.labelResId())}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                )
+            } else if (nextActivity != null) {
+                Text(
+                    stringResource(R.string.no_current_task),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    stringResource(R.string.next_up, nextActivity.title, formatTimeMinutes(nextActivity.startTimeMinutes)),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            } else if (activeTimetableName != null) {
+                Text(
+                    stringResource(R.string.all_done_today),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            } else {
+                Text(
+                    stringResource(R.string.no_active_timetable),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )
             }
         }
@@ -153,249 +273,229 @@ fun HomeScreen(
 }
 
 @Composable
-private fun StudyToolsTabContent(
-    studyStreak: Int = 0,
-    earnedBadges: List<com.studyasist.data.repository.EarnedBadge> = emptyList(),
-    topResults: List<com.studyasist.data.repository.ResultListItem> = emptyList(),
-    onDictate: () -> Unit,
-    onExplain: () -> Unit,
-    onSolve: () -> Unit,
-    onExamGoals: () -> Unit,
-    onQABank: () -> Unit,
-    onAssessments: () -> Unit = {},
-    onResults: () -> Unit = {},
-    onResultClick: (Long) -> Unit = {}
+private fun GoalProgressCard(
+    goalProgress: GoalProgressSummary?,
+    onGoalClick: () -> Unit
 ) {
-    LazyColumn(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onGoalClick)
     ) {
-        item {
+        Column(Modifier.padding(16.dp)) {
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    stringResource(R.string.study_tools),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    stringResource(R.string.goal_progress),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                Icon(
+                    Icons.Default.TrackChanges,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            if (goalProgress != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        val animatedProgress by animateFloatAsState(
+                            targetValue = goalProgress.percentComplete / 100f,
+                            animationSpec = tween(800)
+                        )
+                        CircularProgressIndicator(
+                            progress = { animatedProgress },
+                            modifier = Modifier.size(56.dp),
+                            strokeWidth = 5.dp,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            strokeCap = StrokeCap.Round
+                        )
+                        Text(
+                            "${goalProgress.percentComplete}%",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            goalProgress.goalName,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            stringResource(R.string.days_left, goalProgress.daysUntilExam),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else {
+                Text(
+                    stringResource(R.string.no_active_goals),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LastResultCard(
+    result: com.studyasist.data.repository.ResultListItem,
+    onResultClick: () -> Unit,
+    onViewAll: () -> Unit
+) {
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onResultClick)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text(
+                stringResource(R.string.last_result),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        result.assessmentTitle,
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        result.attemptLabel,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Text(
+                    stringResource(R.string.percent_format, result.percent),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            val animatedProgress by animateFloatAsState(
+                targetValue = (result.percent / 100f).coerceIn(0f, 1f),
+                animationSpec = tween(800)
+            )
+            LinearProgressIndicator(
+                progress = { animatedProgress },
+                modifier = Modifier.fillMaxWidth(),
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                strokeCap = StrokeCap.Round
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuickActionChip(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Row(
+            Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+            Text(label, style = MaterialTheme.typography.labelMedium)
+        }
+    }
+}
+
+@Composable
+private fun StreakBadgesCard(
+    streak: Int,
+    badges: List<com.studyasist.data.repository.EarnedBadge>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (streak > 0) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    if (studyStreak > 0) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.LocalFireDepartment,
-                                contentDescription = stringResource(R.string.cd_streak),
-                                tint = MaterialTheme.colorScheme.tertiary
-                            )
-                            Text(
-                                "${studyStreak}${stringResource(R.string.streak_days)}",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.tertiary
-                            )
-                        }
-                    }
-                    if (earnedBadges.isNotEmpty()) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.EmojiEvents,
-                                contentDescription = stringResource(R.string.cd_badges),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                "${earnedBadges.size} badges",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        if (topResults.isNotEmpty()) {
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f))
-                ) {
-                    Column(Modifier.padding(12.dp)) {
+                    Icon(
+                        Icons.Default.LocalFireDepartment,
+                        contentDescription = stringResource(R.string.cd_streak),
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Column {
                         Text(
-                            stringResource(R.string.personal_bests),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface
+                            "$streak",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.tertiary
                         )
                         Text(
-                            stringResource(R.string.personal_bests_subtitle),
+                            stringResource(R.string.streak_days),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 4.dp)
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
-                        topResults.forEach { result ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { onResultClick(result.attemptId) }
-                                    .padding(top = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(
-                                        result.assessmentTitle,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        maxLines = 1
-                                    )
-                                    Text(
-                                        result.attemptLabel,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Text(
-                                    stringResource(R.string.percent_format, result.percent),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                        androidx.compose.material3.TextButton(
-                            onClick = onResults,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(stringResource(R.string.view_all_results))
-                        }
                     }
                 }
             }
-        }
-        if (earnedBadges.isNotEmpty()) {
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
+            if (badges.isNotEmpty()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Column(Modifier.padding(12.dp)) {
+                    Icon(
+                        Icons.Default.EmojiEvents,
+                        contentDescription = stringResource(R.string.cd_badges),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Column {
+                        Text(
+                            "${badges.size}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                         Text(
                             stringResource(R.string.badges),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.onSurface
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .horizontalScroll(rememberScrollState())
-                                .padding(top = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            earnedBadges.take(6).forEach { badge ->
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        Icons.Default.EmojiEvents,
-                                        contentDescription = stringResource(badge.titleResId),
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        stringResource(badge.titleResId),
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        maxLines = 1
-                                    )
-                                }
-                            }
-                        }
                     }
-                }
-            }
-        }
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable(onClick = onExamGoals),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.exam_goals), style = MaterialTheme.typography.titleSmall)
-                    Text(stringResource(R.string.exam_goals_subtitle), style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable(onClick = onQABank),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.qa_bank), style = MaterialTheme.typography.titleSmall)
-                    Text(stringResource(R.string.qa_bank_subtitle), style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable(onClick = onAssessments),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.assessments), style = MaterialTheme.typography.titleSmall)
-                    Text(stringResource(R.string.create_practice_tests), style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable(onClick = onResults),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.results), style = MaterialTheme.typography.titleSmall)
-                    Text(stringResource(R.string.view_attempt_history), style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable(onClick = onDictate),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.dictate), style = MaterialTheme.typography.titleSmall)
-                    Text(stringResource(R.string.dictate_subtitle), style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable(onClick = onExplain),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.explain), style = MaterialTheme.typography.titleSmall)
-                    Text(stringResource(R.string.explain_subtitle), style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth().clickable(onClick = onSolve),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.solve), style = MaterialTheme.typography.titleSmall)
-                    Text(stringResource(R.string.solve_subtitle), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -403,88 +503,47 @@ private fun StudyToolsTabContent(
 }
 
 @Composable
-private fun TodayTabContent(
-    activeTimetable: com.studyasist.data.local.entity.TimetableEntity?,
-    todayActivities: List<ActivityEntity>,
-    currentActivityId: Long?,
-    onAddActivity: () -> Unit
-) {
-    if (activeTimetable == null) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                stringResource(R.string.no_active_timetable),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        return
-    }
-    if (todayActivities.isEmpty()) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                stringResource(R.string.no_activities_today) + " (${activeTimetable.name})",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        return
-    }
-    LazyColumn(
-        Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+private fun ActivityItem(activity: ActivityEntity, isCurrent: Boolean) {
+    val (typeContainerColor, typeContentColor) = MaterialTheme.colorScheme.colorForActivityType(activity.type)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isCurrent) MaterialTheme.colorScheme.primaryContainer else typeContainerColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isCurrent) 4.dp else 1.dp)
     ) {
-        items(todayActivities, key = { it.id }) { activity ->
-            val isCurrent = activity.id == currentActivityId
-            val (typeContainerColor, typeContentColor) = MaterialTheme.colorScheme.colorForActivityType(activity.type)
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isCurrent) {
-                        MaterialTheme.colorScheme.primaryContainer
-                    } else {
-                        typeContainerColor
-                    }
-                ),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = if (isCurrent) 4.dp else 1.dp
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            val textColor = if (isCurrent) MaterialTheme.colorScheme.onPrimaryContainer else typeContentColor
+            if (isCurrent) {
+                Text(
+                    stringResource(R.string.now),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
-            ) {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp)
-                ) {
-                    val textColor = if (isCurrent) MaterialTheme.colorScheme.onPrimaryContainer else typeContentColor
-                    if (isCurrent) {
-                        Text(
-                            stringResource(R.string.now),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    Text(
-                        text = activity.title,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = textColor
-                    )
-                    Text(
-                        text = "${formatTimeMinutes(activity.startTimeMinutes)} – ${formatTimeMinutes(activity.endTimeMinutes)} · ${stringResource(activity.type.labelResId())}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = textColor.copy(alpha = 0.85f)
-                    )
-                }
             }
+            Text(
+                text = activity.title,
+                style = MaterialTheme.typography.titleSmall,
+                color = textColor
+            )
+            Text(
+                text = "${formatTimeMinutes(activity.startTimeMinutes)} – ${formatTimeMinutes(activity.endTimeMinutes)} · ${stringResource(activity.type.labelResId())}",
+                style = MaterialTheme.typography.bodySmall,
+                color = textColor.copy(alpha = 0.85f)
+            )
         }
     }
+}
+
+private fun findNextActivity(
+    activities: List<ActivityEntity>,
+    currentActivityId: Long?
+): ActivityEntity? {
+    if (currentActivityId != null) return null
+    val now = com.studyasist.util.currentTimeMinutesFromMidnight()
+    return activities.firstOrNull { it.startTimeMinutes > now }
 }

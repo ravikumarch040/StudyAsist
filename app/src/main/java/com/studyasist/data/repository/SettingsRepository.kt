@@ -221,4 +221,24 @@ class SettingsRepository @Inject constructor(
     suspend fun setExamGoalAlertPercentThreshold(percent: Int) {
         dataStore.dataStore.edit { it[dataStore.examGoalAlertPercentThreshold] = percent }
     }
+
+    val themeIdFlow: Flow<String> = dataStore.getPreferencesFlow().map {
+        it[dataStore.themeId] ?: "MINIMAL_LIGHT"
+    }
+
+    suspend fun setThemeId(id: String) {
+        dataStore.dataStore.edit { it[dataStore.themeId] = id }
+    }
+
+    val profilePicUriFlow: Flow<String?> = dataStore.getPreferencesFlow().map {
+        it[dataStore.profilePicUri]?.takeIf { uri -> uri.isNotEmpty() }
+    }
+
+    suspend fun setProfilePicUri(uri: String?) {
+        dataStore.dataStore.edit { it[dataStore.profilePicUri] = uri ?: "" }
+    }
+
+    val userNameFlow: Flow<String> = dataStore.getPreferencesFlow().map {
+        it[dataStore.userName] ?: ""
+    }
 }

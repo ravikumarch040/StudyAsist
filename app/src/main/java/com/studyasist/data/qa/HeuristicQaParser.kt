@@ -30,7 +30,7 @@ object HeuristicQaParser {
         return text
             .replace('\u00a0', ' ')
             .replace(Regex("[-–—]+"), "-")
-            .replace(Regex("\\s+"), " ")
+            .replace(Regex("[^\\S\\n]+"), " ")
             .trim()
     }
 
@@ -46,7 +46,7 @@ object HeuristicQaParser {
                     current = StringBuilder()
                 }
             }
-            if (current.isNotEmpty()) current.append(" ")
+            if (current.isNotEmpty()) current.append("\n")
             current.append(line)
         }
         if (current.isNotBlank()) result.add(current.toString().trim())
@@ -81,12 +81,12 @@ object HeuristicQaParser {
     private fun splitQuestionAnswer(block: String): Triple<String, String?, QuestionType> {
         val type = detectQuestionType(block)
         val answerMarker = when (type) {
-            QuestionType.TRUE_FALSE -> "(?i)\\b(?:answer|ans\\.?)\\s*[:.]?\\s*(true|false)"
-            QuestionType.MCQ -> "(?i)\\b(?:answer|ans\\.?|correct)\\s*[:.]?\\s*([a-dA-D])"
-            else -> "(?i)\\b(?:answer|ans\\.?)\\s*[:.]?\\s*"
+            QuestionType.TRUE_FALSE -> "(?i)\\b(?:answer|ans\\.?)\\s*[:.]+\\s*(true|false)"
+            QuestionType.MCQ -> "(?i)\\b(?:answer|ans\\.?|correct)\\s*[:.]+\\s*([a-dA-D])"
+            else -> "(?i)\\b(?:answer|ans\\.?)\\s*[:.]+\\s*"
         }
         val answerRegex = answerMarker.toRegex()
-        val answerMatch = answerRegex.find(block)
+        val answerMatch = answerRegex.findAll(block).lastOrNull()
         if (answerMatch != null) {
             val answer = when (type) {
                 QuestionType.TRUE_FALSE, QuestionType.MCQ -> answerMatch.groupValues.getOrNull(1) ?: ""

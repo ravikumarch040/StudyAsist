@@ -54,6 +54,17 @@ import androidx.compose.ui.unit.dp
 import com.studyasist.R
 import com.studyasist.data.repository.AppSettings
 import com.studyasist.notification.FOCUS_GUARD_RESTRICTED_PACKAGES
+import com.studyasist.ui.components.ProfileAvatar
+import com.studyasist.ui.theme.AppTheme
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilterChip
 import com.studyasist.notification.openUsageAccessSettings
 import com.studyasist.util.VoiceOption
 import com.studyasist.util.formatRelativeTimeAgo
@@ -80,6 +91,8 @@ fun SettingsScreen(
     val cloudBackupFilesLoading by viewModel.cloudBackupFilesLoading.collectAsState(initial = false)
     val darkMode by viewModel.darkMode.collectAsState(initial = "system")
     val appLocale by viewModel.appLocale.collectAsState(initial = "system")
+    val themeId by viewModel.themeId.collectAsState(initial = "MINIMAL_LIGHT")
+    val profilePicUri by viewModel.profilePicUri.collectAsState(initial = null)
     var showRestoreFromFolderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -172,7 +185,32 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Profile section
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ProfileAvatar(
+                    userName = settings.userName,
+                    profilePicUri = profilePicUri,
+                    size = 56.dp,
+                    editable = true,
+                    onPhotoSelected = { viewModel.setProfilePicUri(it) }
+                )
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.profile), style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        settings.userName.ifBlank { stringResource(R.string.profile_guest) },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
             Text(stringResource(R.string.appearance), style = MaterialTheme.typography.titleMedium)
+
+            // Language
             Text(stringResource(R.string.language), style = MaterialTheme.typography.bodySmall)
             Text(
                 stringResource(R.string.language_app_summary),
@@ -183,24 +221,86 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf("system" to R.string.language_system, "en" to R.string.lang_english, "hi" to R.string.lang_hindi, "es" to R.string.lang_spanish, "fr" to R.string.lang_french, "de" to R.string.lang_german).forEach { (tag, labelRes) ->
-                    androidx.compose.material3.FilterChip(
+                    FilterChip(
                         selected = appLocale == tag,
                         onClick = { viewModel.setAppLocale(tag) },
                         label = { Text(stringResource(labelRes)) }
                     )
                 }
             }
-            Text(stringResource(R.string.theme), style = MaterialTheme.typography.bodySmall)
+
+            // Dark mode toggle
+            Text(stringResource(R.string.dark_mode_label), style = MaterialTheme.typography.bodySmall)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf("system" to R.string.theme_system, "light" to R.string.theme_light, "dark" to R.string.theme_dark).forEach { (mode, labelRes) ->
-                    androidx.compose.material3.FilterChip(
+                    FilterChip(
                         selected = darkMode == mode,
                         onClick = { viewModel.setDarkMode(mode) },
                         label = { Text(stringResource(labelRes)) }
                     )
+                }
+            }
+
+            // Theme picker grid
+            Text(stringResource(R.string.theme), style = MaterialTheme.typography.bodySmall)
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(AppTheme.entries.toList()) { theme ->
+                    val isSelected = theme.name == themeId
+                    val preview = theme.previewColors
+                    Column(
+                        modifier = Modifier
+                            .clickable { viewModel.setThemeId(theme.name) }
+                            .then(
+                                if (isSelected) Modifier.border(
+                                    2.dp,
+                                    MaterialTheme.colorScheme.primary,
+                                    RoundedCornerShape(12.dp)
+                                ) else Modifier
+                            )
+                            .padding(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(32.dp)
+                        ) {
+                            Box(
+                                Modifier
+                                    .weight(1f)
+                                    .height(32.dp)
+                                    .background(preview.primary, RoundedCornerShape(topStart = 8.dp))
+                            )
+                            Box(
+                                Modifier
+                                    .weight(1f)
+                                    .height(32.dp)
+                                    .background(preview.surface)
+                            )
+                            Box(
+                                Modifier
+                                    .weight(1f)
+                                    .height(32.dp)
+                                    .background(preview.accent, RoundedCornerShape(topEnd = 8.dp))
+                            )
+                        }
+                        Text(
+                            stringResource(theme.displayNameRes),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(top = 4.dp),
+                            maxLines = 1
+                        )
+                    }
                 }
             }
             Text(stringResource(R.string.notifications), style = MaterialTheme.typography.titleMedium)

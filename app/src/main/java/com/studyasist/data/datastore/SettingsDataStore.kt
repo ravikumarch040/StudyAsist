@@ -44,6 +44,8 @@ class SettingsDataStore @Inject constructor(
     val useCloudForGrading = booleanPreferencesKey("use_cloud_for_grading") // LLM subjective grading
     val examGoalAlertDaysThreshold = intPreferencesKey("exam_goal_alert_days_threshold")
     val examGoalAlertPercentThreshold = intPreferencesKey("exam_goal_alert_percent_threshold")
+    val themeId = stringPreferencesKey("theme_id")
+    val profilePicUri = stringPreferencesKey("profile_pic_uri")
 
     val dataStore: DataStore<Preferences> get() = prefs
 

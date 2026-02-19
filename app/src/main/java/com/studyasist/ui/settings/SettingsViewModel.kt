@@ -59,6 +59,20 @@ class SettingsViewModel @Inject constructor(
     val appLocale: StateFlow<String> = settingsRepository.appLocaleFlow
         .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), "system")
 
+    val themeId: StateFlow<String> = settingsRepository.themeIdFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), "MINIMAL_LIGHT")
+
+    val profilePicUri: StateFlow<String?> = settingsRepository.profilePicUriFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), null)
+
+    fun setThemeId(id: String) {
+        viewModelScope.launch { settingsRepository.setThemeId(id) }
+    }
+
+    fun setProfilePicUri(uri: String?) {
+        viewModelScope.launch { settingsRepository.setProfilePicUri(uri) }
+    }
+
     fun setDarkMode(mode: String) {
         viewModelScope.launch { settingsRepository.setDarkMode(mode) }
     }

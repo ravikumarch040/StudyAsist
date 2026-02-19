@@ -166,8 +166,16 @@ class ObjectiveGradingService @Inject constructor(
     private fun normalize(s: String): String =
         s.trim().replace(Regex("\\s+"), " ").lowercase()
 
+    private val stopWords = setOf(
+        "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
+        "in", "on", "at", "to", "of", "for", "by", "with", "from", "as",
+        "it", "its", "this", "that", "which", "who", "whom", "and", "or",
+        "but", "not", "no", "do", "does", "did", "has", "have", "had",
+        "if", "so", "up", "out", "can", "will", "may", "than"
+    )
+
     private fun tokenize(s: String): List<String> =
-        s.lowercase().split(Regex("\\s+")).filter { it.length > 1 }
+        s.lowercase().split(Regex("\\s+")).filter { it.length > 1 && it !in stopWords }
 
     private fun parseNumber(s: String): Double? =
         Regex("[-+]?\\d+\\.?\\d*").find(s.trim())?.value?.toDoubleOrNull()

@@ -16,6 +16,9 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val darkModeFlow: kotlinx.coroutines.flow.Flow<String> = settingsRepository.darkModeFlow
+    val themeIdFlow: kotlinx.coroutines.flow.Flow<String> = settingsRepository.themeIdFlow
+    val userNameFlow: kotlinx.coroutines.flow.Flow<String> = settingsRepository.userNameFlow
+    val profilePicUriFlow: kotlinx.coroutines.flow.Flow<String?> = settingsRepository.profilePicUriFlow
 
     private val _pendingGoalIdForDeepLink = MutableStateFlow<Long?>(null)
     val pendingGoalIdForDeepLink: StateFlow<Long?> = _pendingGoalIdForDeepLink.asStateFlow()

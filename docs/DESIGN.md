@@ -1,25 +1,33 @@
 # StudyAsist – Design & Plan
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Target:** Android (personal, single-user)  
-**Scope:** Phase 1–3 + Exam Goal (implemented); Phase 2 extended.
+**Scope:** Phase 1–3 + Exam Goal (fully implemented); Phase 2 extended.
 
 ---
 
-## Implementation Status (as of v1.1)
+## Implementation Status (as of v1.2)
 
 The following are **implemented** beyond the original Phase 1 scope:
 
 - **Export & Print:** CSV, PDF, Excel from Timetable detail and **Results**; Print via PrintManager for both.
 - **Backup/Restore:** JSON export/import via system share/save in Settings.
-- **Cloud backup:** User-selectable folder (Drive, Dropbox, etc.); manual or daily auto backup; `StudyAsist_Backup_YYYY-MM-DD_HHmmss.json` naming; last backup timestamp in Settings; completion/failure notifications with error details.
+- **Cloud backup:** User-selectable folder (Drive, Dropbox, etc.) or direct Google Drive API; manual or daily auto backup; `StudyAsist_Backup_YYYY-MM-DD_HHmmss.json` naming; last backup timestamp in Settings; completion/failure notifications with error details.
 - **Color per type:** Activities use distinct colors by type (STUDY, BREAK, etc.) in timetable and home.
 - **Simple analytics:** Weekly total minutes by activity type in Timetable detail.
 - **Gamification:** Study streak, badges (First Step, Week Warrior, etc.).
 - **Focus guard:** During STUDY blocks, alerts when user opens games/YouTube/social apps (Usage access); built-in + custom restricted package list; nudges via notification only (no blocking).
 - **Study tools (Phase 3):** Dictate (OCR → TTS), Explain, Solve (Gemini); TTS voice selection in Settings.
-- **Exam goal:** Goals, Q&A bank, assessments, attempts, results, manual review, export.
-- **Localization:** In-app language selector (English, Hindi, Spanish, French, German). Exports, notifications, and UI use string resources. `appLocale` in backup/restore.
+- **Exam goal (full):**
+  - Goals with subjects/chapters; Q&A bank via OCR + AI parse.
+  - Assessments: create by goal/subject/manual; timed runs; randomized questions.
+  - Grading: objective (token-overlap, numeric tolerance, Gemini math equivalence); LLM subjective via DeferredGradingWorker.
+  - Voice answers (SpeechRecognizer) and image answers (camera/gallery OCR) with URI persistence.
+  - Dashboard: track prediction (on-track/behind with hours/day), score trend sparkline, activity heatmap, suggested practice, personal bests, "last practiced X days ago" per subject/chapter.
+  - Exam goal alert notifications with deep link to goal detail screen.
+  - Results: sort/filter, manual review, export as PDF/CSV/Excel/image.
+  - Exam data backup/restore (separate from main backup).
+- **Localization:** Full translations for English (base), Hindi, Spanish, French, German (457 strings). In-app language selector. `appLocale` in backup/restore.
 
 ---
 

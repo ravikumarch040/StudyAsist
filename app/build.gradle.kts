@@ -48,6 +48,14 @@ android {
             excludes += "/META-INF/INDEX.LIST"
             excludes += "/META-INF/DEPENDENCIES"
         }
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 }
 
@@ -82,8 +90,11 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.google.api.services.drive)
     implementation(libs.google.api.client.android)
+    implementation(libs.coil.compose)
+    implementation(libs.compose.ui.text.google.fonts)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
+    testImplementation(libs.hilt.android.testing)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
