@@ -1,0 +1,19 @@
+// Wear OS Module Placeholder
+// This module will be activated when the Wear OS companion app is implemented.
+// 
+// To enable:
+// 1. Rename this file to build.gradle.kts
+// 2. Add 'include(":wear")' to settings.gradle.kts
+// 3. Add Wear OS dependencies
+//
+// Dependencies needed:
+// - androidx.wear.compose:compose-material
+// - androidx.wear.compose:compose-foundation
+// - com.google.android.horologist:horologist-composables
+// - com.google.android.gms:play-services-wearable
+//
+// Features planned:
+// - Pomodoro timer with circular display
+// - Flashcard review with swipe gestures
+// - Streak complication for watch faces
+// - Data sync via Wearable Data Layer API

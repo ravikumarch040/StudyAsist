@@ -20,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -45,7 +46,6 @@ import com.studyasist.R
 import com.studyasist.data.local.entity.QA
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Suppress("DEPRECATION")
 @Composable
 fun QABankScreen(
     viewModel: QABankViewModel,
@@ -117,7 +117,7 @@ fun QABankScreen(
                         label = { Text(stringResource(R.string.subject)) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(),
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectExpanded) }
                     )
                     ExposedDropdownMenu(
@@ -154,7 +154,7 @@ fun QABankScreen(
                         label = { Text(stringResource(R.string.chapter)) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(),
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = chapterExpanded) }
                     )
                     ExposedDropdownMenu(

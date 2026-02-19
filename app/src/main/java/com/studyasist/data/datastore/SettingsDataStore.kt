@@ -46,6 +46,16 @@ class SettingsDataStore @Inject constructor(
     val examGoalAlertPercentThreshold = intPreferencesKey("exam_goal_alert_percent_threshold")
     val themeId = stringPreferencesKey("theme_id")
     val profilePicUri = stringPreferencesKey("profile_pic_uri")
+    val onboardingCompleted = booleanPreferencesKey("onboarding_completed")
+    val fontScale = stringPreferencesKey("font_scale") // "0.85", "1.0", "1.15", "1.3"
+    val hapticEnabled = booleanPreferencesKey("haptic_enabled")
+    val highContrastMode = booleanPreferencesKey("high_contrast_mode")
+    val colorBlindMode = booleanPreferencesKey("color_blind_mode")
+    val pomodoroFocusMinutes = intPreferencesKey("pomodoro_focus_minutes")
+    val pomodoroShortBreakMinutes = intPreferencesKey("pomodoro_short_break_minutes")
+    val pomodoroLongBreakMinutes = intPreferencesKey("pomodoro_long_break_minutes")
+    val pomodoroAutoStartBreaks = booleanPreferencesKey("pomodoro_auto_start_breaks")
+    val dashboardCardOrder = stringPreferencesKey("dashboard_card_order")
 
     val dataStore: DataStore<Preferences> get() = prefs
 

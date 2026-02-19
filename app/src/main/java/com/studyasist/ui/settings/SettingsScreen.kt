@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -78,7 +79,8 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onUserGuide: () -> Unit = {}
 ) {
     val settings by viewModel.settings.collectAsState(
         initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, true, true, "system", AppSettings.DEFAULT_EXAM_ALERT_DAYS, AppSettings.DEFAULT_EXAM_ALERT_PERCENT)
@@ -207,6 +209,35 @@ fun SettingsScreen(
                     )
                 }
             }
+
+            Text(stringResource(R.string.user_guide), style = MaterialTheme.typography.titleMedium)
+            androidx.compose.material3.Card(
+                onClick = onUserGuide,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.user_guide),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        Icons.Filled.AutoStories,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            Text(
+                stringResource(R.string.user_guide_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
 
             Text(stringResource(R.string.appearance), style = MaterialTheme.typography.titleMedium)
 

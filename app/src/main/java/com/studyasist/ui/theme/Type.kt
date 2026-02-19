@@ -40,10 +40,10 @@ private fun buildTypography(
     baseBodySize: Int = 16,
     baseLabelSize: Int = 12
 ): Typography = Typography(
-    displayLarge = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.Bold, fontSize = 57.sp, lineHeight = 64.sp),
+    displayLarge = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.Bold, fontSize = 57.sp, lineHeight = 64.sp, letterSpacing = (-0.25).sp),
     displayMedium = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.Bold, fontSize = 45.sp, lineHeight = 52.sp),
     displaySmall = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.Bold, fontSize = 36.sp, lineHeight = 44.sp),
-    headlineLarge = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.SemiBold, fontSize = 32.sp, lineHeight = 40.sp),
+    headlineLarge = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 40.sp),
     headlineMedium = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.SemiBold, fontSize = 28.sp, lineHeight = 36.sp),
     headlineSmall = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, lineHeight = 32.sp),
     titleLarge = TextStyle(fontFamily = headlineFamily, fontWeight = FontWeight.Medium, fontSize = 22.sp, lineHeight = 28.sp),

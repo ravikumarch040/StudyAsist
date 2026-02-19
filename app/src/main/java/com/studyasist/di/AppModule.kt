@@ -9,6 +9,8 @@ import com.studyasist.data.local.dao.ActivityDao
 import com.studyasist.data.local.dao.AssessmentDao
 import com.studyasist.data.local.dao.AssessmentQuestionDao
 import com.studyasist.data.local.dao.BadgeDao
+import com.studyasist.data.local.dao.ChatMessageDao
+import com.studyasist.data.local.dao.PomodoroDao
 import com.studyasist.data.local.dao.AttemptAnswerDao
 import com.studyasist.data.local.dao.AttemptDao
 import com.studyasist.data.local.dao.GoalDao
@@ -92,4 +94,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideBadgeDao(db: AppDatabase): BadgeDao = db.badgeDao()
+
+    @Provides
+    @Singleton
+    fun providePomodoroDao(db: AppDatabase): PomodoroDao = db.pomodoroDao()
+
+    @Provides
+    @Singleton
+    fun provideChatMessageDao(db: AppDatabase): ChatMessageDao = db.chatMessageDao()
 }

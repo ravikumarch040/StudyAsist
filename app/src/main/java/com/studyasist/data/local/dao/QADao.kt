@@ -58,4 +58,19 @@ interface QADao {
 
     @Query("DELETE FROM qa_bank WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("SELECT * FROM qa_bank WHERE nextReviewDate <= :now AND nextReviewDate > 0 ORDER BY nextReviewDate ASC LIMIT :limit")
+    suspend fun getDueCards(now: Long, limit: Int): List<QA>
+
+    @Query("SELECT COUNT(*) FROM qa_bank WHERE nextReviewDate <= :now AND nextReviewDate > 0")
+    suspend fun getDueCount(now: Long): Int
+
+    @Query("SELECT COUNT(*) FROM qa_bank WHERE nextReviewDate > :start AND nextReviewDate <= :end")
+    suspend fun getDueCountInRange(start: Long, end: Long): Int
+
+    @Query("UPDATE qa_bank SET easeFactor = :easeFactor, srsInterval = :interval, repetitions = :repetitions, nextReviewDate = :nextReviewDate, lastReviewDate = :lastReviewDate WHERE id = :id")
+    suspend fun updateSRS(id: Long, easeFactor: Double, interval: Int, repetitions: Int, nextReviewDate: Long, lastReviewDate: Long)
+
+    @Query("SELECT * FROM qa_bank WHERE nextReviewDate = 0 ORDER BY RANDOM() LIMIT :limit")
+    suspend fun getNewCardsForReview(limit: Int): List<QA>
 }

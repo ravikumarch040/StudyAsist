@@ -174,6 +174,22 @@ class GeminiRepository @Inject constructor() {
         }
     }
 
+    /**
+     * Explains the given text in the specified language. Returns the explanation or an error.
+     */
+    suspend fun explain(apiKey: String, text: String, lang: String = "en"): Result<String> {
+        val langName = when (lang) {
+            "en" -> "English"
+            "hi" -> "Hindi"
+            "es" -> "Spanish"
+            "fr" -> "French"
+            "de" -> "German"
+            else -> lang
+        }
+        val prompt = "Explain the following in simple terms. Write the explanation in $langName. Do not add any preamble.\n\n$text"
+        return generateContent(apiKey, prompt)
+    }
+
     private fun parseGeminiError(body: String): String? {
         if (body.isBlank()) return null
         return try {

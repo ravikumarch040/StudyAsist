@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION") // TODO: Migrate to Credential Manager + AuthorizationClient for Drive scopes
+
 package com.studyasist.data.cloud
 
 import android.accounts.Account

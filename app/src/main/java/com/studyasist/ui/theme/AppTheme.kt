@@ -16,6 +16,7 @@ data class ThemeConfig(
 )
 
 enum class AppTheme(val displayNameRes: Int) {
+    DYNAMIC(com.studyasist.R.string.theme_dynamic),
     MINIMAL_LIGHT(com.studyasist.R.string.theme_minimal_light),
     MINIMAL_DARK(com.studyasist.R.string.theme_minimal_dark),
     PASTEL_CALM(com.studyasist.R.string.theme_pastel_calm),
@@ -26,6 +27,8 @@ enum class AppTheme(val displayNameRes: Int) {
     RETRO_CHALKBOARD(com.studyasist.R.string.theme_retro_chalkboard),
     NATURE_EARTHY(com.studyasist.R.string.theme_nature_earthy),
     PRODUCTIVITY_DASHBOARD(com.studyasist.R.string.theme_productivity_dashboard);
+
+    val isDynamic: Boolean get() = this == DYNAMIC
 
     val config: ThemeConfig
         get() = themeConfigs.getValue(this)
@@ -41,6 +44,7 @@ data class PreviewColors(
 )
 
 private val previewColorsMap = mapOf(
+    AppTheme.DYNAMIC to PreviewColors(Color(0xFF6750A4), Color(0xFFFEF7FF), Color(0xFF625B71)),
     AppTheme.MINIMAL_LIGHT to PreviewColors(Color(0xFF0B5FFF), Color(0xFFF6F8FF), Color(0xFF00B37E)),
     AppTheme.MINIMAL_DARK to PreviewColors(Color(0xFF7DA7FF), Color(0xFF111827), Color(0xFFFBBF24)),
     AppTheme.PASTEL_CALM to PreviewColors(Color(0xFF7CB9E8), Color(0xFFFFF8F3), Color(0xFFF7B7A3)),
@@ -461,6 +465,12 @@ private val ProductivityDashboardDark = darkColorScheme(
 
 internal val themeConfigs: Map<AppTheme, ThemeConfig> by lazy {
     mapOf(
+        AppTheme.DYNAMIC to ThemeConfig(
+            lightScheme = MinimalLightLight,
+            darkScheme = MinimalLightDark,
+            typography = interRobotoTypography(),
+            shapes = minimalShapes()
+        ),
         AppTheme.MINIMAL_LIGHT to ThemeConfig(
             lightScheme = MinimalLightLight,
             darkScheme = MinimalLightDark,

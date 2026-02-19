@@ -18,6 +18,10 @@ import com.studyasist.data.local.dao.ResultDao
 import com.studyasist.data.local.dao.StudyToolHistoryDao
 import com.studyasist.data.local.dao.TimetableDao
 import com.studyasist.data.local.entity.BadgeEarned
+import com.studyasist.data.local.entity.ChatMessage
+import com.studyasist.data.local.entity.PomodoroSession
+import com.studyasist.data.local.dao.ChatMessageDao
+import com.studyasist.data.local.dao.PomodoroDao
 import com.studyasist.data.local.entity.ActivityEntity
 import com.studyasist.data.local.entity.ActivityTypeConverter
 import com.studyasist.data.local.entity.Assessment
@@ -193,6 +197,53 @@ private val MIGRATION_6_7 = object : Migration(6, 7) {
     }
 }
 
+private val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE qa_bank ADD COLUMN easeFactor REAL NOT NULL DEFAULT 2.5")
+        db.execSQL("ALTER TABLE qa_bank ADD COLUMN srsInterval INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE qa_bank ADD COLUMN repetitions INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE qa_bank ADD COLUMN nextReviewDate INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE qa_bank ADD COLUMN lastReviewDate INTEGER")
+    }
+}
+
+private val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS pomodoro_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                startedAt INTEGER NOT NULL,
+                endedAt INTEGER,
+                durationMinutes INTEGER NOT NULL,
+                type TEXT NOT NULL,
+                subject TEXT,
+                completed INTEGER NOT NULL DEFAULT 0
+            )
+        """.trimIndent())
+    }
+}
+
+private val MIGRATION_9_10 = object : Migration(9, 10) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE attempt_answers ADD COLUMN timeSpentSeconds INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
+private val MIGRATION_10_11 = object : Migration(10, 11) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS chat_messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                subject TEXT,
+                chapter TEXT,
+                createdAt INTEGER NOT NULL
+            )
+        """.trimIndent())
+    }
+}
+
 @Database(
     entities = [
         TimetableEntity::class,
@@ -206,9 +257,11 @@ private val MIGRATION_6_7 = object : Migration(6, 7) {
         Attempt::class,
         AttemptAnswer::class,
         Result::class,
-        StudyToolHistoryEntity::class
+        StudyToolHistoryEntity::class,
+        PomodoroSession::class,
+        ChatMessage::class
     ],
-    version = 7,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(
@@ -229,8 +282,14 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun resultDao(): ResultDao
     abstract fun studyToolHistoryDao(): StudyToolHistoryDao
     abstract fun badgeDao(): BadgeDao
+    abstract fun pomodoroDao(): PomodoroDao
+    abstract fun chatMessageDao(): ChatMessageDao
 
     companion object {
-        fun migrations(): Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+        fun migrations(): Array<Migration> = arrayOf(
+            MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
+            MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
+            MIGRATION_9_10, MIGRATION_10_11
+        )
     }
 }

@@ -24,7 +24,7 @@ import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.EmojiObjects
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material3.Card
@@ -66,7 +66,7 @@ import java.util.Calendar
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    drawerState: DrawerState,
+    drawerState: DrawerState? = null,
     onTimetableClick: (Long) -> Unit = {},
     onDictate: () -> Unit = {},
     onExplain: () -> Unit = {},
@@ -78,7 +78,6 @@ fun HomeScreen(
     onResultClick: (Long) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) { viewModel.refreshDashboard() }
 
@@ -86,11 +85,6 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.drawer_dashboard)) },
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.drawer_open))
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -104,7 +98,7 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp)
+            contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
         ) {
             // Greeting
             item {

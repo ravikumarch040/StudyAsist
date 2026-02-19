@@ -25,5 +25,6 @@ data class AttemptAnswer(
     val answerText: String? = null,
     val answerImageUri: String? = null,
     val answerVoiceUri: String? = null,
-    val submittedAt: Long
+    val submittedAt: Long,
+    val timeSpentSeconds: Int = 0
 )

@@ -23,5 +23,10 @@ data class QA(
     val questionType: QuestionType,
     val optionsJson: String? = null,
     val metadataJson: String? = null,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val easeFactor: Double = 2.5,
+    val srsInterval: Int = 0,
+    val repetitions: Int = 0,
+    val nextReviewDate: Long = 0,
+    val lastReviewDate: Long? = null
 )

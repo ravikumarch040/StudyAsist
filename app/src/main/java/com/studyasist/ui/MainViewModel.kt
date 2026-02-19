@@ -19,6 +19,8 @@ class MainViewModel @Inject constructor(
     val themeIdFlow: kotlinx.coroutines.flow.Flow<String> = settingsRepository.themeIdFlow
     val userNameFlow: kotlinx.coroutines.flow.Flow<String> = settingsRepository.userNameFlow
     val profilePicUriFlow: kotlinx.coroutines.flow.Flow<String?> = settingsRepository.profilePicUriFlow
+    val onboardingCompletedFlow: kotlinx.coroutines.flow.Flow<Boolean> = settingsRepository.onboardingCompletedFlow
+    val fontScaleFlow: kotlinx.coroutines.flow.Flow<Float> = settingsRepository.fontScaleFlow
 
     private val _pendingGoalIdForDeepLink = MutableStateFlow<Long?>(null)
     val pendingGoalIdForDeepLink: StateFlow<Long?> = _pendingGoalIdForDeepLink.asStateFlow()
@@ -30,5 +32,12 @@ class MainViewModel @Inject constructor(
 
     fun clearPendingGoalId() {
         _pendingGoalIdForDeepLink.value = null
+    }
+
+    suspend fun completeOnboarding(userName: String) {
+        if (userName.isNotBlank()) {
+            settingsRepository.setUserName(userName)
+        }
+        settingsRepository.setOnboardingCompleted(true)
     }
 }

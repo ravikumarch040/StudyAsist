@@ -4,6 +4,8 @@
     <string name="today">Today</string>
     <string name="timetables">Timetables</string>
     <string name="settings">Settings</string>
+    <string name="user_guide">User Guide</string>
+    <string name="user_guide_hint">View all features and how to use them</string>
     <string name="back">Back</string>
     <string name="add_activity">Add activity</string>
     <string name="filter">Filter</string>
@@ -504,4 +506,154 @@
     <string name="profile_guest">Guest</string>
     <string name="change_photo">Change photo</string>
     <string name="enter_your_name">Enter your name</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome">Welcome to StudyAssist</string>
+    <string name="onboarding_timetable_title">Organize Your Day</string>
+    <string name="onboarding_timetable_desc">Create study timetables with smart reminders and focus guard to stay on track.</string>
+    <string name="onboarding_scan_title">Scan &amp; Build Q&amp;A</string>
+    <string name="onboarding_scan_desc">Photograph your textbook pages and let AI extract questions and answers automatically.</string>
+    <string name="onboarding_assess_title">Practice &amp; Improve</string>
+    <string name="onboarding_assess_desc">Take timed assessments, review with flashcards, and track your scores over time.</string>
+    <string name="onboarding_goal_title">Reach Your Goals</string>
+    <string name="onboarding_goal_desc">Set exam goals, get AI-powered study plans, and watch your progress grow every day.</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_enter_name">What\'s your name?</string>
+    <string name="onboarding_name_hint">Your name</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_timetable">Timetable</string>
+    <string name="nav_study">Study</string>
+    <string name="nav_goals">Goals</string>
+    <string name="nav_more">More</string>
+
+    <!-- Dynamic Theme -->
+    <string name="theme_dynamic">System Dynamic</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility">Accessibility</string>
+    <string name="font_size">Font size</string>
+    <string name="font_size_small">Small</string>
+    <string name="font_size_medium">Medium</string>
+    <string name="font_size_large">Large</string>
+    <string name="font_size_extra_large">Extra Large</string>
+    <string name="haptic_feedback">Haptic feedback</string>
+    <string name="haptic_feedback_summary">Vibrate on button presses and interactions</string>
+    <string name="high_contrast">High contrast</string>
+    <string name="high_contrast_summary">Increase contrast for better visibility</string>
+    <string name="color_blind_mode">Color-blind friendly</string>
+    <string name="color_blind_summary">Replace red/green indicators with blue/orange</string>
+
+    <!-- Spaced Repetition -->
+    <string name="daily_review">Daily Review</string>
+    <string name="cards_due_today">%1$d cards due today</string>
+    <string name="no_cards_due">No cards due for review</string>
+    <string name="review_complete">Review Complete!</string>
+    <string name="cards_reviewed_format">%1$d cards reviewed</string>
+    <string name="again">Again</string>
+    <string name="hard">Hard</string>
+    <string name="good">Good</string>
+    <string name="easy">Easy</string>
+    <string name="tap_to_reveal">Tap to reveal answer</string>
+    <string name="review_due">Review Due</string>
+    <string name="srs_coverage_format">SRS coverage: %1$d%%</string>
+
+    <!-- Flashcards -->
+    <string name="flashcards">Flashcards</string>
+    <string name="quick_review">Quick 5-min Review</string>
+    <string name="swipe_right_correct">Swipe right: correct</string>
+    <string name="swipe_left_wrong">Swipe left: wrong</string>
+
+    <!-- Pomodoro -->
+    <string name="pomodoro">Pomodoro</string>
+    <string name="pomodoro_focus">Focus</string>
+    <string name="pomodoro_short_break">Short Break</string>
+    <string name="pomodoro_long_break">Long Break</string>
+    <string name="pomodoro_session_format">Session %1$d of %2$d</string>
+    <string name="pomodoro_start">Start Focus</string>
+    <string name="pomodoro_pause">Pause</string>
+    <string name="pomodoro_resume">Resume</string>
+    <string name="pomodoro_skip">Skip</string>
+    <string name="pomodoro_reset">Reset</string>
+    <string name="pomodoro_settings">Pomodoro Settings</string>
+    <string name="pomodoro_focus_duration">Focus duration</string>
+    <string name="pomodoro_short_break_duration">Short break</string>
+    <string name="pomodoro_long_break_duration">Long break</string>
+    <string name="pomodoro_auto_start_breaks">Auto-start breaks</string>
+    <string name="pomodoro_completed">Focus session completed!</string>
+    <string name="pomodoro_total_today">Total focus today: %1$s</string>
+
+    <!-- Assessment UX -->
+    <string name="combo_format">x%1$d Combo!</string>
+    <string name="points_format">+%1$d</string>
+
+    <!-- AI Tutor -->
+    <string name="ai_tutor">AI Tutor</string>
+    <string name="ai_tutor_hint">Ask me anything about your studies…</string>
+    <string name="ask_about_this">Ask about this question</string>
+
+    <!-- Study Plan -->
+    <string name="study_plan">Study Plan</string>
+    <string name="generate_plan">Generate AI Plan</string>
+    <string name="apply_to_timetable">Apply to Timetable</string>
+    <string name="generating_plan">Generating your personalized study plan…</string>
+
+    <!-- PDF Import -->
+    <string name="import_pdf">Import PDF</string>
+    <string name="processing_page_format">Processing page %1$d of %2$d…</string>
+
+    <!-- Social -->
+    <string name="challenge_friend">Challenge a Friend</string>
+    <string name="share_progress">Share Progress</string>
+    <string name="share_report_card">Share Report Card</string>
+
+    <!-- Widgets -->
+    <string name="widget_schedule">Today\'s Schedule</string>
+    <string name="widget_streak">Study Streak</string>
+    <string name="widget_review">Quick Review</string>
+    <string name="widget_countdown">Exam Countdown</string>
+
+    <!-- Smart Notifications -->
+    <string name="notif_forgetting_curve">%1$s: ~%2$d%% retention — review now!</string>
+    <string name="notif_motivational_nudge">%1$d more questions to hit your daily goal!</string>
+    <string name="notif_best_study_time">Your best study time: %1$s</string>
+
+    <!-- Voice -->
+    <string name="voice_mode">Voice Mode</string>
+    <string name="hands_free_review">Hands-Free Review</string>
+
+    <!-- Timetable Templates -->
+    <string name="use_template">Use Template</string>
+    <string name="template_generic_school">Generic School Day</string>
+    <string name="template_weekend_study">Weekend Study</string>
+    <string name="template_exam_prep">Exam Preparation</string>
+    <string name="timeline_view">Timeline</string>
+
+    <!-- Dashboard -->
+    <string name="daily_focus">Daily Focus</string>
+    <string name="reviews_due_format">%1$d reviews due</string>
+    <string name="better_than_last_week_format">%1$d%% better than last week</string>
+
+    <!-- Freemium -->
+    <string name="pro">Pro</string>
+    <string name="upgrade_to_pro">Upgrade to Pro</string>
+
+    <!-- Speed Dial FAB -->
+    <string name="quick_assessment">Quick Assessment</string>
+    <string name="start_pomodoro">Start Pomodoro</string>
+
+    <!-- Badges (new) -->
+    <string name="badge_first_review">First Review</string>
+    <string name="badge_first_review_desc">Complete your first SRS review</string>
+    <string name="badge_review_streak">Review Streak</string>
+    <string name="badge_review_streak_desc">Review cards 7 days in a row</string>
+    <string name="badge_cards_mastered">Cards Mastered</string>
+    <string name="badge_cards_mastered_desc">Master 50 flashcards</string>
+    <string name="badge_pomodoro_first">First Pomodoro</string>
+    <string name="badge_pomodoro_first_desc">Complete your first Pomodoro session</string>
+    <string name="badge_pomodoro_ten">Pomodoro Pro</string>
+    <string name="badge_pomodoro_ten_desc">Complete 10 Pomodoro sessions</string>
 </resources>

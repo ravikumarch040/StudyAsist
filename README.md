@@ -1,6 +1,12 @@
 # StudyAsist
 
-Personal study timetable app for Android (Kotlin + Jetpack Compose).
+**The complete AI-powered study companion for students.**
+
+Scan your textbooks, build a Q&A bank, practice with flashcards, track progress with spaced repetition, and ace your exams — all in one app.
+
+**Scan -> Practice -> Track -> Improve**
+
+Built with Kotlin + Jetpack Compose + Material 3.
 
 ## Build
 
@@ -74,11 +80,59 @@ Personal study timetable app for Android (Kotlin + Jetpack Compose).
 
 - Full translations for **English** (base), **Hindi**, **Spanish**, **French**, and **German** (457 strings each).
 
+### Spaced Repetition & Flashcards
+
+- **SM-2 algorithm:** Adaptive scheduling based on your performance; review cards at optimal intervals.
+- **Daily review:** Card-based review session with Again/Hard/Good/Easy ratings.
+- **Flashcards:** Tinder-style swipe interface with card flip animation; swipe right for correct, left for wrong.
+- **SRS integration:** All Q&A cards are automatically scheduled for review.
+
+### Pomodoro Timer
+
+- **Focus timer:** Configurable focus/break durations with animated circular countdown.
+- **Session tracking:** Logs completed sessions to database; shows daily total focus time.
+- **Auto-cycling:** Focus -> Short Break -> Focus -> Short Break -> Long Break.
+
+### AI Features
+
+- **AI study plans:** Gemini-powered personalized daily study plan generation based on goals and performance.
+- **AI tutor chat:** Conversational AI tutor with context-aware responses and chat history.
+- **PDF import:** Extract Q&A from PDF documents via PdfRenderer + OCR.
+
+### Widgets
+
+- **Schedule widget:** Today's upcoming activities at a glance.
+- **Streak widget:** Study streak counter.
+- **Quick review widget:** Due card count with one-tap review launch.
+- **Countdown widget:** Days until next exam.
+
+### UI Enhancements
+
+- **Bottom navigation:** 5-tab layout (Home, Timetable, Study, Goals, More).
+- **Dynamic theming:** Material You wallpaper-based colors on Android 12+.
+- **11 themes:** Including Glassmorphism, High Contrast, and Dynamic.
+- **Onboarding:** 4-page guided introduction for new users.
+- **Confetti & animations:** Celebration effects for milestones.
+- **Color psychology:** Activity types use research-backed color associations.
+- **Accessibility:** Font scaling, haptic feedback, high contrast, color-blind mode.
+
+### Market Features
+
+- **Shareable assessments:** Generate challenge codes to share with friends.
+- **Smart notifications:** Forgetting curve alerts and motivational nudges.
+- **Timetable templates:** Pre-built schedules for common use cases.
+- **Freemium-ready:** License architecture prepared for future monetization.
+
+### Play Store Keywords
+
+`study planner` `exam prep` `AI tutor` `flashcard` `spaced repetition` `focus timer` `pomodoro` `Q&A bank` `OCR study` `assessment practice`
+
 ## Planned / Future
 
-- **Spaced repetition:** SM-2 algorithm for scheduling review sessions based on weak topics.
-- **Leaderboards:** Local or optional cloud leaderboards for score comparison.
-- **Integration tests:** Full end-to-end suite covering scan → parse → assess → grade → result flows; OCR dataset regression tests.
+- **Wear OS companion:** Pomodoro timer, flashcard review, streak complication.
+- **Leaderboards:** Optional cloud leaderboards for score comparison.
+- **Integration tests:** Full end-to-end suite covering scan → parse → assess → grade → result flows.
+- **Offline AI:** On-device Gemini Nano for basic operations without internet.
 
 ---
 

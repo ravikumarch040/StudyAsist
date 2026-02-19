@@ -10,6 +10,13 @@ object NavRoutes {
     const val DICTATE = "dictate"
     const val EXPLAIN = "explain"
     const val SOLVE = "solve"
+    const val STUDY_HUB = "study_hub"
+    const val MORE_HUB = "more_hub"
+    const val DAILY_REVIEW = "daily_review"
+    const val FLASHCARD = "flashcard"
+    const val POMODORO = "pomodoro"
+    const val TUTOR_CHAT = "tutor_chat"
+    const val STUDY_PLAN = "study_plan"
 
     const val GOAL_LIST = "goal_list"
     const val GOAL_DETAIL = "goal_detail/{goalId}"
@@ -30,6 +37,7 @@ object NavRoutes {
     const val MANUAL_REVIEW_LIST = "manual_review_list"
     const val MANUAL_OVERRIDE = "manual_override/{attemptId}"
     const val ADD_REVISION = "add_revision/{subject}/{chapter}"
+    const val USER_GUIDE = "user_guide"
 
     fun timetableDetail(timetableId: Long) = "timetable_detail/$timetableId"
     fun activityEdit(timetableId: Long, activityId: Long) = "activity_edit/$timetableId/$activityId"

@@ -241,4 +241,92 @@ class SettingsRepository @Inject constructor(
     val userNameFlow: Flow<String> = dataStore.getPreferencesFlow().map {
         it[dataStore.userName] ?: ""
     }
+
+    // ── Onboarding ───────────────────────────────────────────────────────────
+
+    val onboardingCompletedFlow: Flow<Boolean> = dataStore.getPreferencesFlow().map {
+        it[dataStore.onboardingCompleted] ?: false
+    }
+
+    suspend fun setOnboardingCompleted(completed: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.onboardingCompleted] = completed }
+    }
+
+    // ── Accessibility ────────────────────────────────────────────────────────
+
+    val fontScaleFlow: Flow<Float> = dataStore.getPreferencesFlow().map {
+        (it[dataStore.fontScale] ?: "1.0").toFloatOrNull() ?: 1.0f
+    }
+
+    suspend fun setFontScale(scale: Float) {
+        dataStore.dataStore.edit { it[dataStore.fontScale] = scale.toString() }
+    }
+
+    val hapticEnabledFlow: Flow<Boolean> = dataStore.getPreferencesFlow().map {
+        it[dataStore.hapticEnabled] ?: true
+    }
+
+    suspend fun setHapticEnabled(enabled: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.hapticEnabled] = enabled }
+    }
+
+    val highContrastModeFlow: Flow<Boolean> = dataStore.getPreferencesFlow().map {
+        it[dataStore.highContrastMode] ?: false
+    }
+
+    suspend fun setHighContrastMode(enabled: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.highContrastMode] = enabled }
+    }
+
+    val colorBlindModeFlow: Flow<Boolean> = dataStore.getPreferencesFlow().map {
+        it[dataStore.colorBlindMode] ?: false
+    }
+
+    suspend fun setColorBlindMode(enabled: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.colorBlindMode] = enabled }
+    }
+
+    // ── Pomodoro ─────────────────────────────────────────────────────────────
+
+    val pomodoroFocusMinutesFlow: Flow<Int> = dataStore.getPreferencesFlow().map {
+        it[dataStore.pomodoroFocusMinutes] ?: 25
+    }
+
+    suspend fun setPomodoroFocusMinutes(minutes: Int) {
+        dataStore.dataStore.edit { it[dataStore.pomodoroFocusMinutes] = minutes }
+    }
+
+    val pomodoroShortBreakMinutesFlow: Flow<Int> = dataStore.getPreferencesFlow().map {
+        it[dataStore.pomodoroShortBreakMinutes] ?: 5
+    }
+
+    suspend fun setPomodoroShortBreakMinutes(minutes: Int) {
+        dataStore.dataStore.edit { it[dataStore.pomodoroShortBreakMinutes] = minutes }
+    }
+
+    val pomodoroLongBreakMinutesFlow: Flow<Int> = dataStore.getPreferencesFlow().map {
+        it[dataStore.pomodoroLongBreakMinutes] ?: 15
+    }
+
+    suspend fun setPomodoroLongBreakMinutes(minutes: Int) {
+        dataStore.dataStore.edit { it[dataStore.pomodoroLongBreakMinutes] = minutes }
+    }
+
+    val pomodoroAutoStartBreaksFlow: Flow<Boolean> = dataStore.getPreferencesFlow().map {
+        it[dataStore.pomodoroAutoStartBreaks] ?: false
+    }
+
+    suspend fun setPomodoroAutoStartBreaks(enabled: Boolean) {
+        dataStore.dataStore.edit { it[dataStore.pomodoroAutoStartBreaks] = enabled }
+    }
+
+    // ── Dashboard ────────────────────────────────────────────────────────────
+
+    val dashboardCardOrderFlow: Flow<String> = dataStore.getPreferencesFlow().map {
+        it[dataStore.dashboardCardOrder] ?: ""
+    }
+
+    suspend fun setDashboardCardOrder(order: String) {
+        dataStore.dataStore.edit { it[dataStore.dashboardCardOrder] = order }
+    }
 }
