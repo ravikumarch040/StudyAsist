@@ -4,7 +4,10 @@ import android.content.Context
 import com.studyasist.R
 import com.studyasist.data.local.entity.QA
 import com.studyasist.data.local.entity.QuestionType
+import com.studyasist.data.repository.GeminiRepository
+import com.studyasist.data.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
@@ -14,20 +17,23 @@ enum class GradeLevel { FULL, PARTIAL, WRONG }
 
 @Singleton
 class ObjectiveGradingService @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val geminiRepository: GeminiRepository,
+    private val settingsRepository: SettingsRepository
 ) {
 
-    fun grade(
+    suspend fun grade(
         answers: List<Pair<Long, String?>>,
         qaMap: Map<Long, QA>
     ): GradingResult {
+        val apiKey = settingsRepository.settingsFlow.first().geminiApiKey
         var score = 0f
         val maxScore = answers.size.toFloat()
         val details = mutableListOf<QuestionGrade>()
 
         for ((qaId, userAnswer) in answers) {
             val qa = qaMap[qaId] ?: continue
-            val (level, feedback) = gradeOne(qa, userAnswer?.trim()?.takeIf { it.isNotBlank() } ?: "")
+            val (level, feedback) = gradeOne(qa, userAnswer?.trim()?.takeIf { it.isNotBlank() } ?: "", apiKey)
             score += when (level) {
                 GradeLevel.FULL -> 1f
                 GradeLevel.PARTIAL -> 0.5f
@@ -72,11 +78,11 @@ class ObjectiveGradingService @Inject constructor(
         )
     }
 
-    private fun gradeOne(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
+    private suspend fun gradeOne(qa: QA, userAnswer: String, apiKey: String): Pair<GradeLevel, String> {
         return when (qa.questionType) {
             QuestionType.MCQ -> gradeMcq(qa, userAnswer)
             QuestionType.TRUE_FALSE -> gradeTrueFalse(qa, userAnswer)
-            QuestionType.NUMERIC -> gradeNumeric(qa, userAnswer)
+            QuestionType.NUMERIC -> gradeNumeric(qa, userAnswer, apiKey)
             QuestionType.FILL_BLANK, QuestionType.SHORT, QuestionType.ESSAY -> gradeText(qa, userAnswer)
             else -> gradeText(qa, userAnswer)
         }
@@ -121,17 +127,22 @@ class ObjectiveGradingService @Inject constructor(
         return if (correct) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_incorrect)
     }
 
-    private fun gradeNumeric(qa: QA, userAnswer: String): Pair<GradeLevel, String> {
+    private suspend fun gradeNumeric(qa: QA, userAnswer: String, apiKey: String): Pair<GradeLevel, String> {
         val modelNum = parseNumber(qa.answerText)
         val userNum = parseNumber(userAnswer)
-        if (modelNum == null || userNum == null) {
-            val norm = normalize(qa.answerText) == normalize(userAnswer)
-            return if (norm) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_incorrect)
+        if (modelNum != null && userNum != null) {
+            val tolerance = 0.01
+            val diff = kotlin.math.abs(modelNum - userNum)
+            val correct = diff <= tolerance
+            return if (correct) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_expected_numeric, modelNum.toString())
         }
-        val tolerance = 0.01
-        val diff = kotlin.math.abs(modelNum - userNum)
-        val correct = diff <= tolerance
-        return if (correct) GradeLevel.FULL to context.getString(R.string.feedback_correct) else GradeLevel.WRONG to context.getString(R.string.feedback_expected_numeric, modelNum.toString())
+        val norm = normalize(qa.answerText) == normalize(userAnswer)
+        if (norm) return GradeLevel.FULL to context.getString(R.string.feedback_correct)
+        if (apiKey.isNotBlank()) {
+            val geminiResult = geminiRepository.checkMathEquivalence(apiKey, qa.answerText, userAnswer).getOrNull()
+            if (geminiResult == true) return GradeLevel.FULL to context.getString(R.string.feedback_correct)
+        }
+        return GradeLevel.WRONG to context.getString(R.string.feedback_expected_numeric, qa.answerText.take(50))
     }
 
     /** Token overlap thresholds: >=0.86 full credit, 0.68–0.86 partial, <0.68 wrong */

@@ -148,6 +148,32 @@ class GeminiRepository @Inject constructor() {
         val feedback: String
     )
 
+    /**
+     * Checks if model and student answers are mathematically equivalent (e.g. "1/2" vs "0.5").
+     * Returns true if equivalent, false if not. Use for numeric and math short-answer grading.
+     */
+    suspend fun checkMathEquivalence(
+        apiKey: String,
+        modelAnswer: String,
+        studentAnswer: String
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
+        if (apiKey.isBlank()) return@withContext Result.failure(IllegalStateException("API key not set"))
+        val modelTrim = modelAnswer.trim().takeIf { it.isNotBlank() } ?: return@withContext Result.success(false)
+        val studentTrim = studentAnswer.trim().takeIf { it.isNotBlank() } ?: return@withContext Result.success(false)
+        try {
+            val prompt = """
+                Are these two answers mathematically equivalent? Answer ONLY with YES or NO, nothing else.
+                Model answer: $modelTrim
+                Student answer: $studentTrim
+            """.trimIndent()
+            generateContent(apiKey, prompt).mapCatching { text ->
+                text.trim().uppercase().startsWith("YES")
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     private fun parseGeminiError(body: String): String? {
         if (body.isBlank()) return null
         return try {

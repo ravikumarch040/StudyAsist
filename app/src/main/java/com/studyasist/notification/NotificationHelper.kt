@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.studyasist.MainActivity
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
@@ -62,12 +63,14 @@ object NotificationHelper {
     fun showExamGoalAlert(
         context: Context,
         notificationId: Int,
+        goalId: Long,
         goalName: String,
         daysRemaining: Int,
         percentComplete: Int
     ) {
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(EXTRA_GOAL_ID, goalId)
         }
         val pending = PendingIntent.getActivity(
             context,

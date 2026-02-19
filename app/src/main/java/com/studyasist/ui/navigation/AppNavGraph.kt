@@ -1,7 +1,11 @@
 package com.studyasist.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.StateFlow
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -55,8 +59,19 @@ import com.studyasist.ui.manualreview.ManualOverrideViewModel
 
 @Composable
 fun AppNavGraph(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    pendingGoalIdFlow: StateFlow<Long?>? = null,
+    onPendingGoalIdConsumed: () -> Unit = {}
 ) {
+    val pendingGoalId by (pendingGoalIdFlow ?: kotlinx.coroutines.flow.flowOf<Long?>(null)).collectAsState(initial = null)
+    LaunchedEffect(pendingGoalId) {
+        pendingGoalId?.let { goalId ->
+            navController.navigate(NavRoutes.goalDetail(goalId)) {
+                popUpTo(NavRoutes.HOME) { inclusive = false }
+            }
+            onPendingGoalIdConsumed()
+        }
+    }
     NavHost(
         navController = navController,
         startDestination = NavRoutes.HOME

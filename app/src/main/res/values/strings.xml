@@ -304,6 +304,8 @@
     <string name="goal_not_found">Goal not found</string>
     <string name="recent_attempts">Recent attempts</string>
     <string name="target_hours_display">Target: %1$d h</string>
+    <string name="last_practiced_today">Last practiced today</string>
+    <string name="last_practiced_days_ago_format">Last practiced %1$d days ago</string>
     <string name="err_no_text_to_read">No text to read. Extract text first.</string>
     <string name="err_enter_problem">Enter or capture a problem to solve</string>
     <string name="err_enter_text_explain">Enter or capture text to explain</string>

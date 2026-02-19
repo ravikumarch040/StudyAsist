@@ -29,6 +29,7 @@ const val CHANNEL_ID_FOCUS_GUARD = "focus_guard"
 const val CHANNEL_NAME_FOCUS_GUARD = "Focus guard"
 const val NOTIFICATION_ID_FOCUS_GUARD = 9000
 const val NOTIFICATION_ID_FOCUS_ALERT = 9001
+const val EXTRA_GOAL_ID = "goal_id"
 const val CHANNEL_ID_EXAM_GOAL_ALERT = "exam_goal_alert"
 const val CHANNEL_NAME_EXAM_GOAL_ALERT = "Exam Goal Alert"
 const val NOTIFICATION_ID_EXAM_GOAL_ALERT_BASE = 9100

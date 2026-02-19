@@ -38,6 +38,7 @@ class ExamGoalAlertWorker @AssistedInject constructor(
                 NotificationHelper.showExamGoalAlert(
                     context = applicationContext,
                     notificationId = notificationId,
+                    goalId = goal.id,
                     goalName = goal.name,
                     daysRemaining = daysRemaining.coerceAtLeast(0),
                     percentComplete = metrics.percentComplete.toInt().coerceIn(0, 100)

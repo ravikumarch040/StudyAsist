@@ -1,6 +1,7 @@
 package com.studyasist
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,20 +18,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.activity.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.studyasist.ui.MainViewModel
 import com.studyasist.ui.navigation.AppNavGraph
 import com.studyasist.ui.theme.StudyAsistTheme
-import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val mainViewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        mainViewModel.setPendingGoalIdFromIntent(intent)
         setContent {
-            val viewModel: MainViewModel = viewModel()
-            val darkMode by viewModel.darkModeFlow.collectAsState(initial = "system")
+            val darkMode by mainViewModel.darkModeFlow.collectAsState(initial = "system")
             val isSystemDark = isSystemInDarkTheme()
             val darkTheme = when (darkMode) {
                 "dark" -> true
@@ -50,9 +53,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AppNavGraph()
+                    AppNavGraph(
+                        pendingGoalIdFlow = mainViewModel.pendingGoalIdForDeepLink,
+                        onPendingGoalIdConsumed = mainViewModel::clearPendingGoalId
+                    )
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        mainViewModel.setPendingGoalIdFromIntent(intent)
     }
 }

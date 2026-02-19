@@ -46,7 +46,9 @@ data class AssessmentRunUiState(
 
 data class QuestionWithAnswer(
     val qa: QA,
-    val userAnswer: String = ""
+    val userAnswer: String = "",
+    val answerImageUri: String? = null,
+    val answerVoiceUri: String? = null
 )
 
 @HiltViewModel
@@ -170,7 +172,7 @@ class AssessmentRunViewModel @Inject constructor(
             _uiState.update { it.copy(isExtractingFromImage = true, errorMessage = null) }
             extractTextFromImage(context, uri)
                 .onSuccess { text ->
-                    updateAnswer(index, text.trim())
+                    updateAnswerWithImageUri(index, text.trim(), uri.toString())
                 }
                 .onFailure { e ->
                     _uiState.update {
@@ -178,6 +180,15 @@ class AssessmentRunViewModel @Inject constructor(
                     }
                 }
             _uiState.update { it.copy(isExtractingFromImage = false) }
+        }
+    }
+
+    private fun updateAnswerWithImageUri(index: Int, answer: String, imageUri: String) {
+        _uiState.update { state ->
+            if (index !in state.questions.indices) return@update state
+            val updated = state.questions.toMutableList()
+            updated[index] = updated[index].copy(userAnswer = answer, answerImageUri = imageUri)
+            state.copy(questions = updated)
         }
     }
 
@@ -192,7 +203,9 @@ class AssessmentRunViewModel @Inject constructor(
             val answers = state.questions.map { q ->
                 AttemptRepository.AttemptAnswerInput(
                     qaId = q.qa.id,
-                    answerText = q.userAnswer.takeIf { it.isNotBlank() }
+                    answerText = q.userAnswer.takeIf { it.isNotBlank() },
+                    answerImageUri = q.answerImageUri,
+                    answerVoiceUri = q.answerVoiceUri
                 )
             }
             attemptRepository.saveAnswers(state.attemptId, answers)

@@ -386,6 +386,15 @@ fun GoalDetailScreen(
                                 modifier = Modifier.padding(top = 4.dp)
                             )
                         }
+                        progress.lastPracticedDaysAgo?.let { days ->
+                            Text(
+                                if (days == 0) stringResource(R.string.last_practiced_today)
+                                else stringResource(R.string.last_practiced_days_ago_format, days),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
                     }
                 }
             }

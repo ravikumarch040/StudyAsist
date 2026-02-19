@@ -51,7 +51,9 @@ data class SubjectChapterProgress(
     val practiced: Int,
     val total: Int,
     val percent: Float,
-    val targetHours: Int? = null
+    val targetHours: Int? = null,
+    /** Days since last practice (attempt) that included this subject/chapter; null if never practiced */
+    val lastPracticedDaysAgo: Int? = null
 )
 
 data class RecentAttemptSummary(
@@ -119,7 +121,21 @@ class GoalDashboardRepository @Inject constructor(
             attemptAnswerDao.getByAttemptIds(attemptIds).map { it.qaId }.toSet()
         }
         val practicedQas = if (practicedQaIds.isEmpty()) emptyList() else qaDao.getByIds(practicedQaIds.toList())
-        val practicedBySubjectChapter = practicedQas.groupingBy { it.subject to (it.chapter ?: "") }.eachCount()
+        val practicedBySubjectChapter = practicedQas.groupingBy { (it.subject ?: "") to (it.chapter ?: "") }.eachCount()
+        val qaIdToSubjectChapter = practicedQas.associate { it.id to ((it.subject ?: "") to (it.chapter ?: "")) }
+        val allAttempts = assessments.flatMap { attemptDao.getByAssessmentIdOnce(it.id) }
+        val attemptIdToStartedAt = allAttempts.associate { it.id to it.startedAt }
+        val lastPracticedAtBySubjectChapter = if (attemptIds.isEmpty()) emptyMap() else {
+            val attemptAnswers = attemptAnswerDao.getByAttemptIds(attemptIds)
+            val map = mutableMapOf<Pair<String, String>, Long>()
+            for (aa in attemptAnswers) {
+                val pair = qaIdToSubjectChapter[aa.qaId] ?: continue
+                val startedAt = attemptIdToStartedAt[aa.attemptId] ?: continue
+                val current = map[pair] ?: 0L
+                if (startedAt > current) map[pair] = startedAt
+            }
+            map
+        }
 
         val subjectProgress = items.map { item ->
             val chapters = item.chapterList.split(",").map { it.trim() }.filter { it.isNotBlank() }
@@ -134,13 +150,23 @@ class GoalDashboardRepository @Inject constructor(
             }
             val itemPercent = if (itemTotal > 0) (itemPracticed.toFloat() / itemTotal * 100f).coerceIn(0f, 100f) else 0f
             val chapterLabel = if (chapters.isEmpty()) context.getString(R.string.chapter_all) else chapters.joinToString(", ")
+            val lastPracticedDaysAgo = if (chapters.isEmpty()) {
+                lastPracticedAtBySubjectChapter.entries
+                    .filter { it.key.first == item.subject }
+                    .maxOfOrNull { it.value }
+                    ?.let { millis -> ((System.currentTimeMillis() - millis) / (24 * 60 * 60 * 1000L)).toInt() }
+            } else {
+                chapters.mapNotNull { ch -> lastPracticedAtBySubjectChapter[item.subject to ch] }.maxOrNull()
+                    ?.let { millis -> ((System.currentTimeMillis() - millis) / (24 * 60 * 60 * 1000L)).toInt() }
+            }
             SubjectChapterProgress(
                 subject = item.subject,
                 chapterLabel = chapterLabel,
                 practiced = itemPracticed,
                 total = itemTotal,
                 percent = itemPercent,
-                targetHours = item.targetHours
+                targetHours = item.targetHours,
+                lastPracticedDaysAgo = lastPracticedDaysAgo
             )
         }
 
