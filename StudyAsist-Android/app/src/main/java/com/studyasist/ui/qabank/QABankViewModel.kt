@@ -33,7 +33,8 @@ data class QABankUiState(
 @HiltViewModel
 class QABankViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val qaBankRepository: QABankRepository
+    private val qaBankRepository: QABankRepository,
+    private val studentClassRepository: com.studyasist.data.repository.StudentClassRepository
 ) : ViewModel() {
 
     private val _filterSubject = MutableStateFlow<String?>(null)
@@ -88,7 +89,7 @@ class QABankViewModel @Inject constructor(
 
     private fun loadDistinctValues(subjectFilter: String? = null) {
         viewModelScope.launch {
-            _distinctSubjects.value = qaBankRepository.getDistinctSubjects()
+            _distinctSubjects.value = studentClassRepository.getSubjectsForDropdown()
             _distinctChapters.value = subjectFilter?.let {
                 qaBankRepository.getDistinctChaptersForSubject(it)
             } ?: qaBankRepository.getDistinctChapters()

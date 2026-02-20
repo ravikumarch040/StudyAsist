@@ -59,6 +59,18 @@ class SettingsDataStore @Inject constructor(
     val authAccessToken = stringPreferencesKey("auth_access_token")
     val authUserEmail = stringPreferencesKey("auth_user_email")
 
+    // Student class profile
+    val studentStandard = stringPreferencesKey("student_standard")
+    val studentBoard = stringPreferencesKey("student_board")
+    val studentSchool = stringPreferencesKey("student_school")
+    val studentCity = stringPreferencesKey("student_city")
+    val studentState = stringPreferencesKey("student_state")
+    val studentSubjects = stringPreferencesKey("student_subjects") // JSON array of strings
+
+    // Backup check throttle: once per day
+    val lastBackupCheckDate = stringPreferencesKey("last_backup_check_date") // yyyy-MM-dd
+    val lastBackupCheckResult = booleanPreferencesKey("last_backup_check_result") // true = not setup
+
     val dataStore: DataStore<Preferences> get() = prefs
 
     fun getPreferencesFlow(): Flow<Preferences> = prefs.data

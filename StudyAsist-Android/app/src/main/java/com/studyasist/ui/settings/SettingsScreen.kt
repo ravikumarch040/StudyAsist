@@ -28,6 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -80,7 +82,10 @@ import kotlinx.coroutines.withContext
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBack: () -> Unit,
-    onUserGuide: () -> Unit = {}
+    onUserGuide: () -> Unit = {},
+    onStudentClass: () -> Unit = {},
+    onOnlineResources: () -> Unit = {},
+    onDownloadedDocs: () -> Unit = {}
 ) {
     val settings by viewModel.settings.collectAsState(
         initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, true, true, "system", AppSettings.DEFAULT_EXAM_ALERT_DAYS, AppSettings.DEFAULT_EXAM_ALERT_PERCENT)
@@ -320,9 +325,9 @@ fun SettingsScreen(
                 }
             }
 
-            Text(stringResource(R.string.user_guide), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.student_class_details), style = MaterialTheme.typography.titleMedium)
             androidx.compose.material3.Card(
-                onClick = onUserGuide,
+                onClick = onStudentClass,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
@@ -332,7 +337,7 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        stringResource(R.string.user_guide),
+                        stringResource(R.string.student_class_details),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
                     )
@@ -344,7 +349,65 @@ fun SettingsScreen(
                 }
             }
             Text(
-                stringResource(R.string.user_guide_hint),
+                stringResource(R.string.student_class_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(stringResource(R.string.online_resources), style = MaterialTheme.typography.titleMedium)
+            androidx.compose.material3.Card(
+                onClick = onOnlineResources,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.online_resources),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        Icons.Filled.Download,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            Text(
+                stringResource(R.string.online_resources_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Text(stringResource(R.string.downloaded_docs), style = MaterialTheme.typography.titleMedium)
+            androidx.compose.material3.Card(
+                onClick = onDownloadedDocs,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.downloaded_docs),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        Icons.Filled.FolderOpen,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            Text(
+                stringResource(R.string.downloaded_docs_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -894,6 +957,47 @@ fun SettingsScreen(
                         color = if (msg == stringResource(R.string.restore_successful)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         maxLines = Int.MAX_VALUE
                     )
+                }
+            }
+
+            // User Guide - at bottom
+            Spacer(modifier = Modifier.padding(8.dp))
+            Text(stringResource(R.string.user_guide), style = MaterialTheme.typography.titleMedium)
+            androidx.compose.material3.Card(
+                onClick = onUserGuide,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.user_guide),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        Icons.Filled.AutoStories,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            Text(
+                stringResource(R.string.user_guide_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            // Logout - when signed in
+            if (accountSignedIn) {
+                Button(
+                    onClick = { viewModel.signOutFromAccount() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.logout))
                 }
             }
         }

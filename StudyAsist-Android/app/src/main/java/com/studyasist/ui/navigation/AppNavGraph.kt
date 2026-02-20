@@ -81,6 +81,10 @@ import com.studyasist.ui.manualreview.ManualOverrideScreen
 import com.studyasist.ui.manualreview.ManualOverrideViewModel
 import com.studyasist.ui.leaderboard.LeaderboardScreen
 import com.studyasist.ui.leaderboard.LeaderboardViewModel
+import com.studyasist.ui.onlineresources.OnlineResourcesScreen
+import com.studyasist.ui.onlineresources.OnlineResourcesViewModel
+import com.studyasist.ui.downloadeddocs.DownloadedDocsScreen
+import com.studyasist.ui.downloadeddocs.DownloadedDocsViewModel
 
 sealed class BottomNavItem(
     val route: String,
@@ -184,7 +188,8 @@ fun AppNavGraph(
                     onResults = { navController.navigate(NavRoutes.RESULT_LIST) },
                     onResultClick = { attemptId ->
                         navController.navigate(NavRoutes.assessmentResult(attemptId))
-                    }
+                    },
+                    onBackupSetupClick = { navController.navigate(NavRoutes.SETTINGS) }
                 )
             }
 
@@ -258,7 +263,34 @@ fun AppNavGraph(
                 SettingsScreen(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() },
-                    onUserGuide = { navController.navigate(NavRoutes.USER_GUIDE) }
+                    onUserGuide = { navController.navigate(NavRoutes.USER_GUIDE) },
+                    onStudentClass = { navController.navigate(NavRoutes.STUDENT_CLASS_DETAILS) },
+                    onOnlineResources = { navController.navigate(NavRoutes.ONLINE_RESOURCES) },
+                    onDownloadedDocs = { navController.navigate(NavRoutes.DOWNLOADED_DOCS) }
+                )
+            }
+
+            composable(NavRoutes.STUDENT_CLASS_DETAILS) {
+                val viewModel: com.studyasist.ui.studentclass.StudentClassViewModel = hiltViewModel()
+                com.studyasist.ui.studentclass.StudentClassScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(NavRoutes.ONLINE_RESOURCES) {
+                val viewModel: OnlineResourcesViewModel = hiltViewModel()
+                OnlineResourcesScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(NavRoutes.DOWNLOADED_DOCS) {
+                val viewModel: DownloadedDocsViewModel = hiltViewModel()
+                DownloadedDocsScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
                 )
             }
 
@@ -291,7 +323,9 @@ fun AppNavGraph(
                     onManualReview = { navController.navigate(NavRoutes.MANUAL_REVIEW_LIST) },
                     onLeaderboard = { navController.navigate(NavRoutes.LEADERBOARD) },
                     onQABank = { navController.navigate(NavRoutes.QA_BANK) },
-                    onAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) }
+                    onAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
+                    onOnlineResources = { navController.navigate(NavRoutes.ONLINE_RESOURCES) },
+                    onDownloadedDocs = { navController.navigate(NavRoutes.DOWNLOADED_DOCS) }
                 )
             }
 

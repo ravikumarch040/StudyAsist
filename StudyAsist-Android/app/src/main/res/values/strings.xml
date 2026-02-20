@@ -678,6 +678,31 @@
     <string name="sync_success">Sync successful</string>
     <string name="sync_failed">Sync failed: %1$s</string>
 
+    <!-- Student Class Profile -->
+    <string name="student_class_details">Class Details</string>
+    <string name="student_class_hint">Set your class details for personalized subject lists</string>
+    <string name="standard">Standard</string>
+    <string name="board">Board</string>
+    <string name="school">School (optional)</string>
+    <string name="city">City (optional)</string>
+    <string name="state">State (optional)</string>
+    <string name="subjects">Subjects</string>
+    <string name="add_subject_hint">Type and add your subjects</string>
+    <string name="backup_not_setup">Backup not set up. Your data could be lost. Tap to set up.</string>
+    <string name="online_resources">Online Resources</string>
+    <string name="online_resources_hint">Find textbooks and sample papers</string>
+    <string name="find_books">Find Books</string>
+    <string name="find_sample_papers">Find Sample Papers</string>
+    <string name="search">Search</string>
+    <string name="searching">Searching…</string>
+    <string name="downloaded_docs">Downloaded Documents</string>
+    <string name="downloaded_docs_hint">Books saved in StudyAsist folder</string>
+    <string name="no_downloads">No downloaded files yet</string>
+    <string name="open">Open</string>
+    <string name="download">Download</string>
+    <string name="preview">Preview</string>
+    <string name="logout">Logout</string>
+
     <!-- Leaderboard -->
     <string name="leaderboard">Leaderboard</string>
     <string name="leaderboard_subtitle">Top scores and your rank</string>

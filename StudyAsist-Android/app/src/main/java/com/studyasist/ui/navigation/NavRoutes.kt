@@ -39,6 +39,9 @@ object NavRoutes {
     const val LEADERBOARD = "leaderboard"
     const val ADD_REVISION = "add_revision/{subject}/{chapter}"
     const val USER_GUIDE = "user_guide"
+    const val STUDENT_CLASS_DETAILS = "student_class_details"
+    const val ONLINE_RESOURCES = "online_resources"
+    const val DOWNLOADED_DOCS = "downloaded_docs"
 
     fun timetableDetail(timetableId: Long) = "timetable_detail/$timetableId"
     fun activityEdit(timetableId: Long, activityId: Long) = "activity_edit/$timetableId/$activityId"

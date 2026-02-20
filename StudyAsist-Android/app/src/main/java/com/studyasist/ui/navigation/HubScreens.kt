@@ -20,7 +20,9 @@ import androidx.compose.material.icons.filled.EmojiObjects
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Timer
@@ -111,7 +113,9 @@ fun MoreHubScreen(
     onManualReview: () -> Unit,
     onLeaderboard: () -> Unit,
     onQABank: () -> Unit,
-    onAssessments: () -> Unit
+    onAssessments: () -> Unit,
+    onOnlineResources: () -> Unit = {},
+    onDownloadedDocs: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -137,6 +141,8 @@ fun MoreHubScreen(
             item { HubMenuItem(Icons.Default.Star, stringResource(R.string.results), stringResource(R.string.view_attempt_history), onResults) }
             item { HubMenuItem(Icons.Default.Star, stringResource(R.string.manual_review), stringResource(R.string.manual_review_list), onManualReview) }
             item { HubMenuItem(Icons.Default.EmojiEvents, stringResource(R.string.leaderboard), stringResource(R.string.leaderboard_subtitle), onLeaderboard) }
+            item { HubMenuItem(Icons.Default.Download, stringResource(R.string.online_resources), stringResource(R.string.online_resources_hint), onOnlineResources) }
+            item { HubMenuItem(Icons.Default.FolderOpen, stringResource(R.string.downloaded_docs), stringResource(R.string.downloaded_docs_hint), onDownloadedDocs) }
             item { HubMenuItem(Icons.Default.Settings, stringResource(R.string.settings), "", onSettings) }
         }
     }

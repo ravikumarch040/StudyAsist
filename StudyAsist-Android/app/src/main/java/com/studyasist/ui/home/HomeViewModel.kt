@@ -29,6 +29,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 data class GoalProgressSummary(
@@ -38,6 +41,7 @@ data class GoalProgressSummary(
 )
 
 data class HomeUiState(
+    val backupNotSetup: Boolean = false,
     val activeTimetable: TimetableEntity? = null,
     val todayActivities: List<ActivityEntity> = emptyList(),
     val currentActivityId: Long? = null,
@@ -86,6 +90,32 @@ class HomeViewModel @Inject constructor(
             settingsRepository.userNameFlow.collect { _userName.value = it }
         }
         viewModelScope.launch {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            combine(
+                settingsRepository.settingsFlow,
+                goalRepository.getAllActiveGoals().map { it.isNotEmpty() },
+                settingsRepository.backupCheckCacheFlow
+            ) { settings, hasGoals, cached ->
+                Triple(settings, hasGoals, cached)
+            }.collect { (settings, hasGoals, cached) ->
+                if (!hasGoals) {
+                    _uiState.value = _uiState.value.copy(backupNotSetup = false)
+                    return@collect
+                }
+                val notSetup = when (settings.cloudBackupTarget) {
+                    "folder" -> settings.cloudBackupFolderUri.isNullOrBlank()
+                    "google_drive" -> false
+                    else -> settings.cloudBackupFolderUri.isNullOrBlank()
+                }
+                val today = dateFormat.format(Date())
+                val (lastDate, _) = cached
+                if (lastDate != today) {
+                    settingsRepository.setLastBackupCheck(today, notSetup)
+                }
+                _uiState.value = _uiState.value.copy(backupNotSetup = notSetup)
+            }
+        }
+        viewModelScope.launch {
             loadGoalProgress()
         }
         viewModelScope.launch {
@@ -126,7 +156,8 @@ class HomeViewModel @Inject constructor(
                     topResults = topResults,
                     activeGoalProgress = goalProgress,
                     lastResult = topResults.firstOrNull(),
-                    userName = userName
+                    userName = userName,
+                    backupNotSetup = _uiState.value.backupNotSetup
                 )
             }.collect { _uiState.value = it }
         }

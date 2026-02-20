@@ -174,6 +174,21 @@ class SettingsRepository @Inject constructor(
         dataStore.dataStore.edit { it[dataStore.cloudBackupLastSuccessMillis] = millis }
     }
 
+    /** For backup-check-once-per-day throttle. Emits (lastCheckDate, lastCheckResult). */
+    val backupCheckCacheFlow: Flow<Pair<String?, Boolean?>> = dataStore.getPreferencesFlow().map { prefs ->
+        Pair(
+            prefs[dataStore.lastBackupCheckDate]?.takeIf { it.isNotEmpty() },
+            prefs[dataStore.lastBackupCheckResult]
+        )
+    }
+
+    suspend fun setLastBackupCheck(date: String, result: Boolean) {
+        dataStore.dataStore.edit {
+            it[dataStore.lastBackupCheckDate] = date
+            it[dataStore.lastBackupCheckResult] = result
+        }
+    }
+
     suspend fun getDictateLanguage(): String =
         dataStore.getPreferencesFlow().map { it[dataStore.dictateLanguage] }.first() ?: "en"
 
