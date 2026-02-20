@@ -52,6 +52,7 @@ local.properties
 *.hprof
 
 # Kotlin
+.kotlin/
 *.kotlin_module
 
 # Logs and temp
