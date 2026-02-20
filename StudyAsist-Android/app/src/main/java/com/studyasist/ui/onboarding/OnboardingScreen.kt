@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,8 +30,11 @@ import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material3.Button
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +61,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.studyasist.R
+import com.studyasist.ui.studentclass.BOARD_OPTIONS
+import com.studyasist.ui.studentclass.STANDARD_OPTIONS
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(
@@ -78,11 +84,15 @@ fun OnboardingScreen(
     viewModel: OnboardingViewModel,
     onComplete: (OnboardingResult) -> Unit
 ) {
-    val totalPages = featurePages.size + 1 + 1 + 1 // features + account + backup + name
+    val totalPages = featurePages.size + 1 + 1 + 1 + 1 // features + student class + account + backup + name
 
     val pagerState = rememberPagerState(pageCount = { totalPages })
     val scope = rememberCoroutineScope()
     var userName by remember { mutableStateOf("") }
+    var studentClassStandard by remember { mutableStateOf("10") }
+    var studentClassBoard by remember { mutableStateOf("CBSE") }
+    var studentClassSubjects by remember { mutableStateOf<List<String>>(emptyList()) }
+    var studentClassInput by remember { mutableStateOf("") }
     var backupTarget by remember { mutableStateOf("folder") }
     var backupAuto by remember { mutableStateOf(false) }
     var signInTriggeredFromBackup by remember { mutableStateOf(false) }
@@ -122,14 +132,17 @@ fun OnboardingScreen(
             horizontalArrangement = Arrangement.End
         ) {
             val lastPage = totalPages - 1
-            if (pagerState.currentPage < lastPage) {
+                if (pagerState.currentPage < lastPage) {
                 TextButton(onClick = {
                     val defaultName = if (accountSignedIn) viewModel.getGoogleDisplayName() ?: "" else ""
                     onComplete(OnboardingResult(
                         userName = defaultName.ifBlank { userName },
                         backupTarget = backupTarget,
                         backupAuto = backupAuto,
-                        signedInWithGoogle = accountSignedIn
+                        signedInWithGoogle = accountSignedIn,
+                        studentClassStandard = studentClassStandard,
+                        studentClassBoard = studentClassBoard,
+                        studentClassSubjects = studentClassSubjects
                     ))
                 }) {
                     Text(stringResource(R.string.onboarding_skip))
@@ -143,13 +156,30 @@ fun OnboardingScreen(
         ) { page ->
             when {
                 page < featurePages.size -> OnboardingPageContent(featurePages[page])
-                page == featurePages.size -> OnboardingAccountPage(
+                page == featurePages.size -> OnboardingStudentClassPage(
+                    standard = studentClassStandard,
+                    board = studentClassBoard,
+                    subjects = studentClassSubjects,
+                    subjectInput = studentClassInput,
+                    onStandardChange = { studentClassStandard = it },
+                    onBoardChange = { studentClassBoard = it },
+                    onSubjectInputChange = { studentClassInput = it },
+                    onAddSubject = {
+                        val s = studentClassInput.trim()
+                        if (s.isNotBlank() && s !in studentClassSubjects) {
+                            studentClassSubjects = studentClassSubjects + s
+                            studentClassInput = ""
+                        }
+                    },
+                    onRemoveSubject = { studentClassSubjects = studentClassSubjects - it }
+                )
+                page == featurePages.size + 1 -> OnboardingAccountPage(
                     accountSignedIn = accountSignedIn,
                     signInResult = signInResult,
                     onSignInClick = { googleSignInLauncher.launch(viewModel.getGoogleSignInIntent()) },
                     onClearResult = { viewModel.clearSignInResult() }
                 )
-                page == featurePages.size + 1 -> {
+                page == featurePages.size + 2 -> {
                     LaunchedEffect(Unit) { viewModel.refreshDriveSignInState() }
                     OnboardingBackupPage(
                         backupTarget = backupTarget,
@@ -163,7 +193,7 @@ fun OnboardingScreen(
                         }
                     )
                 }
-                else -> NameCollectionPage(
+                page == featurePages.size + 3 -> NameCollectionPage(
                     userName = userName,
                     onUserNameChange = { userName = it },
                     signedInWithGoogle = accountSignedIn,
@@ -208,7 +238,10 @@ fun OnboardingScreen(
                         userName = userName.ifBlank { viewModel.getGoogleDisplayName() ?: "" },
                         backupTarget = backupTarget,
                         backupAuto = backupAuto,
-                        signedInWithGoogle = accountSignedIn
+                        signedInWithGoogle = accountSignedIn,
+                        studentClassStandard = studentClassStandard,
+                        studentClassBoard = studentClassBoard,
+                        studentClassSubjects = studentClassSubjects
                     ))
                 },
                 modifier = Modifier
@@ -411,6 +444,133 @@ private fun OnboardingBackupPage(
                     checked = backupAuto,
                     onCheckedChange = onAutoChange
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun OnboardingStudentClassPage(
+    standard: String,
+    board: String,
+    subjects: List<String>,
+    subjectInput: String,
+    onStandardChange: (String) -> Unit,
+    onBoardChange: (String) -> Unit,
+    onSubjectInputChange: (String) -> Unit,
+    onAddSubject: () -> Unit,
+    onRemoveSubject: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.School,
+                contentDescription = null,
+                modifier = Modifier.size(56.dp),
+                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Text(
+            text = stringResource(R.string.onboarding_student_class_title),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.onboarding_student_class_desc),
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(stringResource(R.string.standard), style = MaterialTheme.typography.labelMedium)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            STANDARD_OPTIONS.takeLast(4).forEach { opt ->
+                FilterChip(
+                    selected = standard == opt,
+                    onClick = { onStandardChange(opt) },
+                    label = { Text(opt) }
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(stringResource(R.string.board), style = MaterialTheme.typography.labelMedium)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            listOf("CBSE", "ICSE", "State Board", "Other").forEach { opt ->
+                FilterChip(
+                    selected = board == opt,
+                    onClick = { onBoardChange(opt) },
+                    label = { Text(opt) }
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(stringResource(R.string.subjects), style = MaterialTheme.typography.labelMedium)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = subjectInput,
+                onValueChange = onSubjectInputChange,
+                placeholder = { Text(stringResource(R.string.add_subject_hint)) },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+            Button(onClick = onAddSubject) {
+                Text(stringResource(R.string.add_subject))
+            }
+        }
+        if (subjects.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                subjects.forEach { subj ->
+                    AssistChip(
+                        onClick = { onRemoveSubject(subj) },
+                        label = { Text(subj) },
+                        trailingIcon = {
+                            Icon(Icons.Default.Close, contentDescription = null, Modifier.size(18.dp))
+                        }
+                    )
+                }
             }
         }
     }

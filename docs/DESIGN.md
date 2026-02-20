@@ -36,6 +36,11 @@ The following are **implemented** beyond the original Phase 1 scope:
   - Results: sort/filter, manual review, export as PDF/CSV/Excel/image.
   - Exam data backup/restore (separate from main backup).
 - **Localization:** Full translations for English (base), Hindi, Spanish, French, German (457 strings). In-app language selector. `appLocale` in backup/restore.
+- **Student Class Profile:** `StudentClassRepository`; Settings → Student Class Details for standard (1–12), board (CBSE, ICSE, etc.), optional school/city/state, subjects (add/remove chips). All subject dropdowns (Q&A Bank, QA Scan, Assessment Create, Online Resources) use `getSubjectsForDropdown()` (student subjects or Q&A bank fallback).
+- **Online Resources:** Search for PDF/books or sample papers by standard, board, subject; Gemini AI returns top 3–5 results; Preview opens URL; Download saves to Downloads/StudyAsist. More Hub.
+- **Downloaded Documents:** List files from Downloads/StudyAsist; Open uses `Intent.ACTION_VIEW` for book-style viewing. More Hub.
+- **Settings layout:** Sections—Profile, Appearance, Alerts & Notifications, Study & AI, Backup & Sync, About. User Guide and Logout in About section. Online Resources and Downloaded Documents removed from Settings (access via More Hub).
+- **Backup notification:** Home screen INFO banner when backup not set (folder target, no folder URI) and user has at least one goal; checked once per day on app open; tap navigates to Settings. `lastBackupCheckDate` throttle in DataStore.
 
 ---
 
@@ -71,7 +76,7 @@ The following are **implemented** beyond the original Phase 1 scope:
 ┌─────────────────────────────────────────────────────────────────┐
 │                        UI (Compose)                               │
 │  TimetableList | TimetableDetail (Day/Week) | ActivityEdit |      │
-│  Settings | Export/Share/Print dialogs                            │
+│  Settings | StudentClass | OnlineResources | DownloadedDocs | Export/Share/Print │
 └────────────────────────────┬────────────────────────────────────┘
                               │
 ┌────────────────────────────▼────────────────────────────────────┐
@@ -83,7 +88,7 @@ The following are **implemented** beyond the original Phase 1 scope:
 ┌────────────────────────────▼────────────────────────────────────┐
 │  Repositories                                                     │
 │  TimetableRepository | ActivityRepository | SettingsRepository   │
-│  AuthRepository | SyncRepository | LeaderboardRepository | ShareRepository │
+│  StudentClassRepository | AuthRepository | SyncRepository | LeaderboardRepository | ShareRepository │
 │  NotificationScheduler | ExportRepository                        │
 └──────┬─────────────────────┬─────────────────────┬───────────────┘
        │                     │                     │
@@ -180,11 +185,11 @@ The following are **implemented** beyond the original Phase 1 scope:
 | **TimetableList** | List all timetables; FAB “Add”; swipe/action to duplicate, delete, export. |
 | **TimetableDetail** | Day view | Week view; filter by type; weekly analytics; Export CSV/PDF/Excel, Print, Share, Duplicate. |
 | **ActivityEdit** | Add/Edit activity form (day, start/end time, title, type, note, notification toggle, lead time). Overlap warning at save. |
-| **Settings** | Lead time, vibration, user name, TTS voice, focus guard, Backup/Restore, Cloud backup, **Sync (upload/download)** when signed in, Account (Google/Apple sign-in), block overlap, Gemini API key. |
+| **Settings** | Organized in sections: **Profile** (photo, name, Account, Student Class Details), **Appearance** (Language, Dark Mode, Theme), **Alerts & Notifications** (default reminder, vibration, block overlap, exam goal alerts, focus guard), **Study & AI** (name, TTS voice, Gemini API key, AI parsing/grading toggles), **Backup & Sync** (Sync upload/download when signed in, Cloud backup, Backup/Restore, exam data export), **About** (User Guide, Logout when signed in). Online Resources and Downloaded Documents are in More Hub, not Settings. |
 | **ResultList** | Assessment results; Export CSV/PDF/Excel, Print. |
 | **Leaderboard** | Top scores from backend; rank, percentage, streak; in More Hub. |
 | **Study tools** | Dictate, Explain, Solve (OCR, AI). |
-| **Exam goal** | Goals, Q&A bank, assessments, attempts, manual review. |
+| **Exam goal** | Goals Hub: Goals (first), Q&A bank, assessments, results, daily review, flashcards, manual review. Study Hub: Dictate, Explain, Solve, Pomodoro. More Hub: Leaderboard, Online Resources, Downloaded Docs, Settings. |
 | **Dialogs** | Delete confirm; Overlap warning; Export success → Share. |
 
 ### 4.2 Navigation Graph (Compose)

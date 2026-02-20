@@ -313,11 +313,17 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | TC-UI06 | Quick actions - Explain | - | Tap Explain | Explain screen opens | P0 | UI |
 | TC-UI07 | Quick actions - Solve | - | Tap Solve | Solve screen opens | P0 | UI |
 | TC-UI08 | Quick actions - Assessments | - | Tap Assessments | Assessment list opens | P0 | UI |
-| TC-UI09 | Study Hub - all menu items | - | Tap each hub item | Correct screen opens | P0 | UI |
+| TC-UI09 | Study Hub - all menu items | - | Tap Dictate, Explain, Solve, Pomodoro | Correct screen opens | P0 | UI |
+| TC-UI09a | Goals Hub - all menu items | - | Tap Goals, Q&A Bank, Assessments, Results, Daily Review, Flashcards, Manual Review | Correct screen opens | P0 | UI |
 | TC-UI10 | More Hub - Settings | - | Tap Settings | Settings opens | P0 | UI |
 | TC-UI11 | More Hub - Leaderboard | - | Tap Leaderboard | Leaderboard screen opens | P1 | UI |
 | TC-UI12 | Leaderboard - empty/signed out | - | Open Leaderboard | Message or empty list | P1 | UI |
-| TC-UI13 | Settings - User Guide | - | Tap User Guide card | User Guide screen opens | P1 | UI |
+| TC-UI13 | Settings - User Guide | - | Tap User Guide card (at bottom) | User Guide screen opens | P1 | UI |
+| TC-UI13a | Settings - Logout | Signed in | Tap Logout (at bottom) | Signs out, button hidden | P1 | UI |
+| TC-UI13b | Home - Backup banner | Backup not set, has goal | Open Home | INFO banner shown, tap opens Settings | P1 | UI |
+| TC-UI13c | Student Class Details | - | Settings → Student Class | Edit standard, board, subjects | P1 | UI |
+| TC-UI13d | Online Resources | - | More Hub → Online Resources | Search, preview, download | P1 | UI |
+| TC-UI13e | Downloaded Documents | Files in StudyAsist | More Hub → Downloaded Docs | List shown, Open works | P1 | UI |
 | TC-UI14 | Back navigation | On detail screen | Press back | Returns to previous | P0 | UI |
 | TC-UI15 | Bottom bar hidden on run | - | Navigate to Assessment Run | Bottom bar hidden | P0 | UI |
 | TC-UI16 | Bottom bar hidden on QA Scan | - | Navigate to QA Scan | Bottom bar hidden | P0 | UI |
@@ -329,8 +335,9 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | ID | Test Case | Preconditions | First launch | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|--------------|------|-----------------|------|------|
 | TC-OB01 | Onboarding shown first launch | onboardingCompleted=false | - | Launch app | Onboarding pager shown | P0 | UI |
-| TC-OB02 | Onboarding skip | On onboarding | Tap Skip | Skip to name page | P1 | UI |
-| TC-OB03 | Onboarding next | On page 1 | Tap Next 4 times | Reaches name page | P0 | UI |
+| TC-OB02 | Onboarding skip | On onboarding | Tap Skip | Skips to next/skip page or name | P1 | UI |
+| TC-OB02a | Onboarding student class skip | On Student Class page | Tap Skip | Skips Student Class, continues flow | P1 | UI |
+| TC-OB03 | Onboarding next | On page 1 | Tap Next through pages | Reaches name page | P0 | UI |
 | TC-OB04 | Onboarding complete | On name page | Enter name, Get Started | onboardingCompleted=true, Home shown | P0 | UI |
 | TC-OB05 | Onboarding not shown | onboardingCompleted=true | - | Launch app | Home shown directly | P0 | UI |
 
@@ -375,7 +382,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
 | TC-QS01 | Q&A list - empty state | No QAs | Open Q&A Bank | Empty message shown | P0 | UI |
-| TC-QS02 | Q&A list - filter subject | QAs with subjects | Select subject | Filtered list | P0 | UI |
+| TC-QS02 | Q&A list - filter subject | QAs with subjects; Student Class optional | Select subject (from Student Class or Q&A) | Filtered list | P0 | UI |
 | TC-QS03 | Q&A list - filter chapter | - | Select chapter | Filtered list | P0 | UI |
 | TC-QS04 | Q&A list - scan FAB | - | Tap Scan FAB | QA Scan screen | P0 | UI |
 | TC-QS05 | Q&A list - create assessment | QAs exist | Tap Create Assessment (top) | Assessment create | P0 | UI |
@@ -494,6 +501,8 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | TC-SE22 | Settings - Sync upload | Signed in | Tap Upload to cloud | Success/error message | P1 | UI |
 | TC-SE23 | Settings - Sync download | Signed in | Tap Download from cloud | Success/error message | P1 | UI |
 | TC-SE24 | Settings - Sign in with Apple | APPLE_SERVICE_ID set | Tap Sign in with Apple | Web flow or disabled | P2 | UI |
+| TC-SE25 | Settings - sections & User Guide | - | Scroll Settings | Profile, Appearance, Alerts, Study & AI, Backup & Sync, About; User Guide and Logout in About | P1 | UI |
+| TC-SE26 | Settings - Logout when signed in | Signed in | Tap Logout | Signs out | P1 | UI |
 
 ---
 

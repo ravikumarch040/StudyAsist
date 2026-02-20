@@ -187,8 +187,9 @@ Your AI-powered study companion. **Scan → Practice → Track → Improve**
 ## 19. Navigation
 
 - **Bottom Nav** – Home, Timetable, Study, Goals, More
-- **Study Hub** – Dictate, Explain, Solve, Pomodoro, Q&A, Assessments, Results, Daily Review, Flashcards
-- **More Hub** – Q&A, Assessments, Results, Manual Review, Settings
+- **Study Hub** – Dictate, Explain, Solve, Pomodoro
+- **Goals Hub** – Goals, Q&A Bank, Assessments, Results, Daily Review, Flashcards, Manual Review
+- **More Hub** – Leaderboard, Online Resources, Downloaded Docs, Settings
 
 ---
 

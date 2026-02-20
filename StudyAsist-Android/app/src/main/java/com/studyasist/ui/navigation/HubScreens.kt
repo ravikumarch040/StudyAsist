@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.AutoStories
 import androidx.compose.material.icons.filled.EmojiObjects
 import androidx.compose.material.icons.filled.Mic
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,12 +53,8 @@ fun StudyHubScreen(
     onDictate: () -> Unit,
     onExplain: () -> Unit,
     onSolve: () -> Unit,
-    onQABank: () -> Unit,
-    onAssessments: () -> Unit,
-    onResults: () -> Unit,
-    onDailyReview: () -> Unit,
-    onFlashcards: () -> Unit,
-    onPomodoro: () -> Unit
+    onPomodoro: () -> Unit,
+    onTutor: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -88,19 +86,48 @@ fun StudyHubScreen(
             item { HubMenuItem(Icons.Default.AutoStories, stringResource(R.string.explain), stringResource(R.string.explain_subtitle), onExplain) }
             item { HubMenuItem(Icons.Default.EmojiObjects, stringResource(R.string.solve), stringResource(R.string.solve_subtitle), onSolve) }
             item { HubMenuItem(Icons.Default.Timer, stringResource(R.string.pomodoro), stringResource(R.string.pomodoro_focus), onPomodoro) }
-            item {
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    stringResource(R.string.exam_goals),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            item { HubMenuItem(Icons.Default.Chat, stringResource(R.string.ai_tutor), stringResource(R.string.ai_tutor_hint), onTutor) }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GoalsHubScreen(
+    onGoals: () -> Unit,
+    onQABank: () -> Unit,
+    onAssessments: () -> Unit,
+    onResults: () -> Unit,
+    onDailyReview: () -> Unit,
+    onFlashcards: () -> Unit,
+    onManualReview: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.nav_goals)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            }
+            )
+        }
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp)
+        ) {
+            item { HubMenuItem(Icons.Default.TrackChanges, stringResource(R.string.goals), stringResource(R.string.exam_goals_subtitle), onGoals) }
             item { HubMenuItem(Icons.Default.Quiz, stringResource(R.string.qa_bank), stringResource(R.string.qa_bank_subtitle), onQABank) }
             item { HubMenuItem(Icons.Default.Assessment, stringResource(R.string.assessments), stringResource(R.string.create_practice_tests), onAssessments) }
             item { HubMenuItem(Icons.Default.Star, stringResource(R.string.results), stringResource(R.string.view_attempt_history), onResults) }
             item { HubMenuItem(Icons.Default.Style, stringResource(R.string.daily_review), stringResource(R.string.flashcards), onDailyReview) }
             item { HubMenuItem(Icons.Default.Style, stringResource(R.string.flashcards), stringResource(R.string.quick_review), onFlashcards) }
+            item { HubMenuItem(Icons.Default.Star, stringResource(R.string.manual_review), stringResource(R.string.manual_review_list), onManualReview) }
         }
     }
 }
@@ -109,11 +136,7 @@ fun StudyHubScreen(
 @Composable
 fun MoreHubScreen(
     onSettings: () -> Unit,
-    onResults: () -> Unit,
-    onManualReview: () -> Unit,
     onLeaderboard: () -> Unit,
-    onQABank: () -> Unit,
-    onAssessments: () -> Unit,
     onOnlineResources: () -> Unit = {},
     onDownloadedDocs: () -> Unit = {}
 ) {
@@ -136,10 +159,6 @@ fun MoreHubScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp)
         ) {
-            item { HubMenuItem(Icons.Default.Quiz, stringResource(R.string.qa_bank), stringResource(R.string.qa_bank_subtitle), onQABank) }
-            item { HubMenuItem(Icons.Default.Assessment, stringResource(R.string.assessments), stringResource(R.string.create_practice_tests), onAssessments) }
-            item { HubMenuItem(Icons.Default.Star, stringResource(R.string.results), stringResource(R.string.view_attempt_history), onResults) }
-            item { HubMenuItem(Icons.Default.Star, stringResource(R.string.manual_review), stringResource(R.string.manual_review_list), onManualReview) }
             item { HubMenuItem(Icons.Default.EmojiEvents, stringResource(R.string.leaderboard), stringResource(R.string.leaderboard_subtitle), onLeaderboard) }
             item { HubMenuItem(Icons.Default.Download, stringResource(R.string.online_resources), stringResource(R.string.online_resources_hint), onOnlineResources) }
             item { HubMenuItem(Icons.Default.FolderOpen, stringResource(R.string.downloaded_docs), stringResource(R.string.downloaded_docs_hint), onDownloadedDocs) }

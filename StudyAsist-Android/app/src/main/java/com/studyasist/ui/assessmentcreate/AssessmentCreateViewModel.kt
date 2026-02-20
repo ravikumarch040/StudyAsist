@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.GoalRepository
 import com.studyasist.data.repository.QABankRepository
+import com.studyasist.data.repository.StudentClassRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,7 +52,8 @@ class AssessmentCreateViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val assessmentRepository: AssessmentRepository,
     private val goalRepository: GoalRepository,
-    private val qaBankRepository: QABankRepository
+    private val qaBankRepository: QABankRepository,
+    private val studentClassRepository: StudentClassRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AssessmentCreateUiState())
@@ -138,7 +140,7 @@ class AssessmentCreateViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    distinctSubjects = qaBankRepository.getDistinctSubjects(),
+                    distinctSubjects = studentClassRepository.getSubjectsForDropdown(),
                     distinctChapters = qaBankRepository.getDistinctChapters()
                 )
             }

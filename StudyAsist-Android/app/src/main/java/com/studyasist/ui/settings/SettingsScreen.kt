@@ -76,6 +76,16 @@ import java.io.InputStreamReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@Composable
+private fun SettingsSectionHeader(title: String) {
+    Text(
+        title,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("DEPRECATION")
 @Composable
@@ -83,9 +93,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBack: () -> Unit,
     onUserGuide: () -> Unit = {},
-    onStudentClass: () -> Unit = {},
-    onOnlineResources: () -> Unit = {},
-    onDownloadedDocs: () -> Unit = {}
+    onStudentClass: () -> Unit = {}
 ) {
     val settings by viewModel.settings.collectAsState(
         initial = AppSettings(AppSettings.DEFAULT_LEAD_MINUTES, true, "", null, "", false, false, null, "folder", false, true, true, "system", AppSettings.DEFAULT_EXAM_ALERT_DAYS, AppSettings.DEFAULT_EXAM_ALERT_PERCENT)
@@ -197,7 +205,8 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Profile section
+            // ── Profile ─────────────────────────────────────────────────────
+            SettingsSectionHeader(stringResource(R.string.settings_section_profile))
             Row(
                 Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -220,9 +229,8 @@ fun SettingsScreen(
                 }
             }
 
-            // Account (Google / Apple sign-in for backend)
             if (isBackendAuthConfigured) {
-                Text(stringResource(R.string.account), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.account), style = MaterialTheme.typography.titleSmall)
                 Text(
                     stringResource(R.string.account_hint),
                     style = MaterialTheme.typography.bodySmall,
@@ -286,46 +294,7 @@ fun SettingsScreen(
                 }
             }
 
-            // Sync (visible when signed in)
-            if (accountSignedIn) {
-                Text(stringResource(R.string.sync_data), style = MaterialTheme.typography.titleMedium)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = { viewModel.syncUpload() },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.sync_upload))
-                    }
-                    Button(
-                        onClick = { viewModel.syncDownload() },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.sync_download))
-                    }
-                }
-                syncResult?.let { msg ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            msg,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (msg == stringResource(R.string.sync_success)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                            modifier = Modifier.weight(1f)
-                        )
-                        androidx.compose.material3.TextButton(onClick = { viewModel.clearSyncResult() }) {
-                            Text(stringResource(R.string.dismiss))
-                        }
-                    }
-                }
-            }
-
-            Text(stringResource(R.string.student_class_details), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.student_class_details), style = MaterialTheme.typography.titleSmall)
             androidx.compose.material3.Card(
                 onClick = onStudentClass,
                 modifier = Modifier.fillMaxWidth()
@@ -354,67 +323,9 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Text(stringResource(R.string.online_resources), style = MaterialTheme.typography.titleMedium)
-            androidx.compose.material3.Card(
-                onClick = onOnlineResources,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        stringResource(R.string.online_resources),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Icon(
-                        Icons.Filled.Download,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-            Text(
-                stringResource(R.string.online_resources_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Text(stringResource(R.string.downloaded_docs), style = MaterialTheme.typography.titleMedium)
-            androidx.compose.material3.Card(
-                onClick = onDownloadedDocs,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        stringResource(R.string.downloaded_docs),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Icon(
-                        Icons.Filled.FolderOpen,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-            Text(
-                stringResource(R.string.downloaded_docs_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Text(stringResource(R.string.appearance), style = MaterialTheme.typography.titleMedium)
-
-            // Language
+            // ── Appearance ─────────────────────────────────────────────────
+            SettingsSectionHeader(stringResource(R.string.settings_section_appearance))
+            Text(stringResource(R.string.language), style = MaterialTheme.typography.bodySmall)
             Text(stringResource(R.string.language), style = MaterialTheme.typography.bodySmall)
             Text(
                 stringResource(R.string.language_app_summary),
@@ -507,7 +418,8 @@ fun SettingsScreen(
                     }
                 }
             }
-            Text(stringResource(R.string.notifications), style = MaterialTheme.typography.titleMedium)
+            // ── Alerts & Notifications ─────────────────────────────────────
+            SettingsSectionHeader(stringResource(R.string.settings_section_alerts))
             Text(
                 stringResource(R.string.default_reminder_minutes),
                 style = MaterialTheme.typography.bodySmall
@@ -546,7 +458,7 @@ fun SettingsScreen(
                     onCheckedChange = viewModel::setBlockOverlap
                 )
             }
-            Text(stringResource(R.string.exam_goal_alert_settings), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.exam_goal_alert_settings), style = MaterialTheme.typography.titleSmall)
             Text(
                 stringResource(R.string.exam_goal_alert_days_hint),
                 style = MaterialTheme.typography.bodySmall
@@ -579,7 +491,7 @@ fun SettingsScreen(
                     )
                 }
             }
-            Text(stringResource(R.string.focus_guard), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.focus_guard), style = MaterialTheme.typography.titleSmall)
             Text(
                 stringResource(R.string.focus_guard_summary),
                 style = MaterialTheme.typography.bodySmall
@@ -688,7 +600,9 @@ fun SettingsScreen(
                     }
                 }
             }
-            Text(stringResource(R.string.your_name), style = MaterialTheme.typography.titleMedium)
+            // ── Study & AI ─────────────────────────────────────────────────
+            SettingsSectionHeader(stringResource(R.string.settings_section_study_ai))
+            Text(stringResource(R.string.your_name), style = MaterialTheme.typography.titleSmall)
             Text(
                 stringResource(R.string.your_name_hint),
                 style = MaterialTheme.typography.bodySmall
@@ -700,7 +614,7 @@ fun SettingsScreen(
                 placeholder = { Text(stringResource(R.string.your_name)) },
                 singleLine = true
             )
-            Text(stringResource(R.string.speech_india_voices), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.speech_india_voices), style = MaterialTheme.typography.titleSmall)
             Text(
                 stringResource(R.string.voice_for_alarms_hint),
                 style = MaterialTheme.typography.bodySmall
@@ -709,7 +623,7 @@ fun SettingsScreen(
                 selectedVoiceName = settings.ttsVoiceName,
                 onVoiceSelected = viewModel::setTtsVoiceName
             )
-            Text(stringResource(R.string.ai_explain_solve), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ai_explain_solve), style = MaterialTheme.typography.titleSmall)
             Text(
                 stringResource(R.string.gemini_api_key_hint_long),
                 style = MaterialTheme.typography.bodySmall
@@ -742,7 +656,7 @@ fun SettingsScreen(
                     )
                 }
             }
-            Text(stringResource(R.string.ai_privacy), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.ai_privacy), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(R.string.ai_privacy_hint), style = MaterialTheme.typography.bodySmall)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -766,7 +680,46 @@ fun SettingsScreen(
                     onCheckedChange = viewModel::setUseCloudForGrading
                 )
             }
-            Text(stringResource(R.string.cloud_backup), style = MaterialTheme.typography.titleMedium)
+            // ── Backup & Sync ─────────────────────────────────────────────
+            SettingsSectionHeader(stringResource(R.string.settings_section_backup_sync))
+            if (accountSignedIn) {
+                Text(stringResource(R.string.sync_data), style = MaterialTheme.typography.titleSmall)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { viewModel.syncUpload() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.sync_upload))
+                    }
+                    Button(
+                        onClick = { viewModel.syncDownload() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.sync_download))
+                    }
+                }
+                syncResult?.let { msg ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            msg,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (msg == stringResource(R.string.sync_success)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                            modifier = Modifier.weight(1f)
+                        )
+                        androidx.compose.material3.TextButton(onClick = { viewModel.clearSyncResult() }) {
+                            Text(stringResource(R.string.dismiss))
+                        }
+                    }
+                }
+            }
+            Text(stringResource(R.string.cloud_backup), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(R.string.cloud_backup_summary), style = MaterialTheme.typography.bodySmall)
             Text(stringResource(R.string.cloud_backup_target), style = MaterialTheme.typography.bodySmall)
             Row(
@@ -913,8 +866,7 @@ fun SettingsScreen(
                     )
                 }
             }
-            Spacer(modifier = Modifier.padding(8.dp))
-            Text(stringResource(R.string.backup_restore), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.backup_restore), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(R.string.backup_export_hint), style = MaterialTheme.typography.bodySmall)
             Button(
                 onClick = { viewModel.exportBackup() },
@@ -929,8 +881,7 @@ fun SettingsScreen(
             ) {
                 Text(stringResource(R.string.restore))
             }
-            Spacer(modifier = Modifier.padding(8.dp))
-            Text(stringResource(R.string.exam_data_only), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.exam_data_only), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(R.string.export_exam_data_hint), style = MaterialTheme.typography.bodySmall)
             Button(
                 onClick = { viewModel.exportExamData() },
@@ -960,9 +911,9 @@ fun SettingsScreen(
                 }
             }
 
-            // User Guide - at bottom
-            Spacer(modifier = Modifier.padding(8.dp))
-            Text(stringResource(R.string.user_guide), style = MaterialTheme.typography.titleMedium)
+            // ── About ──────────────────────────────────────────────────────
+            SettingsSectionHeader(stringResource(R.string.settings_section_about))
+            Text(stringResource(R.string.user_guide), style = MaterialTheme.typography.titleSmall)
             androidx.compose.material3.Card(
                 onClick = onUserGuide,
                 modifier = Modifier.fillMaxWidth()

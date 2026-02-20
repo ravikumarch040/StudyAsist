@@ -11,6 +11,7 @@ object NavRoutes {
     const val EXPLAIN = "explain"
     const val SOLVE = "solve"
     const val STUDY_HUB = "study_hub"
+    const val GOALS_HUB = "goals_hub"
     const val MORE_HUB = "more_hub"
     const val DAILY_REVIEW = "daily_review"
     const val FLASHCARD = "flashcard"

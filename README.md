@@ -26,6 +26,10 @@ Scan your textbooks, build a Q&A bank, practice with flashcards, track progress 
 - **Sync data:** Upload/download your data to the cloud when signed in (Settings)
 - **Leaderboard:** Top scores and streaks (More Hub)
 - **Share assessments:** Generate shareable codes (local Base64 or backend short codes when signed in)
+- **Student Class Details:** Standard, board, optional school/city/state, subjects (Settings); subject dropdowns app-wide use this
+- **Online Resources:** Search PDF/books and sample papers by standard, board, subject (AI finds top results); preview and download to StudyAsist folder (More Hub)
+- **Downloaded Documents:** View all downloaded files; open for book-style reading (More Hub)
+- **Backup reminder:** Info banner on Home when backup not set (for users with goals); tap to open Settings
 
 ## Quick Start
 

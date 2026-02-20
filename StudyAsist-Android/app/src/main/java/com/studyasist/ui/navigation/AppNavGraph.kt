@@ -94,7 +94,7 @@ sealed class BottomNavItem(
     data object Home : BottomNavItem(NavRoutes.HOME, R.string.nav_home, Icons.Default.Dashboard)
     data object Timetable : BottomNavItem(NavRoutes.TIMETABLE_LIST, R.string.nav_timetable, Icons.Default.CalendarMonth)
     data object Study : BottomNavItem(NavRoutes.STUDY_HUB, R.string.nav_study, Icons.Default.AutoStories)
-    data object Goals : BottomNavItem(NavRoutes.GOAL_LIST, R.string.nav_goals, Icons.Default.TrackChanges)
+    data object Goals : BottomNavItem(NavRoutes.GOALS_HUB, R.string.nav_goals, Icons.Default.TrackChanges)
     data object More : BottomNavItem(NavRoutes.MORE_HUB, R.string.nav_more, Icons.Default.MoreHoriz)
 }
 
@@ -147,7 +147,7 @@ fun AppNavGraph(
                 NavigationBar {
                     bottomNavItems.forEach { item ->
                         val selected = currentRoute == item.route ||
-                            (item == BottomNavItem.Goals && currentRoute?.startsWith("goal_") == true) ||
+                            (item == BottomNavItem.Goals && (currentRoute == NavRoutes.GOALS_HUB || currentRoute?.startsWith("goal_") == true)) ||
                             (item == BottomNavItem.Timetable && currentRoute?.startsWith("timetable_") == true)
                         NavigationBarItem(
                             icon = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
@@ -264,9 +264,7 @@ fun AppNavGraph(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() },
                     onUserGuide = { navController.navigate(NavRoutes.USER_GUIDE) },
-                    onStudentClass = { navController.navigate(NavRoutes.STUDENT_CLASS_DETAILS) },
-                    onOnlineResources = { navController.navigate(NavRoutes.ONLINE_RESOURCES) },
-                    onDownloadedDocs = { navController.navigate(NavRoutes.DOWNLOADED_DOCS) }
+                    onStudentClass = { navController.navigate(NavRoutes.STUDENT_CLASS_DETAILS) }
                 )
             }
 
@@ -300,30 +298,35 @@ fun AppNavGraph(
                 )
             }
 
-            // Study Hub - consolidates study tools
+            // Study Hub - study tools only
             composable(NavRoutes.STUDY_HUB) {
                 StudyHubScreen(
                     onDictate = { navController.navigate(NavRoutes.DICTATE) },
                     onExplain = { navController.navigate(NavRoutes.EXPLAIN) },
                     onSolve = { navController.navigate(NavRoutes.SOLVE) },
+                    onPomodoro = { navController.navigate(NavRoutes.POMODORO) },
+                    onTutor = { navController.navigate(NavRoutes.TUTOR_CHAT) }
+                )
+            }
+
+            // Goals Hub - exam goals, Q&A, assessments, results, etc.
+            composable(NavRoutes.GOALS_HUB) {
+                GoalsHubScreen(
+                    onGoals = { navController.navigate(NavRoutes.GOAL_LIST) },
                     onQABank = { navController.navigate(NavRoutes.QA_BANK) },
                     onAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
                     onResults = { navController.navigate(NavRoutes.RESULT_LIST) },
                     onDailyReview = { navController.navigate(NavRoutes.DAILY_REVIEW) },
                     onFlashcards = { navController.navigate(NavRoutes.FLASHCARD) },
-                    onPomodoro = { navController.navigate(NavRoutes.POMODORO) }
+                    onManualReview = { navController.navigate(NavRoutes.MANUAL_REVIEW_LIST) }
                 )
             }
 
-            // More Hub - settings, results, etc.
+            // More Hub - leaderboard, online resources, settings
             composable(NavRoutes.MORE_HUB) {
                 MoreHubScreen(
                     onSettings = { navController.navigate(NavRoutes.SETTINGS) },
-                    onResults = { navController.navigate(NavRoutes.RESULT_LIST) },
-                    onManualReview = { navController.navigate(NavRoutes.MANUAL_REVIEW_LIST) },
                     onLeaderboard = { navController.navigate(NavRoutes.LEADERBOARD) },
-                    onQABank = { navController.navigate(NavRoutes.QA_BANK) },
-                    onAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
                     onOnlineResources = { navController.navigate(NavRoutes.ONLINE_RESOURCES) },
                     onDownloadedDocs = { navController.navigate(NavRoutes.DOWNLOADED_DOCS) }
                 )

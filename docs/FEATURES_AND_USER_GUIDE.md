@@ -17,6 +17,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Quick Actions** | One-tap shortcuts: Dictate, Explain, Solve, Assessments |
 | **Streak & Badges** | Study streak counter and earned badges (First Step, Week Warrior, etc.) |
 | **Today's Schedule** | Scrollable list of today's activities with current-activity highlight |
+| **Backup Reminder** | INFO banner when backup not set (user has goals); tap to open Settings. Checked once per day on app open. |
 
 ---
 
@@ -94,7 +95,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Scan Q&A** | Take photo or choose image; extract questions automatically |
 | **Improve with AI** | Gemini improves/extracts Q&A from rough OCR (Settings: use cloud for parsing) |
 | **Manual Entry** | Add row: question, answer, type (MCQ, Short, Numeric, True/False, Essay) |
-| **Filter by Subject** | Dropdown to filter by subject |
+| **Filter by Subject** | Dropdown to filter by subject (from Student Class or Q&A bank) |
 | **Filter by Chapter** | Dropdown to filter by chapter |
 | **Delete Q&A** | Remove individual items |
 | **Create Assessment** | Build practice test from filtered Q&A |
@@ -124,7 +125,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | Feature | Description |
 |---------|-------------|
 | **Create Assessment** | Title, select by goal, subject/chapter, or manual; add questions from Q&A bank |
-| **Select Questions** | Pick from Q&A bank; filter by subject/chapter |
+| **Select Questions** | Pick from Q&A bank; filter by subject/chapter (subjects from Student Class) |
 | **Randomize Questions** | Shuffle order each attempt |
 | **Time Limit** | Set total time in minutes |
 | **Question Types** | MCQ, short answer, numeric, true/false, essay |
@@ -291,6 +292,8 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 
 ## 17. Settings
 
+Settings is organized into sections: **Profile**, **Appearance**, **Alerts & Notifications**, **Study & AI**, **Backup & Sync**, **About**. Online Resources and Downloaded Documents are in More Hub, not Settings.
+
 ### 17.0 Account (Backend sign-in)
 
 | Feature | Description |
@@ -298,16 +301,17 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Sign in with Google** | Exchange Google id token for JWT; enables sync, leaderboard, backend share |
 | **Sign in with Apple** | Web flow; enabled when `APPLE_SERVICE_ID` configured; backend callback redirects to app |
 | **Sign out** | Clear JWT; local data retained |
-| **Sync data** | Visible when signed in; Upload to cloud / Download from cloud |
+| **Logout** | In About section (visible when signed in) |
+| **Sync data** | In Backup & Sync section when signed in; Upload to cloud / Download from cloud |
 
-### 17.1 Profile
+### 17.1 Profile (section)
 
 | Feature | Description |
 |---------|-------------|
 | **Profile Photo** | Set avatar (editable) |
 | **Your Name** | Used in greetings and TTS alarms |
 
-### 17.2 Appearance
+### 17.2 Appearance (section)
 
 | Feature | Description |
 |---------|-------------|
@@ -315,7 +319,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Dark Mode** | System, Light, Dark |
 | **Theme** | 11 themes: Dynamic, Minimal Light/Dark, Pastel Calm, Academic Paper, Vibrant Study, Dark High Contrast, Neo Glass, Retro Chalkboard, Nature Earthy, Productivity Dashboard |
 
-### 17.3 Notifications
+### 17.3 Alerts & Notifications (section)
 
 | Feature | Description |
 |---------|-------------|
@@ -338,7 +342,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Built-in Apps** | View list of monitored apps |
 | **Custom Apps** | Add/remove package names |
 
-### 17.6 Speech (India Voices)
+### 17.6 Study & AI (section) – Speech (India Voices)
 
 | Feature | Description |
 |---------|-------------|
@@ -359,7 +363,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Use AI for Q&A Parsing** | Enable "Improve with AI" in scan |
 | **Use AI for Subjective Grading** | Enable LLM grading for essays |
 
-### 17.9 Cloud Backup
+### 17.9 Backup & Sync (section) – Cloud Backup
 
 | Feature | Description |
 |---------|-------------|
@@ -370,19 +374,28 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Restore from Backup** | Pick file from folder/Drive |
 | **Auto Daily Backup** | Schedule daily automatic backup |
 
-### 17.10 Backup & Restore
+### 17.10 Backup & Sync (section) – Backup & Restore
 
 | Feature | Description |
 |---------|-------------|
 | **Backup** | Export all data to JSON file |
 | **Restore** | Import from JSON backup |
 
-### 17.11 Exam Data Only
+### 17.11 Backup & Sync (section) – Exam Data Only
 
 | Feature | Description |
 |---------|-------------|
 | **Export Exam Data** | Goals, Q&A, assessments, attempts, results only |
 | **Restore Exam Data** | Import exam data (replaces existing) |
+
+### 17.11a Profile (section) – Student Class Details
+
+| Feature | Description |
+|---------|-------------|
+| **Standard** | Class 1–12 |
+| **Board** | CBSE, ICSE, State boards |
+| **School / City / State** | Optional |
+| **Subjects** | Add/remove; feeds all subject dropdowns |
 
 ### 17.12 Accessibility (when implemented)
 
@@ -393,7 +406,11 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **High Contrast** | Enhanced contrast mode |
 | **Color-Blind Mode** | Blue/orange instead of red/green |
 
-### 17.13 Pomodoro Settings
+### 17.13 About (section) – User Guide & Logout
+
+User Guide card and Logout button (when signed in) are in the About section at the bottom.
+
+### 17.14 Pomodoro Settings (when in Settings)
 
 | Feature | Description |
 |---------|-------------|
@@ -431,10 +448,11 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 
 | Feature | Description |
 |---------|-------------|
-| **Welcome** | 4-page horizontal pager |
-| **Pages** | Timetable, Scan Q&A, Assess, Goals |
-| **Skip** | Skip to end |
-| **Enter Name** | Final page asks your name |
+| **Welcome** | Multi-page horizontal pager |
+| **Pages** | Timetable, Scan Q&A, Assess, Goals, Student Class (optional), Account, Backup, Name |
+| **Student Class** | Standard (9–12), Board (CBSE, ICSE, State Board, Other), Subjects; optional page with Skip |
+| **Skip** | Skip individual pages (e.g. Student Class) or entire onboarding |
+| **Enter Name** | Asks your name |
 | **Get Started** | Completes onboarding, navigates to Home |
 
 ---
@@ -463,8 +481,45 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | Feature | Description |
 |---------|-------------|
 | **Bottom Nav** | Home, Timetable, Study, Goals, More (5 tabs) |
-| **Study Hub** | Dictate, Explain, Solve, Pomodoro, Q&A Bank, Assessments, Results, Daily Review, Flashcards |
-| **More Hub** | Q&A Bank, Assessments, Results, Manual Review, **Leaderboard**, Settings |
+| **Study Hub** | Dictate, Explain, Solve, Pomodoro |
+| **Goals Hub** | Goals (first), Q&A Bank, Assessments, Results, Daily Review, Flashcards, Manual Review |
+| **More Hub** | Leaderboard, Online Resources, Downloaded Docs, Settings |
+
+---
+
+## 23a. Student Class Details
+
+| Feature | Description |
+|---------|-------------|
+| **Standard** | Class 1–12 dropdown |
+| **Board** | CBSE, ICSE, State boards, etc. |
+| **School** | Optional school name |
+| **City / State** | Optional location |
+| **Subjects** | Add/remove subjects (chips); used as source for all subject dropdowns in app |
+| **Access** | Settings → Student Class Details |
+
+---
+
+## 23b. Online Resources
+
+| Feature | Description |
+|---------|-------------|
+| **Resource Type** | Books (PDF/documents) or Sample Papers |
+| **Filters** | Standard, board, subject (from Student Class) |
+| **AI Search** | Gemini returns top 3–5 relevant resources |
+| **Preview** | Open URL in browser |
+| **Download** | Save to Downloads/StudyAsist folder |
+| **Access** | More Hub → Online Resources |
+
+---
+
+## 23c. Downloaded Documents
+
+| Feature | Description |
+|---------|-------------|
+| **List** | All files in Downloads/StudyAsist |
+| **Open** | View content (book-style) via system viewer |
+| **Access** | More Hub → Downloaded Documents |
 
 ---
 

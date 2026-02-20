@@ -101,6 +101,8 @@
 
 ## 5. Settings
 
+Settings is organized into sections: **Profile**, **Appearance**, **Alerts & Notifications**, **Study & AI**, **Backup & Sync**, **About**. Online Resources and Downloaded Documents are in More Hub, not Settings.
+
 ```
 ┌─────────────────────────────────────────┐
 │  ←  Settings                            │

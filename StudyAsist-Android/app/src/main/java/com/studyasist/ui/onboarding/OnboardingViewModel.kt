@@ -11,6 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.studyasist.data.cloud.DriveApiBackupProvider
 import com.studyasist.data.repository.AuthRepository
 import com.studyasist.data.repository.SettingsRepository
+import com.studyasist.data.repository.StudentClassRepository
 import com.studyasist.notification.CloudBackupWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,7 +28,10 @@ data class OnboardingResult(
     val userName: String,
     val backupTarget: String,
     val backupAuto: Boolean,
-    val signedInWithGoogle: Boolean
+    val signedInWithGoogle: Boolean,
+    val studentClassStandard: String = "",
+    val studentClassBoard: String = "",
+    val studentClassSubjects: List<String> = emptyList()
 )
 
 @HiltViewModel
@@ -35,6 +39,7 @@ class OnboardingViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val authRepository: AuthRepository,
     private val settingsRepository: SettingsRepository,
+    private val studentClassRepository: StudentClassRepository,
     private val driveApiBackupProvider: DriveApiBackupProvider,
     private val workManager: WorkManager
 ) : ViewModel() {
@@ -83,6 +88,15 @@ class OnboardingViewModel @Inject constructor(
     suspend fun completeOnboarding(result: OnboardingResult) {
         if (result.userName.isNotBlank()) {
             settingsRepository.setUserName(result.userName)
+        }
+        if (result.studentClassStandard.isNotBlank() || result.studentClassBoard.isNotBlank() || result.studentClassSubjects.isNotEmpty()) {
+            studentClassRepository.saveProfile(
+                com.studyasist.data.repository.StudentClassProfile(
+                    standard = result.studentClassStandard,
+                    board = result.studentClassBoard,
+                    subjects = result.studentClassSubjects
+                )
+            )
         }
         settingsRepository.setCloudBackupTarget(result.backupTarget)
         val effectiveBackupAuto = result.backupAuto && result.backupTarget == "google_drive"

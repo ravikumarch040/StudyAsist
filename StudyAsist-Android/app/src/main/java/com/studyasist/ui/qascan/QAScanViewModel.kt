@@ -8,6 +8,7 @@ import com.studyasist.data.qa.HeuristicQaParser
 import com.studyasist.data.local.entity.QuestionType
 import com.studyasist.data.repository.QABankRepository
 import com.studyasist.data.repository.SettingsRepository
+import com.studyasist.data.repository.StudentClassRepository
 import com.studyasist.data.repository.GeminiRepository
 import com.studyasist.util.extractTextFromImage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,7 +47,8 @@ class QAScanViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val qaBankRepository: QABankRepository,
     private val settingsRepository: SettingsRepository,
-    private val geminiRepository: GeminiRepository
+    private val geminiRepository: GeminiRepository,
+    private val studentClassRepository: StudentClassRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QAScanUiState())
@@ -68,7 +70,7 @@ class QAScanViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    distinctSubjects = qaBankRepository.getDistinctSubjects(),
+                    distinctSubjects = studentClassRepository.getSubjectsForDropdown(),
                     distinctChapters = qaBankRepository.getDistinctChapters()
                 )
             }
