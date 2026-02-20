@@ -79,6 +79,8 @@ import com.studyasist.ui.manualreview.ManualReviewListScreen
 import com.studyasist.ui.manualreview.ManualReviewListViewModel
 import com.studyasist.ui.manualreview.ManualOverrideScreen
 import com.studyasist.ui.manualreview.ManualOverrideViewModel
+import com.studyasist.ui.leaderboard.LeaderboardScreen
+import com.studyasist.ui.leaderboard.LeaderboardViewModel
 
 sealed class BottomNavItem(
     val route: String,
@@ -287,8 +289,17 @@ fun AppNavGraph(
                     onSettings = { navController.navigate(NavRoutes.SETTINGS) },
                     onResults = { navController.navigate(NavRoutes.RESULT_LIST) },
                     onManualReview = { navController.navigate(NavRoutes.MANUAL_REVIEW_LIST) },
+                    onLeaderboard = { navController.navigate(NavRoutes.LEADERBOARD) },
                     onQABank = { navController.navigate(NavRoutes.QA_BANK) },
                     onAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) }
+                )
+            }
+
+            composable(NavRoutes.LEADERBOARD) {
+                val viewModel: LeaderboardViewModel = hiltViewModel()
+                LeaderboardScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
                 )
             }
 

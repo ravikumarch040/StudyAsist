@@ -1,12 +1,20 @@
 # StudyAsist – Design & Plan
 
-**Version:** 1.2  
+**Version:** 1.3  
 **Target:** Android (personal, single-user)  
-**Scope:** Phase 1–3 + Exam Goal (fully implemented); Phase 2 extended.
+**Scope:** Phase 1–3 + Exam Goal (fully implemented); Phase 2 extended; Backend integration.
 
 ---
 
-## Implementation Status (as of v1.2)
+## Implementation Status (as of v1.3)
+
+### Backend Integration (new in v1.3)
+
+- **Auth & JWT:** OkHttp `AuthTokenInterceptor` adds `Authorization: Bearer <token>` to API calls. `SettingsAuthTokenProvider` reads token from DataStore. Google Sign-In and Sign in with Apple exchange id tokens for JWT via backend.
+- **Sync:** `SyncApi` upload/download; `SyncRepository` exports via `BackupRepository.exportToJson()` and imports via `BackupRepository.importFromJson()`. Sync UI in Settings (Upload to cloud, Download from cloud) visible when signed in.
+- **Leaderboard:** `LeaderboardApi` (submit, getTop, getMyScores); `LeaderboardRepository`; `LeaderboardScreen` in More Hub; scores submitted automatically on assessment result.
+- **Share via backend:** `ShareRepository.generateShareCode()` uses `ShareApi.create()` when signed in (returns short alphanumeric code); `decodeShareCode()` tries `ShareApi.resolve()` for 6–12 char codes, else local Base64.
+- **Sign in with Apple (Android):** Web flow via `AppleSignInHelper`; deep link `studyasist://apple-signin`; enabled when `APPLE_SERVICE_ID` configured in `local.properties`.
 
 The following are **implemented** beyond the original Phase 1 scope:
 
@@ -75,6 +83,7 @@ The following are **implemented** beyond the original Phase 1 scope:
 ┌────────────────────────────▼────────────────────────────────────┐
 │  Repositories                                                     │
 │  TimetableRepository | ActivityRepository | SettingsRepository   │
+│  AuthRepository | SyncRepository | LeaderboardRepository | ShareRepository │
 │  NotificationScheduler | ExportRepository                        │
 └──────┬─────────────────────┬─────────────────────┬───────────────┘
        │                     │                     │
@@ -85,14 +94,20 @@ The following are **implemented** beyond the original Phase 1 scope:
 │ Activity     │    │                 │    │ WorkManager (opt)    │
 └──────────────┘    └─────────────────┘    └──────────────────────┘
        │
+       ▼ (AuthRepository, SyncRepository, LeaderboardRepository, ShareRepository)
+┌──────────────────────────────────────────────────────────────────────┐
+│  Backend API (Retrofit): Auth, Sync, Leaderboard, Share | JWT via OkHttp │
+└──────────────────────────────────────────────────────────────────────┘
+       │
        ▼
 ┌──────────────────────────────────────────────────────────────────┐
 │  Export: FileProvider + Apache POI (.xlsx) → Share / Print (PDF)   │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-- **Offline-first:** All data in Room + DataStore; no network layer in Phase 1.
+- **Offline-first:** All data in Room + DataStore; backend APIs augment sync, leaderboard, share when signed in.
 - **Single source of truth:** Repositories expose `Flow<List<T>>` for reactive UI.
+- **Backend (optional):** When `DRIVE_WEB_CLIENT_ID` and `BACKEND_BASE_URL` configured, user can sign in (Google/Apple), sync data, access leaderboard, and share assessments via backend.
 
 ---
 
@@ -165,8 +180,9 @@ The following are **implemented** beyond the original Phase 1 scope:
 | **TimetableList** | List all timetables; FAB “Add”; swipe/action to duplicate, delete, export. |
 | **TimetableDetail** | Day view | Week view; filter by type; weekly analytics; Export CSV/PDF/Excel, Print, Share, Duplicate. |
 | **ActivityEdit** | Add/Edit activity form (day, start/end time, title, type, note, notification toggle, lead time). Overlap warning at save. |
-| **Settings** | Lead time, vibration, user name, TTS voice, focus guard, Backup/Restore, Cloud backup, block overlap, Gemini API key. |
+| **Settings** | Lead time, vibration, user name, TTS voice, focus guard, Backup/Restore, Cloud backup, **Sync (upload/download)** when signed in, Account (Google/Apple sign-in), block overlap, Gemini API key. |
 | **ResultList** | Assessment results; Export CSV/PDF/Excel, Print. |
+| **Leaderboard** | Top scores from backend; rank, percentage, streak; in More Hub. |
 | **Study tools** | Dictate, Explain, Solve (OCR, AI). |
 | **Exam goal** | Goals, Q&A bank, assessments, attempts, manual review. |
 | **Dialogs** | Delete confirm; Overlap warning; Export success → Share. |
@@ -175,9 +191,10 @@ The following are **implemented** beyond the original Phase 1 scope:
 
 - **NavHost** routes:  
   `timetable_list` → `timetable_detail/{id}?day={optional}` → `activity_edit/{timetableId}?activityId={optional}`  
-  `settings`
+  `settings`  
+  `leaderboard` (from More Hub)
 
-- **Back stack:** List → Detail → ActivityEdit; Settings can be modal or separate.
+- **Back stack:** List → Detail → ActivityEdit; Settings can be modal or separate; Leaderboard from More Hub.
 
 ### 4.3 Day View vs Week View
 

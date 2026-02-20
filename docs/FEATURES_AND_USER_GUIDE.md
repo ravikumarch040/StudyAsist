@@ -143,6 +143,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Score Display** | Correct/max, percentage |
 | **Per-Question Breakdown** | Your answer vs correct; partial credit for essays |
 | **AI Grading** | Subjective grading for essays (Settings: use cloud for grading) |
+| **Leaderboard Submit** | Score submitted to leaderboard when signed in (automatic) |
 | **Revise** | Jump to Q&A bank filtered by subject/chapter |
 | **Add to Timetable** | Add revision block for weak topics |
 | **Manual Review** | Flag answers, override scores, add feedback |
@@ -290,6 +291,15 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 
 ## 17. Settings
 
+### 17.0 Account (Backend sign-in)
+
+| Feature | Description |
+|---------|-------------|
+| **Sign in with Google** | Exchange Google id token for JWT; enables sync, leaderboard, backend share |
+| **Sign in with Apple** | Web flow; enabled when `APPLE_SERVICE_ID` configured; backend callback redirects to app |
+| **Sign out** | Clear JWT; local data retained |
+| **Sync data** | Visible when signed in; Upload to cloud / Download from cloud |
+
 ### 17.1 Profile
 
 | Feature | Description |
@@ -402,7 +412,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | **Print Timetable** | PDF via Print dialog |
 | **Export Results** | PDF, CSV, Excel from result list/detail |
 | **Share as Image** | Timetable or result as PNG |
-| **Share Assessment** | Generate shareable code for friend to take same test |
+| **Share Assessment** | Generate shareable code; when signed in uses backend (short alphanumeric code); otherwise local Base64 |
 
 ---
 
@@ -440,17 +450,25 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 
 ---
 
-## 22. Navigation & Hub
+## 22. Leaderboard
+
+| Feature | Description |
+|---------|-------------|
+| **Leaderboard** | Top scores from backend; rank, user name, score/max, percentage, streak days |
+| **Access** | More Hub → Leaderboard |
+| **Sign in required** | Shows message when not signed in |
+
+## 23. Navigation & Hub
 
 | Feature | Description |
 |---------|-------------|
 | **Bottom Nav** | Home, Timetable, Study, Goals, More (5 tabs) |
 | **Study Hub** | Dictate, Explain, Solve, Pomodoro, Q&A Bank, Assessments, Results, Daily Review, Flashcards |
-| **More Hub** | Q&A Bank, Assessments, Results, Manual Review, Settings |
+| **More Hub** | Q&A Bank, Assessments, Results, Manual Review, **Leaderboard**, Settings |
 
 ---
 
-## 23. Miscellaneous
+## 24. Miscellaneous
 
 | Feature | Description |
 |---------|-------------|

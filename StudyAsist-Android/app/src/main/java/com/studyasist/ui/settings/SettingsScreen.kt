@@ -101,6 +101,8 @@ fun SettingsScreen(
     val driveSignedIn by viewModel.driveSignedIn.collectAsState(initial = false)
     val accountSignedIn by viewModel.accountSignedIn.collectAsState(initial = false)
     val accountSignInResult by viewModel.accountSignInResult.collectAsState(initial = null)
+    val syncResult by viewModel.syncResult.collectAsState(initial = null)
+    val appleSignInConfigured = remember { viewModel.isAppleSignInConfigured() }
     val isBackendAuthConfigured = remember { viewModel.isBackendAuthConfigured() }
 
     val backupFolderLauncher = rememberLauncherForActivityResult(
@@ -245,11 +247,18 @@ fun SettingsScreen(
                             Text(stringResource(R.string.sign_in_with_google))
                         }
                         Button(
-                            onClick = {},
+                            onClick = {
+                                if (appleSignInConfigured) {
+                                    context.startActivity(viewModel.getAppleSignInIntent())
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = false
+                            enabled = appleSignInConfigured
                         ) {
-                            Text(stringResource(R.string.sign_in_with_apple_coming_soon))
+                            Text(
+                                if (appleSignInConfigured) stringResource(R.string.sign_in_with_apple)
+                                else stringResource(R.string.sign_in_with_apple_coming_soon)
+                            )
                         }
                     }
                 }
@@ -266,6 +275,45 @@ fun SettingsScreen(
                             modifier = Modifier.weight(1f)
                         )
                         androidx.compose.material3.TextButton(onClick = { viewModel.clearAccountSignInResult() }) {
+                            Text(stringResource(R.string.dismiss))
+                        }
+                    }
+                }
+            }
+
+            // Sync (visible when signed in)
+            if (accountSignedIn) {
+                Text(stringResource(R.string.sync_data), style = MaterialTheme.typography.titleMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { viewModel.syncUpload() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.sync_upload))
+                    }
+                    Button(
+                        onClick = { viewModel.syncDownload() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.sync_download))
+                    }
+                }
+                syncResult?.let { msg ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            msg,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (msg == stringResource(R.string.sync_success)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                            modifier = Modifier.weight(1f)
+                        )
+                        androidx.compose.material3.TextButton(onClick = { viewModel.clearSyncResult() }) {
                             Text(stringResource(R.string.dismiss))
                         }
                     }

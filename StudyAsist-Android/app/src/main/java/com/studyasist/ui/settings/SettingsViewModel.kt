@@ -33,6 +33,7 @@ import android.net.Uri
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.studyasist.auth.AppleSignInHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -45,7 +46,9 @@ class SettingsViewModel @Inject constructor(
     private val notificationScheduler: NotificationScheduler,
     private val backupRepository: com.studyasist.data.repository.BackupRepository,
     private val workManager: WorkManager,
-    private val driveApiBackupProvider: DriveApiBackupProvider
+    private val driveApiBackupProvider: DriveApiBackupProvider,
+    private val syncRepository: com.studyasist.data.repository.SyncRepository,
+    private val appleSignInResultHolder: com.studyasist.auth.AppleSignInResultHolder
 ) : ViewModel() {
 
     val settings: StateFlow<AppSettings> = settingsRepository.settingsFlow
@@ -360,7 +363,18 @@ class SettingsViewModel @Inject constructor(
     private val _accountSignInResult = MutableStateFlow<String?>(null)
     val accountSignInResult: StateFlow<String?> = _accountSignInResult.asStateFlow()
 
-    fun clearAccountSignInResult() { _accountSignInResult.value = null }
+    init {
+        viewModelScope.launch {
+            appleSignInResultHolder.result.collect { msg ->
+                if (msg != null) _accountSignInResult.value = msg
+            }
+        }
+    }
+
+    fun clearAccountSignInResult() {
+        _accountSignInResult.value = null
+        appleSignInResultHolder.clear()
+    }
 
     fun isBackendAuthConfigured(): Boolean = authRepository.isBackendAuthConfigured()
 
@@ -384,6 +398,44 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.signOut()
             _accountSignInResult.value = null
+        }
+    }
+
+    fun isAppleSignInConfigured(): Boolean = AppleSignInHelper.isConfigured()
+
+    /** Launches Sign in with Apple web flow. Requires APPLE_SERVICE_ID and backend callback. */
+    fun getAppleSignInIntent(): android.content.Intent {
+        val authUrl = AppleSignInHelper.buildAuthUrl(AppleSignInHelper.getRedirectUri())
+        return android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(authUrl))
+    }
+
+    // Sync (backend)
+    private val _syncResult = MutableStateFlow<String?>(null)
+    val syncResult: StateFlow<String?> = _syncResult.asStateFlow()
+
+    fun clearSyncResult() { _syncResult.value = null }
+
+    fun syncUpload() {
+        viewModelScope.launch {
+            _syncResult.value = null
+            when (val r = syncRepository.upload()) {
+                is com.studyasist.data.repository.SyncResult.Success ->
+                    _syncResult.value = context.getString(com.studyasist.R.string.sync_success)
+                is com.studyasist.data.repository.SyncResult.Error ->
+                    _syncResult.value = context.getString(com.studyasist.R.string.sync_failed, r.message)
+            }
+        }
+    }
+
+    fun syncDownload() {
+        viewModelScope.launch {
+            _syncResult.value = null
+            when (val r = syncRepository.download()) {
+                is com.studyasist.data.repository.SyncResult.Success ->
+                    _syncResult.value = context.getString(com.studyasist.R.string.sync_success)
+                is com.studyasist.data.repository.SyncResult.Error ->
+                    _syncResult.value = context.getString(com.studyasist.R.string.sync_failed, r.message)
+            }
         }
     }
 }

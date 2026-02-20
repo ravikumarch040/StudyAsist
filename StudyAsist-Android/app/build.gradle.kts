@@ -22,6 +22,8 @@ android {
         buildConfigField("String", "DRIVE_WEB_CLIENT_ID", "\"$driveClientId\"")
         val backendUrl = project.findProperty("STUDYASIST_BACKEND_URL") as? String ?: "http://10.0.2.2:8000"
         buildConfigField("String", "BACKEND_BASE_URL", "\"$backendUrl\"")
+        val appleServiceId = project.findProperty("APPLE_SERVICE_ID") as? String ?: ""
+        buildConfigField("String", "APPLE_SERVICE_ID", "\"$appleServiceId\"")
     }
 
     buildTypes {

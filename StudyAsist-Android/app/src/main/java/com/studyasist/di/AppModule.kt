@@ -6,7 +6,13 @@ import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.studyasist.BuildConfig
 import com.studyasist.data.api.AuthApi
+import com.studyasist.data.api.LeaderboardApi
+import com.studyasist.data.api.ShareApi
+import com.studyasist.data.api.SyncApi
 import com.studyasist.data.local.db.AppDatabase
+import com.studyasist.data.network.AuthTokenProvider
+import com.studyasist.data.network.AuthTokenInterceptor
+import com.studyasist.data.network.SettingsAuthTokenProvider
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -24,12 +30,21 @@ import com.studyasist.data.local.dao.QADao
 import com.studyasist.data.local.dao.ResultDao
 import com.studyasist.data.local.dao.StudyToolHistoryDao
 import com.studyasist.data.local.dao.TimetableDao
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class AuthModule {
+    @Binds
+    @Singleton
+    abstract fun bindAuthTokenProvider(impl: SettingsAuthTokenProvider): AuthTokenProvider
+}
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -46,15 +61,37 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(): AuthApi {
+    fun provideOkHttpClient(authInterceptor: AuthTokenInterceptor): OkHttpClient =
+        OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .build()
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(client: OkHttpClient): Retrofit {
         val baseUrl = BuildConfig.BACKEND_BASE_URL.trimEnd('/') + "/"
         return Retrofit.Builder()
             .baseUrl(baseUrl)
-            .client(OkHttpClient.Builder().build())
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(AuthApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideAuthApi(retrofit: Retrofit): AuthApi = retrofit.create(AuthApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSyncApi(retrofit: Retrofit): SyncApi = retrofit.create(SyncApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideLeaderboardApi(retrofit: Retrofit): LeaderboardApi = retrofit.create(LeaderboardApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideShareApi(retrofit: Retrofit): ShareApi = retrofit.create(ShareApi::class.java)
 
     @Provides
     @Singleton

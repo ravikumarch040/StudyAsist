@@ -49,7 +49,10 @@ class AssessmentResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val resultRepository: ResultRepository,
     private val attemptRepository: AttemptRepository,
-    private val assessmentRepository: AssessmentRepository
+    private val assessmentRepository: AssessmentRepository,
+    private val goalRepository: com.studyasist.data.repository.GoalRepository,
+    private val leaderboardRepository: com.studyasist.data.repository.LeaderboardRepository,
+    private val streakRepository: com.studyasist.data.repository.StreakRepository
 ) : ViewModel() {
 
     private val attemptId: Long = checkNotNull(savedStateHandle["attemptId"]) { "attemptId required" }
@@ -109,10 +112,22 @@ class AssessmentResultViewModel @Inject constructor(
                     maxScore = result.maxScore,
                     percent = result.percent,
                     details = details,
+                    assessmentTitle = assessmentRepository.getAssessment(attempt?.assessmentId ?: 0)?.title ?: "",
                     subjectChapter = subjectChapter,
                     needsManualReview = attempt?.needsManualReview ?: false,
                     manualFeedback = result.manualFeedback,
                     isLoading = false
+                )
+            }
+            attempt?.assessmentId?.let { aid ->
+                val assessment = assessmentRepository.getAssessment(aid)
+                val goalName = assessment?.goalId?.let { gid -> goalRepository.getGoal(gid)?.name }
+                leaderboardRepository.submitScore(
+                    score = result.score.toDouble(),
+                    maxScore = result.maxScore.toDouble(),
+                    assessmentTitle = assessment?.title,
+                    goalName = goalName,
+                    streakDays = streakRepository.getCurrentStreak()
                 )
             }
         }

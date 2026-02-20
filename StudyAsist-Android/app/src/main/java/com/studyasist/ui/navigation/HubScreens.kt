@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.EmojiObjects
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Timer
@@ -108,6 +109,7 @@ fun MoreHubScreen(
     onSettings: () -> Unit,
     onResults: () -> Unit,
     onManualReview: () -> Unit,
+    onLeaderboard: () -> Unit,
     onQABank: () -> Unit,
     onAssessments: () -> Unit
 ) {
@@ -134,6 +136,7 @@ fun MoreHubScreen(
             item { HubMenuItem(Icons.Default.Assessment, stringResource(R.string.assessments), stringResource(R.string.create_practice_tests), onAssessments) }
             item { HubMenuItem(Icons.Default.Star, stringResource(R.string.results), stringResource(R.string.view_attempt_history), onResults) }
             item { HubMenuItem(Icons.Default.Star, stringResource(R.string.manual_review), stringResource(R.string.manual_review_list), onManualReview) }
+            item { HubMenuItem(Icons.Default.EmojiEvents, stringResource(R.string.leaderboard), stringResource(R.string.leaderboard_subtitle), onLeaderboard) }
             item { HubMenuItem(Icons.Default.Settings, stringResource(R.string.settings), "", onSettings) }
         }
     }

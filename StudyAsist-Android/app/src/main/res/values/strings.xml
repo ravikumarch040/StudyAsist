@@ -670,4 +670,18 @@
     <string name="badge_pomodoro_first_desc">Complete your first Pomodoro session</string>
     <string name="badge_pomodoro_ten">Pomodoro Pro</string>
     <string name="badge_pomodoro_ten_desc">Complete 10 Pomodoro sessions</string>
+
+    <!-- Sync (backend) -->
+    <string name="sync_data">Sync data</string>
+    <string name="sync_upload">Upload to cloud</string>
+    <string name="sync_download">Download from cloud</string>
+    <string name="sync_success">Sync successful</string>
+    <string name="sync_failed">Sync failed: %1$s</string>
+
+    <!-- Leaderboard -->
+    <string name="leaderboard">Leaderboard</string>
+    <string name="leaderboard_subtitle">Top scores and your rank</string>
+    <string name="leaderboard_rank">Rank</string>
+    <string name="leaderboard_no_entries">No leaderboard entries yet</string>
+    <string name="leaderboard_sign_in_required">Sign in to view leaderboard</string>
 </resources>

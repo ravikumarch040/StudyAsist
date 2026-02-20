@@ -20,6 +20,13 @@ Scan your textbooks, build a Q&A bank, practice with flashcards, track progress 
 
 ---
 
+## Features (Android)
+
+- **Account sign-in:** Google and Sign in with Apple (when configured) for backend sync and leaderboards
+- **Sync data:** Upload/download your data to the cloud when signed in (Settings)
+- **Leaderboard:** Top scores and streaks (More Hub)
+- **Share assessments:** Generate shareable codes (local Base64 or backend short codes when signed in)
+
 ## Quick Start
 
 ### Android
@@ -43,6 +50,11 @@ uvicorn main:app --reload
 ```
 
 API: http://localhost:8000 | Docs: http://localhost:8000/docs
+
+**Backend configuration (optional):** Add to `StudyAsist-Android/local.properties`:
+- `DRIVE_WEB_CLIENT_ID` – Google OAuth web client ID (for backend + Drive)
+- `STUDYASIST_BACKEND_URL` – Backend base URL (default: http://10.0.2.2:8000 for emulator)
+- `APPLE_SERVICE_ID` – Apple Services ID (for Sign in with Apple; requires backend callback)
 
 ### iOS
 

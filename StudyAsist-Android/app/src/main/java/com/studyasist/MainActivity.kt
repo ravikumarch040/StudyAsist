@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import com.studyasist.auth.AppleSignInHelper
+import com.studyasist.auth.AppleSignInResultHolder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -29,17 +31,24 @@ import com.studyasist.ui.onboarding.OnboardingScreen
 import com.studyasist.ui.onboarding.OnboardingViewModel
 import com.studyasist.ui.theme.AppTheme
 import com.studyasist.ui.theme.StudyAsistTheme
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject lateinit var authRepository: com.studyasist.data.repository.AuthRepository
+    @Inject lateinit var appleSignInResultHolder: AppleSignInResultHolder
+
     private val mainViewModel: MainViewModel by viewModels()
     private val onboardingViewModel: OnboardingViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         mainViewModel.setPendingGoalIdFromIntent(intent)
+        processAppleSignInIntent(intent)
         setContent {
             val darkMode by mainViewModel.darkModeFlow.collectAsState(initial = "system")
             val themeId by mainViewModel.themeIdFlow.collectAsState(initial = "MINIMAL_LIGHT")
@@ -98,5 +107,18 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         mainViewModel.setPendingGoalIdFromIntent(intent)
+        processAppleSignInIntent(intent)
+    }
+
+    private fun processAppleSignInIntent(intent: Intent?) {
+        val idToken = AppleSignInHelper.extractIdTokenFromIntent(intent) ?: return
+        lifecycleScope.launch {
+            when (val r = authRepository.loginWithApple(idToken)) {
+                is com.studyasist.data.repository.AuthResult.Success ->
+                    appleSignInResultHolder.setResult(getString(R.string.signed_in_success))
+                is com.studyasist.data.repository.AuthResult.Error ->
+                    appleSignInResultHolder.setResult(r.message)
+            }
+        }
     }
 }

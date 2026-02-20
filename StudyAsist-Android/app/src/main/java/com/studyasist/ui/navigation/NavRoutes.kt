@@ -36,6 +36,7 @@ object NavRoutes {
     const val RESULT_LIST = "result_list"
     const val MANUAL_REVIEW_LIST = "manual_review_list"
     const val MANUAL_OVERRIDE = "manual_override/{attemptId}"
+    const val LEADERBOARD = "leaderboard"
     const val ADD_REVISION = "add_revision/{subject}/{chapter}"
     const val USER_GUIDE = "user_guide"
 

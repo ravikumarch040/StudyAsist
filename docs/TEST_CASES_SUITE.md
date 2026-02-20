@@ -114,11 +114,13 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
-| TC-SH01 | Generate share code | Assessment with questions | generateShareCode(assessmentId) | Base64 string | P0 | Integration |
+| TC-SH01 | Generate share code | Assessment with questions | generateShareCode(assessmentId) | Base64 string (or backend code when signed in) | P0 | Integration |
 | TC-SH02 | Generate for non-existent | assessmentId=-1 | generateShareCode | Returns null | P0 | Integration |
-| TC-SH03 | Decode share code | Valid code from TC-SH01 | decodeShareCode(code) | ShareableAssessment with questions | P0 | Unit |
+| TC-SH03 | Decode share code | Valid code from TC-SH01 | decodeShareCode(code) | ShareableAssessment with questions | P0 | Integration |
 | TC-SH04 | Decode invalid code | Garbage string | decodeShareCode | Returns null | P0 | Unit |
 | TC-SH05 | Decode malformed Base64 | Invalid Base64 | decodeShareCode | Returns null, no crash | P1 | Unit |
+| TC-SH06 | Generate via backend | Signed in, assessment exists | generateShareCode(assessmentId) | Short alphanumeric code (6–12 chars) | P1 | Integration |
+| TC-SH07 | Decode backend code | Valid backend share code | decodeShareCode(code) | ShareableAssessment from API | P1 | Integration |
 
 ---
 
@@ -281,7 +283,25 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 19. Navigation & UI Flows
+## 19. Sync Repository
+
+| ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
+|----|-----------|---------------|-------|-----------------|------|------|
+| TC-SY01 | Upload - not signed in | No token | syncRepository.upload() | SyncResult.Error("Not signed in") | P0 | Integration |
+| TC-SY02 | Download - not signed in | No token | syncRepository.download() | SyncResult.Error("Not signed in") | P0 | Integration |
+| TC-SY03 | Upload - signed in | Token present | syncRepository.upload() | SyncResult.Success or Error from API | P1 | Integration |
+| TC-SY04 | Download - signed in | Token present | syncRepository.download() | SyncResult.Success or Error from API | P1 | Integration |
+
+## 20. Leaderboard Repository & API
+
+| ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
+|----|-----------|---------------|-------|-----------------|------|------|
+| TC-LB01 | Get top - no auth required | - | leaderboardRepository.getTop(50) | Success with list or empty | P1 | Integration |
+| TC-LB02 | Submit score - not signed in | No token | leaderboardRepository.submitScore(...) | LeaderboardResult.Error("Not signed in") | P0 | Integration |
+| TC-LB03 | Submit score - signed in | Token present | leaderboardRepository.submitScore(...) | Success or API error | P1 | Integration |
+| TC-LB04 | Get my scores - not signed in | No token | leaderboardRepository.getMyScores(20) | LeaderboardResult.Error | P1 | Integration |
+
+## 21. Navigation & UI Flows
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -295,14 +315,16 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | TC-UI08 | Quick actions - Assessments | - | Tap Assessments | Assessment list opens | P0 | UI |
 | TC-UI09 | Study Hub - all menu items | - | Tap each hub item | Correct screen opens | P0 | UI |
 | TC-UI10 | More Hub - Settings | - | Tap Settings | Settings opens | P0 | UI |
-| TC-UI11 | Settings - User Guide | - | Tap User Guide card | User Guide screen opens | P1 | UI |
-| TC-UI12 | Back navigation | On detail screen | Press back | Returns to previous | P0 | UI |
-| TC-UI13 | Bottom bar hidden on run | - | Navigate to Assessment Run | Bottom bar hidden | P0 | UI |
-| TC-UI14 | Bottom bar hidden on QA Scan | - | Navigate to QA Scan | Bottom bar hidden | P0 | UI |
+| TC-UI11 | More Hub - Leaderboard | - | Tap Leaderboard | Leaderboard screen opens | P1 | UI |
+| TC-UI12 | Leaderboard - empty/signed out | - | Open Leaderboard | Message or empty list | P1 | UI |
+| TC-UI13 | Settings - User Guide | - | Tap User Guide card | User Guide screen opens | P1 | UI |
+| TC-UI14 | Back navigation | On detail screen | Press back | Returns to previous | P0 | UI |
+| TC-UI15 | Bottom bar hidden on run | - | Navigate to Assessment Run | Bottom bar hidden | P0 | UI |
+| TC-UI16 | Bottom bar hidden on QA Scan | - | Navigate to QA Scan | Bottom bar hidden | P0 | UI |
 
 ---
 
-## 20. Onboarding
+## 22. Onboarding
 
 | ID | Test Case | Preconditions | First launch | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|--------------|------|-----------------|------|------|
@@ -314,7 +336,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 21. Timetable Screens
+## 23. Timetable Screens
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -333,7 +355,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 22. Goal Screens
+## 24. Goal Screens
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -348,7 +370,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 23. Q&A Bank & Scan
+## 25. Q&A Bank & Scan
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -366,7 +388,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 24. Assessment Flow
+## 26. Assessment Flow
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -385,7 +407,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 25. Result & Manual Review
+## 27. Result & Manual Review
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -401,7 +423,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 26. Daily Review & Flashcards
+## 28. Daily Review & Flashcards
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -418,7 +440,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 27. Pomodoro
+## 29. Pomodoro
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -432,7 +454,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 28. AI Study Plan & Tutor
+## 30. AI Study Plan & Tutor
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -444,7 +466,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 29. Settings Screens
+## 31. Settings Screens
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -468,10 +490,14 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | TC-SE18 | Settings - restore | Backup file | Tap Restore, pick file | Import, success message | P0 | UI |
 | TC-SE19 | Settings - export exam data | - | Tap Export exam data | File picker | P1 | UI |
 | TC-SE20 | Settings - restore exam data | Exam JSON | Tap Restore exam data | Import | P1 | UI |
+| TC-SE21 | Settings - Account sign in Google | Backend configured | Tap Sign in with Google | Google sign-in flow | P1 | UI |
+| TC-SE22 | Settings - Sync upload | Signed in | Tap Upload to cloud | Success/error message | P1 | UI |
+| TC-SE23 | Settings - Sync download | Signed in | Tap Download from cloud | Success/error message | P1 | UI |
+| TC-SE24 | Settings - Sign in with Apple | APPLE_SERVICE_ID set | Tap Sign in with Apple | Web flow or disabled | P2 | UI |
 
 ---
 
-## 30. Add Revision
+## 32. Add Revision
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -481,7 +507,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 31. Export & Share
+## 33. Export & Share
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -494,7 +520,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 32. Widgets
+## 34. Widgets
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -507,7 +533,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 33. Database Migrations
+## 35. Database Migrations
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -519,7 +545,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 34. Error Handling & Edge Cases
+## 36. Error Handling & Edge Cases
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -533,7 +559,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
-## 35. License Repository (Freemium)
+## 37. License Repository (Freemium)
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
 |----|-----------|---------------|-------|-----------------|------|------|
@@ -553,14 +579,16 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | Q&A Parser | 6 | 0 | 0 | 6 |
 | Focus Guard | 6 | 0 | 0 | 6 |
 | Backup | 0 | 8 | 0 | 8 |
-| Share | 2 | 3 | 0 | 5 |
+| Share | 2 | 5 | 0 | 7 |
+| Sync | 0 | 4 | 0 | 4 |
+| Leaderboard | 0 | 4 | 2 | 6 |
 | Repositories | 0 | 60+ | 0 | 60+ |
 | Templates | 4 | 0 | 0 | 4 |
-| UI Flows | 0 | 0 | 90+ | 90+ |
+| UI Flows | 0 | 0 | 96+ | 96+ |
 | Migrations | 0 | 5 | 0 | 5 |
 | Error handling | 0 | 1 | 6 | 7 |
 | License | 3 | 0 | 0 | 3 |
-| **Total** | **~51** | **~79** | **~96** | **~226** |
+| **Total** | **~51** | **~87** | **~100** | **~238** |
 
 ---
 
