@@ -199,15 +199,16 @@
 
 ### 5.2 Tasks
 
-1. Add Wearable Data Layer dependency to Wear module.
-2. Phone: `MainActivity` or a service: on streak update, send to `WearableClient` or `DataClient`.
-3. Wear: `StreakScreen` subscribes to data; display received streak.
-4. Fallback: show "Sync required" or 0 when no data.
+1. ~~Add Wearable Data Layer dependency to Wear module.~~ (play-services-wearable already present)
+2. ~~Phone: `MainActivity` or a service: on streak update, send to `WearableClient` or `DataClient`.~~
+3. ~~Wear: `StreakScreen` subscribes to data; display received streak.~~
+4. ~~Fallback: show "Sync required" or 0 when no data.~~
 
-**Files:**
-- `wear/build.gradle.kts`
-- `wear/.../StreakScreen.kt`
-- Phone: new `WearSyncManager` or integrate into existing sync flow
+**Implemented:**
+- `WearSyncManager` (app module): syncs streak to Wear via PutDataMapRequest
+- `HomeViewModel`, `AssessmentResultViewModel`: call `wearSyncManager.syncStreak()` when streak changes
+- `StreakScreen` (wear): fetches from DataClient, adds listener for updates; shows "Sync with phone" when no data
+- Wear app: Pomodoro screen has Streak button; StreakScreen shows synced value with Back
 
 ---
 

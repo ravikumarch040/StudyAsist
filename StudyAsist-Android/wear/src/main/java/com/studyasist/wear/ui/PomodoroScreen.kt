@@ -18,7 +18,7 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeText
 
 @Composable
-fun PomodoroScreen() {
+fun PomodoroScreen(onOpenStreak: () -> Unit = {}) {
     var isRunning by remember { mutableStateOf(false) }
     var secondsLeft by remember { mutableStateOf(25 * 60) } // 25 min focus
 
@@ -41,6 +41,12 @@ fun PomodoroScreen() {
                 modifier = Modifier.padding(top = 8.dp)
             ) {
                 Text(if (isRunning) "Pause" else "Start")
+            }
+            Button(
+                onClick = onOpenStreak,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text("Streak")
             }
         }
     }

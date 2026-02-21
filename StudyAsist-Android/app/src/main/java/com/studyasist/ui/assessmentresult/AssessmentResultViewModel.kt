@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.studyasist.data.repository.AssessmentRepository
 import com.studyasist.data.repository.AttemptRepository
+import com.studyasist.sync.WearSyncManager
 import com.studyasist.data.repository.ResultRepository
 import com.studyasist.data.repository.SubjectChapter
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +53,8 @@ class AssessmentResultViewModel @Inject constructor(
     private val assessmentRepository: AssessmentRepository,
     private val goalRepository: com.studyasist.data.repository.GoalRepository,
     private val leaderboardRepository: com.studyasist.data.repository.LeaderboardRepository,
-    private val streakRepository: com.studyasist.data.repository.StreakRepository
+    private val streakRepository: com.studyasist.data.repository.StreakRepository,
+    private val wearSyncManager: WearSyncManager
 ) : ViewModel() {
 
     private val attemptId: Long = checkNotNull(savedStateHandle["attemptId"]) { "attemptId required" }
@@ -122,13 +124,15 @@ class AssessmentResultViewModel @Inject constructor(
             attempt?.assessmentId?.let { aid ->
                 val assessment = assessmentRepository.getAssessment(aid)
                 val goalName = assessment?.goalId?.let { gid -> goalRepository.getGoal(gid)?.name }
+                val streak = streakRepository.getCurrentStreak()
                 leaderboardRepository.submitScore(
                     score = result.score.toDouble(),
                     maxScore = result.maxScore.toDouble(),
                     assessmentTitle = assessment?.title,
                     goalName = goalName,
-                    streakDays = streakRepository.getCurrentStreak()
+                    streakDays = streak
                 )
+                wearSyncManager.syncStreak(streak)
             }
         }
     }

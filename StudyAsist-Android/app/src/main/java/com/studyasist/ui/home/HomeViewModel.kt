@@ -14,6 +14,7 @@ import com.studyasist.data.repository.ResultRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.data.repository.StreakRepository
 import com.studyasist.data.repository.TimetableRepository
+import com.studyasist.sync.WearSyncManager
 import com.studyasist.notification.NotificationScheduler
 import com.studyasist.util.currentTimeMinutesFromMidnight
 import com.studyasist.util.daysUntil
@@ -65,6 +66,7 @@ class HomeViewModel @Inject constructor(
     private val streakRepository: StreakRepository,
     private val badgeRepository: BadgeRepository,
     private val resultRepository: ResultRepository,
+    private val wearSyncManager: WearSyncManager,
     private val goalRepository: GoalRepository,
     private val goalDashboardRepository: GoalDashboardRepository
 ) : ViewModel() {
@@ -85,6 +87,7 @@ class HomeViewModel @Inject constructor(
             val streak = streakRepository.getCurrentStreak()
             _streak.value = streak
             badgeRepository.checkAndAwardStreakBadges(streak)
+            wearSyncManager.syncStreak(streak)
         }
         viewModelScope.launch {
             settingsRepository.userNameFlow.collect { _userName.value = it }
@@ -181,6 +184,7 @@ class HomeViewModel @Inject constructor(
             val streak = streakRepository.getCurrentStreak()
             _streak.value = streak
             badgeRepository.checkAndAwardStreakBadges(streak)
+            wearSyncManager.syncStreak(streak)
         }
     }
 

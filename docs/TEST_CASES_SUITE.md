@@ -543,6 +543,17 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
+## 34a. Wear OS Streak Sync
+
+| ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
+|----|-----------|---------------|------|-----------------|------|------|
+| TC-WR01 | Phone syncs streak to Wear | Phone + Wear paired, streak > 0 | Open Home on phone | WearSyncManager sends streak via Data Layer | P1 | Integration |
+| TC-WR02 | Wear displays synced streak | Phone synced streak | Open Streak screen on Wear | Shows streak days | P1 | UI |
+| TC-WR03 | Wear shows Sync with phone | No data yet, Wear only | Open Streak screen | "Sync with phone" shown | P1 | UI |
+| TC-WR04 | Streak updates on Wear | Streak changes on phone | Complete assessment on phone, open Streak on Wear | Updated streak shown | P1 | UI |
+
+---
+
 ## 34. Widgets
 
 | ID | Test Case | Preconditions | Steps | Expected Result | Prio | Type |
