@@ -1,6 +1,7 @@
 package com.studyasist.util
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import com.google.mlkit.vision.common.InputImage
@@ -65,6 +66,31 @@ suspend fun extractTextFromImage(context: Context, imageUri: Uri): Result<String
             cont.invokeOnCancellation { recognizer.close() }
         }
     } catch (e: IOException) {
+        Result.failure(e)
+    }
+}
+
+/**
+ * Extracts text from a Bitmap using ML Kit Text Recognition.
+ */
+suspend fun extractTextFromBitmap(bitmap: Bitmap): Result<String> = withContext(Dispatchers.IO) {
+    try {
+        val image = InputImage.fromBitmap(bitmap, 0)
+        suspendCancellableCoroutine { cont ->
+            val recognizer: TextRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+            recognizer.process(image)
+                .addOnSuccessListener { result ->
+                    val text = result.text?.trim() ?: ""
+                    recognizer.close()
+                    cont.resume(Result.success(text))
+                }
+                .addOnFailureListener { e ->
+                    recognizer.close()
+                    cont.resume(Result.failure(e))
+                }
+            cont.invokeOnCancellation { recognizer.close() }
+        }
+    } catch (e: Exception) {
         Result.failure(e)
     }
 }

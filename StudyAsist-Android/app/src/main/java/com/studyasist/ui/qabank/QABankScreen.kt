@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Score
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -51,6 +52,7 @@ fun QABankScreen(
     viewModel: QABankViewModel,
     onBack: () -> Unit,
     onScanClick: () -> Unit,
+    onImportPdf: () -> Unit = {},
     onCreateAssessment: () -> Unit = {},
     onViewAssessments: () -> Unit = {},
     onViewResults: () -> Unit = {}
@@ -69,6 +71,9 @@ fun QABankScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onImportPdf) {
+                        Icon(Icons.Default.PictureAsPdf, contentDescription = stringResource(R.string.import_pdf))
+                    }
                     IconButton(onClick = onViewAssessments) {
                         Icon(Icons.AutoMirrored.Filled.Assignment, contentDescription = stringResource(R.string.assessments))
                     }

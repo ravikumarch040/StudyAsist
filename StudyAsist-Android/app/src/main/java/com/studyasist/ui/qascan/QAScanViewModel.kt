@@ -10,6 +10,7 @@ import com.studyasist.data.repository.QABankRepository
 import com.studyasist.data.repository.SettingsRepository
 import com.studyasist.data.repository.StudentClassRepository
 import com.studyasist.data.repository.GeminiRepository
+import com.studyasist.ui.pdfimport.PendingPdfImportHolder
 import com.studyasist.util.extractTextFromImage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -48,7 +49,8 @@ class QAScanViewModel @Inject constructor(
     private val qaBankRepository: QABankRepository,
     private val settingsRepository: SettingsRepository,
     private val geminiRepository: GeminiRepository,
-    private val studentClassRepository: StudentClassRepository
+    private val studentClassRepository: StudentClassRepository,
+    private val pendingPdfImportHolder: PendingPdfImportHolder
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QAScanUiState())
@@ -57,6 +59,11 @@ class QAScanViewModel @Inject constructor(
     init {
         loadDistinctValues()
         syncUseAiFromSettings()
+        pendingPdfImportHolder.consume()?.let { rows ->
+            _uiState.update {
+                it.copy(parsedRows = rows.ifEmpty { listOf(EditableQARow("", "", QuestionType.SHORT)) })
+            }
+        }
     }
 
     private fun syncUseAiFromSettings() {

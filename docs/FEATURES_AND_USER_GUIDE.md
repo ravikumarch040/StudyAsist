@@ -93,6 +93,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 | Feature | Description |
 |---------|-------------|
 | **Scan Q&A** | Take photo or choose image; extract questions automatically |
+| **Import PDF** | Select PDF file; pick pages to process; OCR extracts Q&A; edit then save to bank |
 | **Improve with AI** | Gemini improves/extracts Q&A from rough OCR (Settings: use cloud for parsing) |
 | **Manual Entry** | Add row: question, answer, type (MCQ, Short, Numeric, True/False, Essay) |
 | **Filter by Subject** | Dropdown to filter by subject (from Student Class or Q&A bank) |
@@ -143,6 +144,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 |---------|-------------|
 | **Score Display** | Correct/max, percentage |
 | **Per-Question Breakdown** | Your answer vs correct; partial credit for essays |
+| **Ask about this question** | Tap on any question card to open AI Tutor with that question pre-filled |
 | **AI Grading** | Subjective grading for essays (Settings: use cloud for grading) |
 | **Leaderboard Submit** | Score submitted to leaderboard when signed in (automatic) |
 | **Revise** | Jump to Q&A bank filtered by subject/chapter |
@@ -237,6 +239,7 @@ A comprehensive list of all features and sub-features in StudyAsist, your AI-pow
 |---------|-------------|
 | **Chat UI** | User messages on right, AI on left |
 | **Send Message** | Ask anything about your studies |
+| **Ask about this question** | From Assessment Result, tap "Ask about this" to open Tutor with that question pre-filled |
 | **Context-Aware** | AI uses recent wrong answers, subject, level |
 | **Chat History** | Stored per session |
 | **Loading Indicator** | While AI is responding |
@@ -397,20 +400,22 @@ Settings is organized into sections: **Profile**, **Appearance**, **Alerts & Not
 | **School / City / State** | Optional |
 | **Subjects** | Add/remove; feeds all subject dropdowns |
 
-### 17.12 Accessibility (when implemented)
+### 17.12 Accessibility (section)
 
 | Feature | Description |
 |---------|-------------|
-| **Font Scale** | 0.85x, 1.0x, 1.15x, 1.3x |
+| **Font Scale** | 0.85x, 1.0x, 1.15x, 1.3x (Small, Medium, Large, Extra Large) |
 | **Haptic Feedback** | Vibration on taps |
 | **High Contrast** | Enhanced contrast mode |
 | **Color-Blind Mode** | Blue/orange instead of red/green |
+
+*Access:* Settings → Accessibility
 
 ### 17.13 About (section) – User Guide & Logout
 
 User Guide card and Logout button (when signed in) are in the About section at the bottom.
 
-### 17.14 Pomodoro Settings (when in Settings)
+### 17.14 Pomodoro Settings (section)
 
 | Feature | Description |
 |---------|-------------|
@@ -418,6 +423,8 @@ User Guide card and Logout button (when signed in) are in the About section at t
 | **Short Break** | 5, 10, 15 min |
 | **Long Break** | 15, 20, 30 min |
 | **Auto-Start Breaks** | Automatically start break when focus ends |
+
+*Access:* Settings → Pomodoro
 
 ---
 

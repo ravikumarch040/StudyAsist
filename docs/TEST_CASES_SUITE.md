@@ -392,6 +392,10 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | TC-QS09 | QA Scan - improve with AI | useCloudForParsing on | Tap Improve with AI | AI improves, QAs extracted | P1 | UI |
 | TC-QS10 | QA Scan - manual add row | - | Tap Add row, fill Q&A | Row added | P0 | UI |
 | TC-QS11 | QA Scan - save to bank | Rows filled | Tap Save to bank | QAs in DB | P0 | UI |
+| TC-QS12 | Q&A Bank - Import PDF | - | Tap PDF icon in top bar | PDF Import screen opens | P0 | UI |
+| TC-QS13 | PDF Import - select file | - | Tap Import PDF, pick PDF | Page thumbnails shown | P0 | UI |
+| TC-QS14 | PDF Import - select pages | PDF loaded | Select pages, tap Import | OCR runs; QA Scan opens with rows | P1 | UI |
+| TC-QS15 | PDF Import - save to bank | Imported rows on QA Scan | Edit if needed, Save | QAs in DB | P1 | UI |
 
 ---
 
@@ -427,6 +431,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | TC-RF07 | Result detail - export | On result | Tap Export, PDF | PDF generated | P1 | UI |
 | TC-RF08 | Manual override - change score | On override screen | Change score, Save | Updated | P0 | UI |
 | TC-RF09 | Manual override - feedback | On override screen | Add feedback, Save | Saved | P1 | UI |
+| TC-RF10 | Result detail - Ask about this | On result with details | Tap Ask about this on question card | Tutor chat opens with question | P1 | UI |
 
 ---
 
@@ -470,6 +475,7 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | TC-AI03 | AI Tutor - send message | API key set | Type, Send | AI response shown | P1 | UI |
 | TC-AI04 | AI Tutor - loading | - | Send message | Loading indicator | P1 | UI |
 | TC-AI05 | AI Tutor - history | Messages sent | Scroll | History visible | P1 | UI |
+| TC-AI06 | AI Tutor - Ask about this question | Result with questions | On result, tap "Ask about this" on a question | Tutor opens with question pre-filled and sent | P1 | UI |
 
 ---
 
@@ -503,6 +509,14 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 | TC-SE24 | Settings - Sign in with Apple | APPLE_SERVICE_ID set | Tap Sign in with Apple | Web flow or disabled | P2 | UI |
 | TC-SE25 | Settings - sections & User Guide | - | Scroll Settings | Profile, Appearance, Alerts, Study & AI, Backup & Sync, About; User Guide and Logout in About | P1 | UI |
 | TC-SE26 | Settings - Logout when signed in | Signed in | Tap Logout | Signs out | P1 | UI |
+| TC-SE27 | Settings - Accessibility font scale | - | Accessibility section, select Large (1.15x) | Font scale applied app-wide | P1 | UI |
+| TC-SE28 | Settings - Accessibility haptic | - | Toggle haptic feedback | Persisted | P1 | UI |
+| TC-SE29 | Settings - Accessibility high contrast | - | Toggle high contrast | Persisted | P1 | UI |
+| TC-SE30 | Settings - Accessibility color blind | - | Toggle color-blind mode | Persisted | P1 | UI |
+| TC-SE31 | Settings - Pomodoro focus duration | - | Pomodoro section, select 45 min | Persisted, used by Pomodoro timer | P1 | UI |
+| TC-SE32 | Settings - Pomodoro short break | - | Select 10 min short break | Persisted | P1 | UI |
+| TC-SE33 | Settings - Pomodoro long break | - | Select 20 min long break | Persisted | P1 | UI |
+| TC-SE34 | Settings - Pomodoro auto-start breaks | - | Toggle auto-start | Persisted | P1 | UI |
 
 ---
 

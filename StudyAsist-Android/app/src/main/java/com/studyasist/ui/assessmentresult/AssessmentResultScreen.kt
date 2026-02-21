@@ -58,7 +58,8 @@ fun AssessmentResultScreen(
     onRevise: (subject: String?, chapter: String?) -> Unit = { _, _ -> },
     onAddToTimetable: (subject: String, chapter: String?) -> Unit = { _, _ -> },
     onManualReview: () -> Unit = {},
-    onRetry: (Long) -> Unit = {}
+    onRetry: (Long) -> Unit = {},
+    onAskAboutQuestion: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -387,6 +388,14 @@ fun AssessmentResultScreen(
                                     Icon(Icons.Default.Schedule, contentDescription = stringResource(R.string.cd_add_to_timetable), modifier = Modifier.padding(end = 4.dp))
                                     Text(stringResource(R.string.add_to_timetable))
                                 }
+                            }
+                        }
+                        if (item.questionText.isNotBlank()) {
+                            androidx.compose.material3.TextButton(
+                                onClick = { onAskAboutQuestion(item.questionText) },
+                                modifier = Modifier.padding(top = 4.dp)
+                            ) {
+                                Text(stringResource(R.string.ask_about_this))
                             }
                         }
                     }

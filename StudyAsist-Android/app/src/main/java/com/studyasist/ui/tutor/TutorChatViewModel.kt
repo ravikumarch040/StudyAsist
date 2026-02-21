@@ -1,5 +1,6 @@
 package com.studyasist.ui.tutor
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studyasist.data.local.dao.ChatMessageDao
@@ -18,6 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TutorChatViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val chatMessageDao: ChatMessageDao,
     private val geminiRepository: GeminiRepository,
     private val settingsRepository: SettingsRepository
@@ -28,6 +30,13 @@ class TutorChatViewModel @Inject constructor(
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    init {
+        val initialQuestion = savedStateHandle.get<String>("initialQuestion")?.trim()
+        if (!initialQuestion.isNullOrBlank()) {
+            sendMessage(initialQuestion)
+        }
+    }
 
     fun sendMessage(text: String) {
         val trimmed = text.trim()

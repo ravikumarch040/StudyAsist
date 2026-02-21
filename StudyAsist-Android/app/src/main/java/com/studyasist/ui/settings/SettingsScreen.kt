@@ -600,6 +600,58 @@ fun SettingsScreen(
                     }
                 }
             }
+            // ── Accessibility ───────────────────────────────────────────────
+            SettingsSectionHeader(stringResource(R.string.settings_section_accessibility))
+            val fontScale by viewModel.fontScale.collectAsState(initial = 1.0f)
+            val hapticEnabled by viewModel.hapticEnabled.collectAsState(initial = true)
+            val highContrastMode by viewModel.highContrastMode.collectAsState(initial = false)
+            val colorBlindMode by viewModel.colorBlindMode.collectAsState(initial = false)
+            Text(stringResource(R.string.font_size), style = MaterialTheme.typography.titleSmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(0.85f to R.string.font_size_small, 1.0f to R.string.font_size_medium, 1.15f to R.string.font_size_large, 1.3f to R.string.font_size_extra_large).forEach { (scale, labelRes) ->
+                    FilterChip(
+                        selected = kotlin.math.abs(fontScale - scale) < 0.01f,
+                        onClick = { viewModel.setFontScale(scale) },
+                        label = { Text(stringResource(labelRes)) }
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.haptic_feedback))
+                    Text(stringResource(R.string.haptic_feedback_summary), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = hapticEnabled, onCheckedChange = viewModel::setHapticEnabled)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.high_contrast))
+                    Text(stringResource(R.string.high_contrast_summary), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = highContrastMode, onCheckedChange = viewModel::setHighContrastMode)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.color_blind_mode))
+                    Text(stringResource(R.string.color_blind_summary), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = colorBlindMode, onCheckedChange = viewModel::setColorBlindMode)
+            }
             // ── Study & AI ─────────────────────────────────────────────────
             SettingsSectionHeader(stringResource(R.string.settings_section_study_ai))
             Text(stringResource(R.string.your_name), style = MaterialTheme.typography.titleSmall)
@@ -679,6 +731,59 @@ fun SettingsScreen(
                     checked = settings.useCloudForGrading,
                     onCheckedChange = viewModel::setUseCloudForGrading
                 )
+            }
+            // ── Pomodoro ────────────────────────────────────────────────────
+            SettingsSectionHeader(stringResource(R.string.settings_section_pomodoro))
+            val pomodoroFocus by viewModel.pomodoroFocusMinutes.collectAsState(initial = 25)
+            val pomodoroShortBreak by viewModel.pomodoroShortBreakMinutes.collectAsState(initial = 5)
+            val pomodoroLongBreak by viewModel.pomodoroLongBreakMinutes.collectAsState(initial = 15)
+            val pomodoroAutoStart by viewModel.pomodoroAutoStartBreaks.collectAsState(initial = false)
+            Text(stringResource(R.string.pomodoro_focus_duration), style = MaterialTheme.typography.titleSmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(25, 45, 50).forEach { mins ->
+                    FilterChip(
+                        selected = pomodoroFocus == mins,
+                        onClick = { viewModel.setPomodoroFocusMinutes(mins) },
+                        label = { Text("$mins min") }
+                    )
+                }
+            }
+            Text(stringResource(R.string.pomodoro_short_break_duration), style = MaterialTheme.typography.titleSmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(5, 10, 15).forEach { mins ->
+                    FilterChip(
+                        selected = pomodoroShortBreak == mins,
+                        onClick = { viewModel.setPomodoroShortBreakMinutes(mins) },
+                        label = { Text("$mins min") }
+                    )
+                }
+            }
+            Text(stringResource(R.string.pomodoro_long_break_duration), style = MaterialTheme.typography.titleSmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(15, 20, 30).forEach { mins ->
+                    FilterChip(
+                        selected = pomodoroLongBreak == mins,
+                        onClick = { viewModel.setPomodoroLongBreakMinutes(mins) },
+                        label = { Text("$mins min") }
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.pomodoro_auto_start_breaks))
+                Switch(checked = pomodoroAutoStart, onCheckedChange = viewModel::setPomodoroAutoStartBreaks)
             }
             // ── Backup & Sync ─────────────────────────────────────────────
             SettingsSectionHeader(stringResource(R.string.settings_section_backup_sync))

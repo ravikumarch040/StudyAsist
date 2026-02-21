@@ -71,4 +71,5 @@ See [StudyAsist-iOS/README.md](StudyAsist-iOS/README.md) – implementation plan
 - [docs/FEATURES_AND_USER_GUIDE.md](docs/FEATURES_AND_USER_GUIDE.md) – Features and user guide
 - [docs/DESIGN.md](docs/DESIGN.md) – Design and architecture
 - [docs/TEST_CASES_SUITE.md](docs/TEST_CASES_SUITE.md) – Test cases
+- [docs/PLAN-PENDING-FEATURES.md](docs/PLAN-PENDING-FEATURES.md) – Plan to finish all pending features
 - [StudyAsist-Backend/README.md](StudyAsist-Backend/README.md) – Backend API

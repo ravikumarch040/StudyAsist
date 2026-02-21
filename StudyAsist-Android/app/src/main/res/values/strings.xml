@@ -10,6 +10,8 @@
     <string name="settings_section_study_ai">Study &amp; AI</string>
     <string name="settings_section_backup_sync">Backup &amp; Sync</string>
     <string name="settings_section_about">About</string>
+    <string name="settings_section_accessibility">Accessibility</string>
+    <string name="settings_section_pomodoro">Pomodoro</string>
     <string name="user_guide">User Guide</string>
     <string name="user_guide_hint">View all features and how to use them</string>
     <string name="back">Back</string>
@@ -626,6 +628,9 @@
     <!-- PDF Import -->
     <string name="import_pdf">Import PDF</string>
     <string name="processing_page_format">Processing page %1$d of %2$d…</string>
+    <string name="select_pages_hint">Select at least one page to import</string>
+    <string name="pdf_import_select_pages">Select pages to import</string>
+    <string name="select_all">Select all</string>
 
     <!-- Social -->
     <string name="challenge_friend">Challenge a Friend</string>

@@ -438,4 +438,64 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
+
+    // ── Accessibility ────────────────────────────────────────────────────────
+
+    val fontScale: StateFlow<Float> = settingsRepository.fontScaleFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), 1.0f)
+
+    val hapticEnabled: StateFlow<Boolean> = settingsRepository.hapticEnabledFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), true)
+
+    val highContrastMode: StateFlow<Boolean> = settingsRepository.highContrastModeFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), false)
+
+    val colorBlindMode: StateFlow<Boolean> = settingsRepository.colorBlindModeFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), false)
+
+    fun setFontScale(scale: Float) {
+        viewModelScope.launch { settingsRepository.setFontScale(scale) }
+    }
+
+    fun setHapticEnabled(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setHapticEnabled(enabled) }
+    }
+
+    fun setHighContrastMode(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setHighContrastMode(enabled) }
+    }
+
+    fun setColorBlindMode(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setColorBlindMode(enabled) }
+    }
+
+    // ── Pomodoro ─────────────────────────────────────────────────────────────
+
+    val pomodoroFocusMinutes: StateFlow<Int> = settingsRepository.pomodoroFocusMinutesFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), 25)
+
+    val pomodoroShortBreakMinutes: StateFlow<Int> = settingsRepository.pomodoroShortBreakMinutesFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), 5)
+
+    val pomodoroLongBreakMinutes: StateFlow<Int> = settingsRepository.pomodoroLongBreakMinutesFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), 15)
+
+    val pomodoroAutoStartBreaks: StateFlow<Boolean> = settingsRepository.pomodoroAutoStartBreaksFlow
+        .stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), false)
+
+    fun setPomodoroFocusMinutes(minutes: Int) {
+        viewModelScope.launch { settingsRepository.setPomodoroFocusMinutes(minutes) }
+    }
+
+    fun setPomodoroShortBreakMinutes(minutes: Int) {
+        viewModelScope.launch { settingsRepository.setPomodoroShortBreakMinutes(minutes) }
+    }
+
+    fun setPomodoroLongBreakMinutes(minutes: Int) {
+        viewModelScope.launch { settingsRepository.setPomodoroLongBreakMinutes(minutes) }
+    }
+
+    fun setPomodoroAutoStartBreaks(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setPomodoroAutoStartBreaks(enabled) }
+    }
 }

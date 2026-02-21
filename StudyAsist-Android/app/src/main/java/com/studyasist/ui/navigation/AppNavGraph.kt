@@ -61,6 +61,8 @@ import com.studyasist.ui.qabank.QABankScreen
 import com.studyasist.ui.qabank.QABankViewModel
 import com.studyasist.ui.qascan.QAScanScreen
 import com.studyasist.ui.qascan.QAScanViewModel
+import com.studyasist.ui.pdfimport.PdfImportScreen
+import com.studyasist.ui.pdfimport.PdfImportViewModel
 import com.studyasist.ui.addrevision.AddRevisionScreen
 import com.studyasist.ui.addrevision.AddRevisionViewModel
 import com.studyasist.ui.assessmentcreate.AssessmentCreateScreen
@@ -435,6 +437,7 @@ fun AppNavGraph(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() },
                     onScanClick = { navController.navigate(NavRoutes.QA_SCAN) },
+                    onImportPdf = { navController.navigate(NavRoutes.PDF_IMPORT) },
                     onCreateAssessment = { navController.navigate(NavRoutes.ASSESSMENT_CREATE) },
                     onViewAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
                     onViewResults = { navController.navigate(NavRoutes.RESULT_LIST) }
@@ -453,9 +456,22 @@ fun AppNavGraph(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() },
                     onScanClick = { navController.navigate(NavRoutes.QA_SCAN) },
+                    onImportPdf = { navController.navigate(NavRoutes.PDF_IMPORT) },
                     onCreateAssessment = { navController.navigate(NavRoutes.ASSESSMENT_CREATE) },
                     onViewAssessments = { navController.navigate(NavRoutes.ASSESSMENT_LIST) },
                     onViewResults = { navController.navigate(NavRoutes.RESULT_LIST) }
+                )
+            }
+
+            composable(NavRoutes.PDF_IMPORT) {
+                val viewModel: PdfImportViewModel = hiltViewModel()
+                PdfImportScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onImportComplete = {
+                        navController.popBackStack()
+                        navController.navigate(NavRoutes.QA_SCAN)
+                    }
                 )
             }
 
@@ -556,6 +572,9 @@ fun AppNavGraph(
                     onRetry = { newAssessmentId ->
                         navController.popBackStack()
                         navController.navigate(NavRoutes.assessmentRun(newAssessmentId))
+                    },
+                    onAskAboutQuestion = { question ->
+                        navController.navigate(NavRoutes.tutorChatWithQuestion(question))
                     }
                 )
             }
@@ -638,6 +657,22 @@ fun AppNavGraph(
                 )
             }
             composable(NavRoutes.TUTOR_CHAT) {
+                val viewModel: com.studyasist.ui.tutor.TutorChatViewModel = hiltViewModel()
+                com.studyasist.ui.tutor.TutorChatScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = NavRoutes.TUTOR_CHAT_WITH_QUESTION,
+                arguments = listOf(
+                    navArgument("initialQuestion") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) {
                 val viewModel: com.studyasist.ui.tutor.TutorChatViewModel = hiltViewModel()
                 com.studyasist.ui.tutor.TutorChatScreen(
                     viewModel = viewModel,

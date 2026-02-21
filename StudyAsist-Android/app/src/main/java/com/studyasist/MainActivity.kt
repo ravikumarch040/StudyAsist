@@ -13,6 +13,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
@@ -52,6 +55,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val darkMode by mainViewModel.darkModeFlow.collectAsState(initial = "system")
             val themeId by mainViewModel.themeIdFlow.collectAsState(initial = "MINIMAL_LIGHT")
+            val fontScale by mainViewModel.fontScaleFlow.collectAsState(initial = 1.0f)
             val onboardingCompleted by mainViewModel.onboardingCompletedFlow.collectAsState(initial = true)
             val isSystemDark = isSystemInDarkTheme()
             val darkTheme = when (darkMode) {
@@ -67,6 +71,10 @@ class MainActivity : ComponentActivity() {
                 showOnboarding = !onboardingCompleted
             }
 
+            val defaultDensity = LocalDensity.current
+            CompositionLocalProvider(
+                LocalDensity provides Density(density = defaultDensity.density, fontScale = fontScale)
+            ) {
             StudyAsistTheme(appTheme = appTheme, darkTheme = darkTheme) {
                 val permissionLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestPermission()
@@ -99,6 +107,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
+            }
             }
         }
     }

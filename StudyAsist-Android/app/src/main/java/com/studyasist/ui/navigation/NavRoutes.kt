@@ -17,6 +17,10 @@ object NavRoutes {
     const val FLASHCARD = "flashcard"
     const val POMODORO = "pomodoro"
     const val TUTOR_CHAT = "tutor_chat"
+    const val TUTOR_CHAT_WITH_QUESTION = "tutor_chat?initialQuestion={initialQuestion}"
+
+    fun tutorChatWithQuestion(initialQuestion: String): String =
+        "tutor_chat?initialQuestion=${java.net.URLEncoder.encode(initialQuestion, "UTF-8")}"
     const val STUDY_PLAN = "study_plan"
 
     const val GOAL_LIST = "goal_list"
@@ -27,6 +31,7 @@ object NavRoutes {
     const val QA_BANK = "qa_bank"
     const val QA_BANK_REVISE = "qa_bank_revise/{subject}/{chapter}"
     const val QA_SCAN = "qa_scan"
+    const val PDF_IMPORT = "pdf_import"
 
     const val ASSESSMENT_CREATE = "assessment_create"
     const val ASSESSMENT_CREATE_FOR_GOAL = "assessment_create/{goalId}"
