@@ -1,22 +1,20 @@
 # Credential Manager Migration for Google Drive
 
-## Status: Deferred
+## Status: Hybrid Implemented
 
-The current Google Drive backup uses deprecated `GoogleSignIn` and `GoogleAccountCredential`. Full migration to Credential Manager is complex.
+**Backend auth** now uses Credential Manager. **Drive backup** still uses Google Sign-In (needs OAuth2 access tokens).
 
 ## Key Constraint
 
-**Credential Manager provides authentication (ID token), not authorization (OAuth2 access token).** The Drive API requires OAuth2 access tokens with `drive.file` scope. `GetGoogleIdOption` / `GoogleIdTokenCredential` from Credential Manager return ID tokens only—no access token for Drive.
+**Credential Manager provides authentication (ID token), not authorization (OAuth2 access token).** The Drive API requires access tokens; Credential Manager returns ID tokens only.
 
-## Options
+## Implemented (Hybrid)
 
-1. **Hybrid**: Use Credential Manager for backend auth (ID token → JWT exchange) and keep Google Sign-In for Drive backup when `cloudBackupTarget == "google_drive"`. Splits flows but works.
-2. **Full migration**: Use [Google Identity Authorization for Android](https://developers.google.com/identity/authorization/android) for Drive OAuth2 scopes—separate from Credential Manager.
-3. **Backend proxy**: Have backend exchange ID token for Drive access token; app never uses Drive API directly.
-
-## Completed
-
-- [x] Add `androidx.credentials:credentials` and `credentials-play-services-auth` (done).
+- [x] **CredentialManagerAuthHelper**: `getGoogleIdToken(Activity)` via Credential Manager
+- [x] **Settings Account section**: "Sign in with Google" uses Credential Manager when `isBackendAuthConfigured`
+- [x] **Onboarding Account page**: Same Credential Manager flow
+- [x] **Drive backup**: Still uses Google Sign-In intent (unchanged)
+- [x] Dependencies: `credentials`, `credentials-play-services-auth`, `googleid:1.1.1`
 
 ## Pending (when migrating)
 

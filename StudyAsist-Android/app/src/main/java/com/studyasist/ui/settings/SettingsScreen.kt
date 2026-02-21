@@ -254,7 +254,11 @@ fun SettingsScreen(
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
-                            onClick = { googleSignInLauncher.launch(viewModel.getGoogleSignInIntent()) },
+                            onClick = {
+                                (context as? android.app.Activity)?.let { activity ->
+                                    viewModel.signInWithCredentialManager(activity)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(stringResource(R.string.sign_in_with_google))

@@ -31,6 +31,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.studyasist.auth.CredentialManagerAuthException
+import com.studyasist.auth.CredentialManagerAuthHelper
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.studyasist.auth.AppleSignInHelper
@@ -378,18 +380,43 @@ class SettingsViewModel @Inject constructor(
 
     fun isBackendAuthConfigured(): Boolean = authRepository.isBackendAuthConfigured()
 
-    /** Call after Google Sign-In activity result when resultCode == RESULT_OK. */
-    fun onGoogleSignInResult(resultCode: Int) {
-        refreshDriveSignInState()
-        if (resultCode != android.app.Activity.RESULT_OK || !authRepository.isBackendAuthConfigured()) return
+    /**
+     * Sign in with Credential Manager (backend auth only).
+     * Use for Account section. Requires Activity context.
+     */
+    fun signInWithCredentialManager(activity: android.app.Activity) {
         viewModelScope.launch {
             _accountSignInResult.value = null
-            val idToken = GoogleSignIn.getLastSignedInAccount(context)?.idToken ?: return@launch
-            when (val r = authRepository.loginWithGoogle(idToken)) {
-                is com.studyasist.data.repository.AuthResult.Success ->
-                    _accountSignInResult.value = context.getString(com.studyasist.R.string.signed_in_success)
-                is com.studyasist.data.repository.AuthResult.Error ->
-                    _accountSignInResult.value = r.message
+            try {
+                val idToken = CredentialManagerAuthHelper.getGoogleIdToken(activity)
+                when (val r = authRepository.loginWithGoogle(idToken)) {
+                    is com.studyasist.data.repository.AuthResult.Success ->
+                        _accountSignInResult.value = context.getString(com.studyasist.R.string.signed_in_success)
+                    is com.studyasist.data.repository.AuthResult.Error ->
+                        _accountSignInResult.value = r.message
+                }
+            } catch (e: CredentialManagerAuthException) {
+                _accountSignInResult.value = e.message ?: "Sign-in failed"
+            }
+        }
+    }
+
+    /** Call after Google Sign-In activity result (Drive) when resultCode == RESULT_OK. */
+    fun onGoogleSignInResult(resultCode: Int) {
+        refreshDriveSignInState()
+        if (resultCode != android.app.Activity.RESULT_OK) return
+        // Also complete backend auth if configured and ID token available (Drive sign-in includes it)
+        if (authRepository.isBackendAuthConfigured()) {
+            viewModelScope.launch {
+                val idToken = GoogleSignIn.getLastSignedInAccount(context)?.idToken
+                if (idToken != null) {
+                    when (val r = authRepository.loginWithGoogle(idToken)) {
+                        is com.studyasist.data.repository.AuthResult.Success ->
+                            _accountSignInResult.value = context.getString(com.studyasist.R.string.signed_in_success)
+                        is com.studyasist.data.repository.AuthResult.Error ->
+                            _accountSignInResult.value = r.message
+                    }
+                }
             }
         }
     }

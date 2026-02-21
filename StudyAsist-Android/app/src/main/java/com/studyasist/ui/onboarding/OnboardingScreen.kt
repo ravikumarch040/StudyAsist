@@ -54,6 +54,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -85,6 +86,7 @@ fun OnboardingScreen(
     onComplete: (OnboardingResult) -> Unit
 ) {
     val totalPages = featurePages.size + 1 + 1 + 1 + 1 // features + student class + account + backup + name
+    val context = LocalContext.current
 
     val pagerState = rememberPagerState(pageCount = { totalPages })
     val scope = rememberCoroutineScope()
@@ -173,12 +175,21 @@ fun OnboardingScreen(
                     },
                     onRemoveSubject = { studentClassSubjects = studentClassSubjects - it }
                 )
-                page == featurePages.size + 1 -> OnboardingAccountPage(
-                    accountSignedIn = accountSignedIn,
-                    signInResult = signInResult,
-                    onSignInClick = { googleSignInLauncher.launch(viewModel.getGoogleSignInIntent()) },
-                    onClearResult = { viewModel.clearSignInResult() }
-                )
+                page == featurePages.size + 1 -> {
+                    val ctx = context
+                    OnboardingAccountPage(
+                        accountSignedIn = accountSignedIn,
+                        signInResult = signInResult,
+                        onSignInClick = {
+                            if (ctx is android.app.Activity && viewModel.isBackendAuthConfigured()) {
+                                viewModel.signInWithCredentialManager(ctx)
+                            } else {
+                                googleSignInLauncher.launch(viewModel.getGoogleSignInIntent())
+                            }
+                        },
+                        onClearResult = { viewModel.clearSignInResult() }
+                    )
+                }
                 page == featurePages.size + 2 -> {
                     LaunchedEffect(Unit) { viewModel.refreshDriveSignInState() }
                     OnboardingBackupPage(

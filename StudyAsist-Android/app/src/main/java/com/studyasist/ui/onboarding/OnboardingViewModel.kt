@@ -8,6 +8,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.studyasist.auth.CredentialManagerAuthException
+import com.studyasist.auth.CredentialManagerAuthHelper
 import com.studyasist.data.cloud.DriveApiBackupProvider
 import com.studyasist.data.repository.AuthRepository
 import com.studyasist.data.repository.SettingsRepository
@@ -64,6 +66,27 @@ class OnboardingViewModel @Inject constructor(
 
     fun getGoogleSignInIntent(): Intent =
         GoogleSignIn.getClient(context, DriveApiBackupProvider.getSignInOptions()).signInIntent
+
+    /**
+     * Sign in with Credential Manager (backend auth only).
+     * Use for Account page when isBackendAuthConfigured.
+     */
+    fun signInWithCredentialManager(activity: android.app.Activity) {
+        viewModelScope.launch {
+            _signInResult.value = null
+            try {
+                val idToken = CredentialManagerAuthHelper.getGoogleIdToken(activity)
+                when (val r = authRepository.loginWithGoogle(idToken)) {
+                    is com.studyasist.data.repository.AuthResult.Success ->
+                        _signInResult.value = "success"
+                    is com.studyasist.data.repository.AuthResult.Error ->
+                        _signInResult.value = r.message
+                }
+            } catch (e: CredentialManagerAuthException) {
+                _signInResult.value = e.message ?: "Sign-in failed"
+            }
+        }
+    }
 
     fun onGoogleSignInResult(resultCode: Int) {
         refreshDriveSignInState()
