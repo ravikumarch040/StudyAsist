@@ -87,6 +87,8 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.hilt.work)
     implementation(libs.mlkit.text.recognition)
+    // genai-prompt removed: requires Kotlin 2.2, triggers KSP "unexpected jvm signature V" with Hilt.
+    // Re-add when Dagger/KSP compatibility is fixed. See docs/PLAN-OFFLINE-AI.md
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)

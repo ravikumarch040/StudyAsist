@@ -101,7 +101,7 @@ class ExplainViewModel @Inject constructor(
             val lang = _uiState.value.selectedLanguageCode
             val langName = languageOptions.find { it.first == lang }?.second?.let { context.getString(it) } ?: lang
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            val result = geminiRepository.generateContent(
+            val result = geminiRepository.generateContentWithFallback(
                 apiKey,
                 "Explain the following in simple terms. Write the explanation in $langName. Do not add any preamble.\n\n$text"
             )

@@ -1,5 +1,6 @@
 package com.studyasist.data.repository
 
+import com.studyasist.ai.OfflineGeminiProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.util.Base64
@@ -14,7 +15,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GeminiRepository @Inject constructor() {
+class GeminiRepository @Inject constructor(
+    private val offlineGeminiProvider: OfflineGeminiProvider
+) {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -175,6 +178,19 @@ class GeminiRepository @Inject constructor() {
     }
 
     /**
+     * Generates content: cloud first, falls back to on-device Gemini Nano when cloud fails
+     * (no API key, offline, or error). Use for explain/solve flows.
+     */
+    suspend fun generateContentWithFallback(apiKey: String, prompt: String): Result<String> {
+        val cloud = generateContent(apiKey, prompt)
+        if (cloud.isSuccess) return cloud
+        if (offlineGeminiProvider.isAvailable()) {
+            return offlineGeminiProvider.generateContent(prompt)
+        }
+        return cloud
+    }
+
+    /**
      * Explains the given text in the specified language. Returns the explanation or an error.
      */
     suspend fun explain(apiKey: String, text: String, lang: String = "en"): Result<String> {
@@ -187,7 +203,7 @@ class GeminiRepository @Inject constructor() {
             else -> lang
         }
         val prompt = "Explain the following in simple terms. Write the explanation in $langName. Do not add any preamble.\n\n$text"
-        return generateContent(apiKey, prompt)
+        return generateContentWithFallback(apiKey, prompt)
     }
 
     private fun parseGeminiError(body: String): String? {

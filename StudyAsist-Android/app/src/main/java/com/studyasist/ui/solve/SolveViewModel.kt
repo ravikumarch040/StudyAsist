@@ -101,7 +101,7 @@ class SolveViewModel @Inject constructor(
             val lang = _uiState.value.selectedLanguageCode
             val langName = languageOptions.find { it.first == lang }?.second?.let { context.getString(it) } ?: lang
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            val result = geminiRepository.generateContent(
+            val result = geminiRepository.generateContentWithFallback(
                 apiKey,
                 """Solve this problem. Write the solution in $langName. Use EXACTLY this format:
 

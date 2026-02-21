@@ -212,7 +212,7 @@
 
 ---
 
-## Phase 6: Offline AI (Gemini Nano) – Future
+## Phase 6: Offline AI (Gemini Nano) – Implemented
 
 ### 6.1 Overview
 
@@ -220,10 +220,11 @@
 - Device-dependent (Pixel 8+, selected Samsung).
 - Fallback when no network or no API key.
 
-### 6.2 Notes
+### 6.2 Implemented
 
-- Requires AICore SDK, model download.
-- Lower priority; implement when device support is broader.
+- **OfflineGeminiProvider**: ML Kit GenAI Prompt API for on-device Gemini Nano
+- **GeminiRepository.generateContentWithFallback**: Cloud first, then offline when cloud fails
+- **ExplainViewModel** & **SolveViewModel**: Use `generateContentWithFallback` for explain/solve
 
 ---
 

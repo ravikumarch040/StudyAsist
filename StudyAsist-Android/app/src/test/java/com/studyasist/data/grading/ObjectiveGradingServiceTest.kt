@@ -1,5 +1,6 @@
 package com.studyasist.data.grading
 
+import com.studyasist.ai.OfflineGeminiProvider
 import com.studyasist.data.datastore.SettingsDataStore
 import com.studyasist.data.local.entity.QA
 import com.studyasist.data.local.entity.QuestionType
@@ -26,7 +27,8 @@ class ObjectiveGradingServiceTest {
         val context = org.robolectric.RuntimeEnvironment.getApplication().applicationContext
         val settingsDataStore = SettingsDataStore(context)
         val settingsRepository = SettingsRepository(settingsDataStore)
-        val geminiRepository = GeminiRepository()
+        val offlineProvider = OfflineGeminiProvider(context)
+        val geminiRepository = GeminiRepository(offlineProvider)
         service = ObjectiveGradingService(context, geminiRepository, settingsRepository)
     }
 

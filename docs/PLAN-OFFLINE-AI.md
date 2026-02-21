@@ -1,8 +1,8 @@
 # Offline AI (Gemini Nano)
 
-## Status: Placeholder
+## Status: Placeholder (build-blocked)
 
-On-device Gemini Nano for basic AI operations without internet is planned for future implementation.
+ML Kit genai-prompt requires Kotlin 2.2+, which triggers KSP "unexpected jvm signature V" with Hilt. Dependency removed; OfflineGeminiProvider is stubbed. Re-enable when Dagger/KSP fix is released.
 
 ## Requirements
 
@@ -10,12 +10,13 @@ On-device Gemini Nano for basic AI operations without internet is planned for fu
 - `com.google.android.aicare` or AICore system app
 - Model download on first use
 
+## Implementation
+
+- **OfflineGeminiProvider** (`com.studyasist.ai`): ML Kit `Generation.getClient()`, `checkStatus()`, `download()`, `generateContent(prompt)`
+- **GeminiRepository.generateContentWithFallback(apiKey, prompt)**: Tries cloud first; on failure, uses `OfflineGeminiProvider` if `isAvailable()`
+- **ExplainViewModel** & **SolveViewModel**: Use `generateContentWithFallback` for explain/solve flows
+
 ## Use Cases
 
 - Basic Explain/Solve when offline
-- Fallback when user has no API key
-
-## Implementation Notes
-
-- Check `AICoreClient.isAvailable()` before offering offline AI
-- Graceful fallback to "Requires network" or "Add API key" when unavailable
+- Fallback when user has no API key or cloud API errors
