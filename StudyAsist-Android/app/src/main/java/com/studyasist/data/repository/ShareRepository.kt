@@ -23,6 +23,17 @@ data class ShareableQuestion(
     val options: String?
 )
 
+/** Extracted for unit testing invalid/malformed input (TC-SH04, TC-SH05). */
+internal object ShareCodeDecoder {
+    fun decodeLocalShareCode(code: String, gson: Gson): ShareableAssessment? =
+        try {
+            val json = String(Base64.decode(code, Base64.URL_SAFE or Base64.NO_WRAP))
+            gson.fromJson(json, ShareableAssessment::class.java)
+        } catch (_: Exception) {
+            null
+        }
+}
+
 @Singleton
 class ShareRepository @Inject constructor(
     private val assessmentDao: AssessmentDao,
@@ -94,11 +105,6 @@ class ShareRepository @Inject constructor(
         }
 
         // Local Base64
-        return try {
-            val json = String(Base64.decode(code, Base64.URL_SAFE or Base64.NO_WRAP))
-            gson.fromJson(json, ShareableAssessment::class.java)
-        } catch (_: Exception) {
-            null
-        }
+        return ShareCodeDecoder.decodeLocalShareCode(code, gson)
     }
 }

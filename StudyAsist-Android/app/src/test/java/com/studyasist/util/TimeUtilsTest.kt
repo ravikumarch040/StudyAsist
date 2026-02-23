@@ -1,7 +1,11 @@
 package com.studyasist.util
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.Calendar
+import java.util.TimeZone
 
 class TimeUtilsTest {
 
@@ -75,5 +79,31 @@ class TimeUtilsTest {
         val futureEpoch = System.currentTimeMillis() + 24 * 60 * 60 * 1000
         val result = formatRelativeTimeAgo(futureEpoch)
         assert(result.matches(Regex("""[A-Za-z]{3} \d{1,2}""")))
+    }
+
+    @Test
+    fun formatExamDate_validEpoch() {
+        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        cal.set(2024, Calendar.JUNE, 15, 0, 0, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        val epoch = cal.timeInMillis
+        val result = formatExamDate(epoch)
+        assertFalse(result.isBlank())
+        assertTrue(result.contains("2024"))
+    }
+
+    @Test
+    fun formatExamDate_edgeDates_yearBoundary() {
+        val utc = TimeZone.getTimeZone("UTC")
+        val dec31_2024 = Calendar.getInstance(utc).apply {
+            set(2024, Calendar.DECEMBER, 31, 0, 0, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        val jan1_2025 = Calendar.getInstance(utc).apply {
+            set(2025, Calendar.JANUARY, 1, 0, 0, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        assertTrue(formatExamDate(dec31_2024).contains("2024"))
+        assertTrue(formatExamDate(jan1_2025).contains("2025"))
     }
 }
