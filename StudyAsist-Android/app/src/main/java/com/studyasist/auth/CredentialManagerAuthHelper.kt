@@ -1,6 +1,8 @@
 package com.studyasist.auth
 
 import android.app.Activity
+import android.content.Context
+import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -57,6 +59,20 @@ object CredentialManagerAuthHelper {
             throw CredentialManagerAuthException(e.message ?: "Invalid token")
         } catch (e: Exception) {
             throw CredentialManagerAuthException(e.message ?: "Sign-in failed")
+        }
+    }
+
+    /**
+     * Clears cached credential state so the next sign-in shows the account picker.
+     * Call on sign-out when using Credential Manager for backend auth.
+     */
+    suspend fun clearCredentialState(context: Context) = withContext(Dispatchers.Main) {
+        try {
+            val credentialManager = CredentialManager.create(context)
+            val request = ClearCredentialStateRequest()
+            credentialManager.clearCredentialState(request)
+        } catch (_: Exception) {
+            // Ignore: provider may not support clear; local sign-out still succeeds
         }
     }
 }

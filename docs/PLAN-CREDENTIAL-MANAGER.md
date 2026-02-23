@@ -16,11 +16,15 @@
 - [x] **Drive backup**: Still uses Google Sign-In intent (unchanged)
 - [x] Dependencies: `credentials`, `credentials-play-services-auth`, `googleid:1.1.1`
 
+## Implemented (additional)
+
+- [x] **Sign-out**: `CredentialManagerAuthHelper.clearCredentialState()` called on account sign-out when backend auth is configured
+
 ## Pending (when migrating)
 
 1. For **backend auth only**: Replace `GoogleSignIn` sign-in intent with `CredentialManager.getCredential()` + `GetGoogleIdOption`; use ID token for `authRepository.loginWithGoogle()`.
 2. For **Drive backup**: Either keep Google Sign-In for Drive scope, or implement Authorization API flow for access tokens.
-3. Handle sign-out: `CredentialManager.clearCredentialState()` for Credential Manager credentials.
+3. ~~Handle sign-out: `CredentialManager.clearCredentialState()`~~ Done.
 4. Remove `@Suppress("DEPRECATION")` where no longer needed.
 
 ## References

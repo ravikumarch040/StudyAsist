@@ -404,12 +404,12 @@ Settings is organized into sections: **Profile**, **Appearance**, **Alerts & Not
 
 | Feature | Description |
 |---------|-------------|
-| **Font Scale** | 0.85x, 1.0x, 1.15x, 1.3x (Small, Medium, Large, Extra Large) |
-| **Haptic Feedback** | Vibration on taps |
-| **High Contrast** | Enhanced contrast mode |
-| **Color-Blind Mode** | Blue/orange instead of red/green |
+| **Font Scale** | 0.85x, 1.0x, 1.15x, 1.3x (Small, Medium, Large, Extra Large); applied app-wide |
+| **Haptic Feedback** | Vibration on taps; when off, all haptic feedback is disabled app-wide |
+| **High Contrast** | Overrides theme to Dark High Contrast (cyan/orange, high legibility) |
+| **Color-Blind Mode** | Overrides theme to Dark High Contrast (avoids red-green; uses cyan/orange) |
 
-*Access:* Settings → Accessibility
+*Access:* Settings → Accessibility. When High Contrast or Color-Blind Mode is on, the app uses the Dark High Contrast theme regardless of the selected theme.
 
 ### 17.13 About (section) – User Guide & Logout
 

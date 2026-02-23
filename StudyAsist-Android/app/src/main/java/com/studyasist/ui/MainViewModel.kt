@@ -17,6 +17,9 @@ class MainViewModel @Inject constructor(
 
     val darkModeFlow: kotlinx.coroutines.flow.Flow<String> = settingsRepository.darkModeFlow
     val themeIdFlow: kotlinx.coroutines.flow.Flow<String> = settingsRepository.themeIdFlow
+    val hapticEnabledFlow: kotlinx.coroutines.flow.Flow<Boolean> = settingsRepository.hapticEnabledFlow
+    val highContrastModeFlow: kotlinx.coroutines.flow.Flow<Boolean> = settingsRepository.highContrastModeFlow
+    val colorBlindModeFlow: kotlinx.coroutines.flow.Flow<Boolean> = settingsRepository.colorBlindModeFlow
     val userNameFlow: kotlinx.coroutines.flow.Flow<String> = settingsRepository.userNameFlow
     val profilePicUriFlow: kotlinx.coroutines.flow.Flow<String?> = settingsRepository.profilePicUriFlow
     val onboardingCompletedFlow: kotlinx.coroutines.flow.Flow<Boolean> = settingsRepository.onboardingCompletedFlow

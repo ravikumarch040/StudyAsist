@@ -29,7 +29,7 @@ data class AppSettings(
 ) {
     companion object {
         const val DEFAULT_LEAD_MINUTES = 5
-        val LEAD_OPTIONS = listOf(0, 5, 10)
+        val LEAD_OPTIONS = listOf(0, 5, 10, 15, 30, 60)
         const val DEFAULT_EXAM_ALERT_DAYS = 7
         const val DEFAULT_EXAM_ALERT_PERCENT = 50
         val EXAM_ALERT_DAYS_OPTIONS = listOf(1, 3, 7, 14, 21)

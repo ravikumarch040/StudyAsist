@@ -423,6 +423,9 @@ class SettingsViewModel @Inject constructor(
 
     fun signOutFromAccount() {
         viewModelScope.launch {
+            if (authRepository.isBackendAuthConfigured()) {
+                CredentialManagerAuthHelper.clearCredentialState(context)
+            }
             authRepository.signOut()
             _accountSignInResult.value = null
         }

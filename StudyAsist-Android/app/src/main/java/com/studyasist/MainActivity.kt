@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ import com.studyasist.ui.navigation.AppNavGraph
 import com.studyasist.ui.onboarding.OnboardingResult
 import com.studyasist.ui.onboarding.OnboardingScreen
 import com.studyasist.ui.onboarding.OnboardingViewModel
+import com.studyasist.ui.ConditionalHapticFeedback
 import com.studyasist.ui.theme.AppTheme
 import com.studyasist.ui.theme.StudyAsistTheme
 import androidx.lifecycle.lifecycleScope
@@ -55,6 +57,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val darkMode by mainViewModel.darkModeFlow.collectAsState(initial = "system")
             val themeId by mainViewModel.themeIdFlow.collectAsState(initial = "MINIMAL_LIGHT")
+            val hapticEnabled by mainViewModel.hapticEnabledFlow.collectAsState(initial = true)
+            val highContrastMode by mainViewModel.highContrastModeFlow.collectAsState(initial = false)
+            val colorBlindMode by mainViewModel.colorBlindModeFlow.collectAsState(initial = false)
             val fontScale by mainViewModel.fontScaleFlow.collectAsState(initial = 1.0f)
             val onboardingCompleted by mainViewModel.onboardingCompletedFlow.collectAsState(initial = true)
             val isSystemDark = isSystemInDarkTheme()
@@ -63,7 +68,8 @@ class MainActivity : ComponentActivity() {
                 "light" -> false
                 else -> isSystemDark
             }
-            val appTheme = try { AppTheme.valueOf(themeId) } catch (_: Exception) { AppTheme.MINIMAL_LIGHT }
+            val baseTheme = try { AppTheme.valueOf(themeId) } catch (_: Exception) { AppTheme.MINIMAL_LIGHT }
+            val appTheme = if (highContrastMode || colorBlindMode) AppTheme.DARK_HIGH_CONTRAST else baseTheme
             val scope = rememberCoroutineScope()
             var showOnboarding by remember { mutableStateOf(!onboardingCompleted) }
 
@@ -72,8 +78,10 @@ class MainActivity : ComponentActivity() {
             }
 
             val defaultDensity = LocalDensity.current
+            val platformHaptic = LocalHapticFeedback.current
             CompositionLocalProvider(
-                LocalDensity provides Density(density = defaultDensity.density, fontScale = fontScale)
+                LocalDensity provides Density(density = defaultDensity.density, fontScale = fontScale),
+                LocalHapticFeedback provides ConditionalHapticFeedback(hapticEnabled, platformHaptic)
             ) {
             StudyAsistTheme(appTheme = appTheme, darkTheme = darkTheme) {
                 val permissionLauncher = rememberLauncherForActivityResult(

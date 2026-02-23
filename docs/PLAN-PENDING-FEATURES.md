@@ -212,7 +212,7 @@
 
 ---
 
-## Phase 6: Offline AI (Gemini Nano) – Implemented
+## Phase 6: Offline AI (Gemini Nano) – Placeholder (build-blocked)
 
 ### 6.1 Overview
 
@@ -220,11 +220,10 @@
 - Device-dependent (Pixel 8+, selected Samsung).
 - Fallback when no network or no API key.
 
-### 6.2 Implemented
+### 6.2 Status
 
-- **OfflineGeminiProvider**: ML Kit GenAI Prompt API for on-device Gemini Nano
-- **GeminiRepository.generateContentWithFallback**: Cloud first, then offline when cloud fails
-- **ExplainViewModel** & **SolveViewModel**: Use `generateContentWithFallback` for explain/solve
+- **OfflineGeminiProvider**: Stubbed (ML Kit genai-prompt removed due to Kotlin 2.2 / KSP compatibility)
+- **GeminiRepository.generateContentWithFallback**: Cloud first; offline path disabled until genai-prompt can be re-enabled
 
 ---
 
