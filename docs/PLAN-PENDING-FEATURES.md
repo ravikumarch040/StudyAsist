@@ -224,6 +224,7 @@
 
 - **OfflineGeminiProvider**: Stubbed (ML Kit genai-prompt removed due to Kotlin 2.2 / KSP compatibility)
 - **GeminiRepository.generateContentWithFallback**: Cloud first; offline path disabled until genai-prompt can be re-enabled
+- **Implementation checklist**: Documented in PLAN-OFFLINE-AI.md for when unblocked
 
 ---
 
@@ -266,3 +267,16 @@
 | **Total** | **~6 days** |
 
 Phases 4–7 are separate efforts and can be scheduled later.
+
+---
+
+## Implementation Summary (Completed 2025-02)
+
+| Phase | Status | Notes |
+|-------|--------|------|
+| 4 | Deferred | Drive keeps Google Sign-In; documented in PLAN-CREDENTIAL-MANAGER |
+| 5 | Done | Wear OS Streak sync implemented |
+| 6 | Blocked | Offline AI placeholder; checklist in PLAN-OFFLINE-AI |
+| 7 | Separate | iOS app |
+| Tests | Added | ActivityRepositoryIntegrationTest, GoalRepositoryIntegrationTest |
+| TODOs | Resolved | Drive TODOs documented; PENDING-DEPRECATIONS.md created |

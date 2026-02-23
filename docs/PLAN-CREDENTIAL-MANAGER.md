@@ -1,31 +1,36 @@
 # Credential Manager Migration for Google Drive
 
-## Status: Hybrid Implemented
+## Status: Hybrid Implemented (Drive Migration Deferred)
 
 **Backend auth** now uses Credential Manager. **Drive backup** still uses Google Sign-In (needs OAuth2 access tokens).
 
-## Key Constraint
+## Decision: Drive Keeps Google Sign-In
 
-**Credential Manager provides authentication (ID token), not authorization (OAuth2 access token).** The Drive API requires access tokens; Credential Manager returns ID tokens only.
+**Credential Manager provides authentication (ID token), not authorization (OAuth2 access token).** The Drive API requires access tokens. Migration options:
+
+1. **Keep Google Sign-In for Drive** (current): Works; no backend needed. `@Suppress("DEPRECATION")` retained in `DriveApiBackupProvider.kt` and `SettingsViewModel.kt`.
+2. **Authorization API**: Use `AuthorizationClient` from Google Identity to obtain access tokens. Requires OAuth client setup and possibly a thin backend for token exchange. See [Google Identity Authorization](https://developers.google.com/identity/authorization/android).
+
+**Chosen**: Option 1 until Authorization API is fully integrated.
 
 ## Implemented (Hybrid)
 
 - [x] **CredentialManagerAuthHelper**: `getGoogleIdToken(Activity)` via Credential Manager
 - [x] **Settings Account section**: "Sign in with Google" uses Credential Manager when `isBackendAuthConfigured`
 - [x] **Onboarding Account page**: Same Credential Manager flow
-- [x] **Drive backup**: Still uses Google Sign-In intent (unchanged)
+- [x] **Drive backup**: Uses Google Sign-In intent (unchanged; intentional per above)
 - [x] Dependencies: `credentials`, `credentials-play-services-auth`, `googleid:1.1.1`
 
 ## Implemented (additional)
 
 - [x] **Sign-out**: `CredentialManagerAuthHelper.clearCredentialState()` called on account sign-out when backend auth is configured
 
-## Pending (when migrating)
+## Deferred (Drive Migration)
 
-1. For **backend auth only**: Replace `GoogleSignIn` sign-in intent with `CredentialManager.getCredential()` + `GetGoogleIdOption`; use ID token for `authRepository.loginWithGoogle()`.
-2. For **Drive backup**: Either keep Google Sign-In for Drive scope, or implement Authorization API flow for access tokens.
-3. ~~Handle sign-out: `CredentialManager.clearCredentialState()`~~ Done.
-4. Remove `@Suppress("DEPRECATION")` where no longer needed.
+1. ~~For **backend auth only**: Replace GoogleSignIn…~~ Backend auth uses Credential Manager.
+2. **For Drive backup**: Deferred. See "Decision" above.
+3. ~~Handle sign-out~~ Done.
+4. **Remove `@Suppress("DEPRECATION")`**: Deferred for Drive-related files until Option 2 is implemented.
 
 ## References
 

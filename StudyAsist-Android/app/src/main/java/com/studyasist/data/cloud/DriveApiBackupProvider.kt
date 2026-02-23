@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION") // TODO: Migrate to Credential Manager + AuthorizationClient for Drive scopes
+@file:Suppress("DEPRECATION") // Drive requires OAuth2 access tokens. Credential Manager provides ID tokens only. See docs/PLAN-CREDENTIAL-MANAGER.md.
 
 package com.studyasist.data.cloud
 

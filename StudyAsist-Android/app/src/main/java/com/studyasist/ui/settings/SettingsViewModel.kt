@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION") // TODO: Migrate to Credential Manager + AuthorizationClient for Drive scopes
+@file:Suppress("DEPRECATION") // Drive sign-in uses GoogleSignIn. See docs/PLAN-CREDENTIAL-MANAGER.md.
 
 package com.studyasist.ui.settings
 
