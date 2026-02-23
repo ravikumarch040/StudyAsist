@@ -54,14 +54,15 @@ class ScanParseAssessGradeResultE2ETest {
     @Test
     fun fullFlow_scanParseAssessGradeResult() = runBlocking {
         // 1. PARSE: Extract Q&A from text (simulates OCR output)
+        // Use numbered format so HeuristicQaParser splits into 3 separate blocks
         val rawText = """
-            What is the capital of France?
+            1. What is the capital of France?
             Answer: Paris
 
-            True or False: The Earth is flat.
+            2. True or False: The Earth is flat.
             Answer: False
 
-            2 + 2 = ?
+            3. 2 + 2 = ?
             Answer: 4
         """.trimIndent()
         val parsed = HeuristicQaParser.parse(rawText)
