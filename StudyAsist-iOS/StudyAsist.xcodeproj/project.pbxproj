@@ -1,0 +1,562 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1000001 /* StudyAsistApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001; };
+		A1000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002; };
+		A1000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000003; };
+		A1000010 /* WeekType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010; };
+		A1000011 /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011; };
+		A1000012 /* QuestionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000012; };
+		A1000013 /* Timetable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000013; };
+		A1000014 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000014; };
+		A1000015 /* Goal.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000015; };
+		A1000016 /* GoalItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000016; };
+		A1000017 /* QA.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000017; };
+		A1000018 /* Assessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000018; };
+		A1000019 /* AssessmentQuestion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000019; };
+		A1000020 /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020; };
+		A1000021 /* AttemptAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000021; };
+		A1000022 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022; };
+		A1000023 /* BadgeEarned.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000023; };
+		A1000024 /* StudyToolHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000024; };
+		A1000025 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000025; };
+		A1000026 /* PomodoroSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000026; };
+		A1000027 /* BackupData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000027; };
+		A1000028 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000028; };
+		A1000029 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000029; };
+		A1000030 /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000030; };
+		A1000031 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000031; };
+		A1000032 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000032; };
+		A1000040 /* TimetableListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000040; };
+		A1000041 /* TimetableDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000041; };
+		A1000042 /* ActivityEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000042; };
+		A1000043 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000043; };
+		A1000044 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000044; };
+		A1000050 /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000050; };
+		A1000051 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000051; };
+		A1000060 /* GoalListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000060; };
+		A1000061 /* GoalEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000061; };
+		A1000062 /* GoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000062; };
+		A1000063 /* QABankListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000063; };
+		A1000064 /* QAEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000064; };
+		A1000065 /* QAScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000065; };
+		A1000066 /* AssessmentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000066; };
+		A1000067 /* AssessmentCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000067; };
+		A1000068 /* AssessmentRunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000068; };
+		A1000069 /* AssessmentResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000069; };
+		A1000070 /* ResultListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000070; };
+		A1000071 /* ResultDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000071; };
+		A1000072 /* StudyHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000072; };
+		A1000073 /* DictateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000073; };
+		A1000074 /* ExplainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000074; };
+		A1000075 /* SolveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000075; };
+		A1000076 /* PomodoroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000076; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A0000001 /* StudyAsist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StudyAsist.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2000001 /* StudyAsistApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyAsistApp.swift; sourceTree = "<group>"; };
+		A2000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A2000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A2000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A2000010 /* WeekType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekType.swift; sourceTree = "<group>"; };
+		A2000011 /* ActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
+		A2000012 /* QuestionType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionType.swift; sourceTree = "<group>"; };
+		A2000013 /* Timetable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timetable.swift; sourceTree = "<group>"; };
+		A2000014 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
+		A2000015 /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
+		A2000016 /* GoalItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalItem.swift; sourceTree = "<group>"; };
+		A2000017 /* QA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QA.swift; sourceTree = "<group>"; };
+		A2000018 /* Assessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assessment.swift; sourceTree = "<group>"; };
+		A2000019 /* AssessmentQuestion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentQuestion.swift; sourceTree = "<group>"; };
+		A2000020 /* Attempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attempt.swift; sourceTree = "<group>"; };
+		A2000021 /* AttemptAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttemptAnswer.swift; sourceTree = "<group>"; };
+		A2000022 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		A2000023 /* BadgeEarned.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeEarned.swift; sourceTree = "<group>"; };
+		A2000024 /* StudyToolHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyToolHistory.swift; sourceTree = "<group>"; };
+		A2000025 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
+		A2000026 /* PomodoroSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroSession.swift; sourceTree = "<group>"; };
+		A2000027 /* BackupData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupData.swift; sourceTree = "<group>"; };
+		A2000028 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		A2000029 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		A2000030 /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
+		A2000031 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
+		A2000032 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		A2000040 /* TimetableListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimetableListView.swift; sourceTree = "<group>"; };
+		A2000041 /* TimetableDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimetableDetailView.swift; sourceTree = "<group>"; };
+		A2000042 /* ActivityEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityEditView.swift; sourceTree = "<group>"; };
+		A2000043 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A2000044 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A2000050 /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
+		A2000051 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		A2000060 /* GoalListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalListView.swift; sourceTree = "<group>"; };
+		A2000061 /* GoalEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalEditView.swift; sourceTree = "<group>"; };
+		A2000062 /* GoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalDetailView.swift; sourceTree = "<group>"; };
+		A2000063 /* QABankListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QABankListView.swift; sourceTree = "<group>"; };
+		A2000064 /* QAEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QAEditView.swift; sourceTree = "<group>"; };
+		A2000065 /* QAScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QAScanView.swift; sourceTree = "<group>"; };
+		A2000066 /* AssessmentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentListView.swift; sourceTree = "<group>"; };
+		A2000067 /* AssessmentCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentCreateView.swift; sourceTree = "<group>"; };
+		A2000068 /* AssessmentRunView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentRunView.swift; sourceTree = "<group>"; };
+		A2000069 /* AssessmentResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessmentResultView.swift; sourceTree = "<group>"; };
+		A2000070 /* ResultListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultListView.swift; sourceTree = "<group>"; };
+		A2000071 /* ResultDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultDetailView.swift; sourceTree = "<group>"; };
+		A2000072 /* StudyHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyHubView.swift; sourceTree = "<group>"; };
+		A2000073 /* DictateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictateView.swift; sourceTree = "<group>"; };
+		A2000074 /* ExplainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplainView.swift; sourceTree = "<group>"; };
+		A2000075 /* SolveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolveView.swift; sourceTree = "<group>"; };
+		A2000076 /* PomodoroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B1000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C1000001 = {
+			isa = PBXGroup;
+			children = (
+				C1000002 /* StudyAsist */,
+				C1000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C1000002 /* StudyAsist */ = {
+			isa = PBXGroup;
+			children = (
+				C1000010 /* App */,
+				C1000011 /* Models */,
+				C1000012 /* Data */,
+				C1000013 /* Views */,
+				C1000014 /* Resources */,
+			);
+			path = StudyAsist;
+			sourceTree = "<group>";
+		};
+		C1000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A0000001 /* StudyAsist.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C1000010 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A2000001 /* StudyAsistApp.swift */,
+				A2000002 /* ContentView.swift */,
+				A2000028 /* AppState.swift */,
+				A2000044 /* MainTabView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		C1000011 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A2000010 /* WeekType.swift */,
+				A2000011 /* ActivityType.swift */,
+				A2000012 /* QuestionType.swift */,
+				A2000013 /* Timetable.swift */,
+				A2000014 /* Activity.swift */,
+				A2000015 /* Goal.swift */,
+				A2000016 /* GoalItem.swift */,
+				A2000017 /* QA.swift */,
+				A2000018 /* Assessment.swift */,
+				A2000019 /* AssessmentQuestion.swift */,
+				A2000020 /* Attempt.swift */,
+				A2000021 /* AttemptAnswer.swift */,
+				A2000022 /* Result.swift */,
+				A2000023 /* BadgeEarned.swift */,
+				A2000024 /* StudyToolHistory.swift */,
+				A2000025 /* ChatMessage.swift */,
+				A2000026 /* PomodoroSession.swift */,
+				A2000027 /* BackupData.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		C1000012 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				C1000020 /* Services */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		C1000020 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A2000029 /* KeychainService.swift */,
+				A2000030 /* ApiClient.swift */,
+				A2000031 /* SettingsStore.swift */,
+				A2000032 /* BackupService.swift */,
+				A2000050 /* NotificationScheduler.swift */,
+				A2000051 /* AuthService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		C1000013 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C1000030 /* Timetable */,
+				C1000032 /* Goals */,
+				C1000033 /* QABank */,
+				C1000034 /* Assessments */,
+				C1000035 /* Results */,
+				C1000036 /* Study */,
+				C1000031 /* Settings */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C1000030 /* Timetable */ = {
+			isa = PBXGroup;
+			children = (
+				A2000040 /* TimetableListView.swift */,
+				A2000041 /* TimetableDetailView.swift */,
+				A2000042 /* ActivityEditView.swift */,
+			);
+			path = Timetable;
+			sourceTree = "<group>";
+		};
+		C1000032 /* Goals */ = {
+			isa = PBXGroup;
+			children = (
+				A2000060 /* GoalListView.swift */,
+				A2000061 /* GoalEditView.swift */,
+				A2000062 /* GoalDetailView.swift */,
+			);
+			path = Goals;
+			sourceTree = "<group>";
+		};
+		C1000033 /* QABank */ = {
+			isa = PBXGroup;
+			children = (
+				A2000063 /* QABankListView.swift */,
+				A2000064 /* QAEditView.swift */,
+				A2000065 /* QAScanView.swift */,
+			);
+			path = QABank;
+			sourceTree = "<group>";
+		};
+		C1000034 /* Assessments */ = {
+			isa = PBXGroup;
+			children = (
+				A2000066 /* AssessmentListView.swift */,
+				A2000067 /* AssessmentCreateView.swift */,
+				A2000068 /* AssessmentRunView.swift */,
+				A2000069 /* AssessmentResultView.swift */,
+			);
+			path = Assessments;
+			sourceTree = "<group>";
+		};
+		C1000035 /* Results */ = {
+			isa = PBXGroup;
+			children = (
+				A2000070 /* ResultListView.swift */,
+				A2000071 /* ResultDetailView.swift */,
+			);
+			path = Results;
+			sourceTree = "<group>";
+		};
+		C1000036 /* Study */ = {
+			isa = PBXGroup;
+			children = (
+				A2000072 /* StudyHubView.swift */,
+				A2000073 /* DictateView.swift */,
+				A2000074 /* ExplainView.swift */,
+				A2000075 /* SolveView.swift */,
+				A2000076 /* PomodoroView.swift */,
+			);
+			path = Study;
+			sourceTree = "<group>";
+		};
+		C1000031 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A2000043 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		C1000014 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A2000003 /* Assets.xcassets */,
+				A2000005 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D1000001 /* StudyAsist */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D2000001;
+			buildPhases = (
+				D1000002 /* Sources */,
+				B1000001 /* Frameworks */,
+				D1000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StudyAsist;
+			productName = StudyAsist;
+			productReference = A0000001 /* StudyAsist.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E1000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = E2000001;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C1000001;
+			productRefGroup = C1000003;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D1000001 /* StudyAsist */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D1000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000003 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D1000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000001 /* StudyAsistApp.swift in Sources */,
+				A1000002 /* ContentView.swift in Sources */,
+				A1000010 /* WeekType.swift in Sources */,
+				A1000011 /* ActivityType.swift in Sources */,
+				A1000012 /* QuestionType.swift in Sources */,
+				A1000013 /* Timetable.swift in Sources */,
+				A1000014 /* Activity.swift in Sources */,
+				A1000015 /* Goal.swift in Sources */,
+				A1000016 /* GoalItem.swift in Sources */,
+				A1000017 /* QA.swift in Sources */,
+				A1000018 /* Assessment.swift in Sources */,
+				A1000019 /* AssessmentQuestion.swift in Sources */,
+				A1000020 /* Attempt.swift in Sources */,
+				A1000021 /* AttemptAnswer.swift in Sources */,
+				A1000022 /* Result.swift in Sources */,
+				A1000023 /* BadgeEarned.swift in Sources */,
+				A1000024 /* StudyToolHistory.swift in Sources */,
+				A1000025 /* ChatMessage.swift in Sources */,
+				A1000026 /* PomodoroSession.swift in Sources */,
+				A1000027 /* BackupData.swift in Sources */,
+				A1000028 /* AppState.swift in Sources */,
+				A1000029 /* KeychainService.swift in Sources */,
+				A1000030 /* ApiClient.swift in Sources */,
+				A1000031 /* SettingsStore.swift in Sources */,
+				A1000032 /* BackupService.swift in Sources */,
+				A1000040 /* TimetableListView.swift in Sources */,
+				A1000041 /* TimetableDetailView.swift in Sources */,
+				A1000042 /* ActivityEditView.swift in Sources */,
+				A1000043 /* SettingsView.swift in Sources */,
+				A1000044 /* MainTabView.swift in Sources */,
+				A1000050 /* NotificationScheduler.swift in Sources */,
+				A1000051 /* AuthService.swift in Sources */,
+				A1000060 /* GoalListView.swift in Sources */,
+				A1000061 /* GoalEditView.swift in Sources */,
+				A1000062 /* GoalDetailView.swift in Sources */,
+				A1000063 /* QABankListView.swift in Sources */,
+				A1000064 /* QAEditView.swift in Sources */,
+				A1000065 /* QAScanView.swift in Sources */,
+				A1000066 /* AssessmentListView.swift in Sources */,
+				A1000067 /* AssessmentCreateView.swift in Sources */,
+				A1000068 /* AssessmentRunView.swift in Sources */,
+				A1000069 /* AssessmentResultView.swift in Sources */,
+				A1000070 /* ResultListView.swift in Sources */,
+				A1000071 /* ResultDetailView.swift in Sources */,
+				A1000072 /* StudyHubView.swift in Sources */,
+				A1000073 /* DictateView.swift in Sources */,
+				A1000074 /* ExplainView.swift in Sources */,
+				A1000075 /* SolveView.swift in Sources */,
+				A1000076 /* PomodoroView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F1000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F1000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F1000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = StudyAsist/StudyAsist.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StudyAsist/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = StudyAsist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.studyasist;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F1000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = StudyAsist/StudyAsist.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StudyAsist/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = StudyAsist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.studyasist;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D2000001 /* Build configuration list for PBXNativeTarget "StudyAsist" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1000003 /* Debug */,
+				F1000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E2000001 /* Build configuration list for PBXProject "StudyAsist" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1000001 /* Debug */,
+				F1000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E1000001 /* Project object */;
+}

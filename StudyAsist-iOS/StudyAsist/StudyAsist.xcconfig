@@ -1,0 +1,3 @@
+// StudyAsist.xcconfig
+// Backend URL - override in Scheme or xcconfig for your environment
+STUDYASIST_BACKEND_URL = https://your-backend.example.com

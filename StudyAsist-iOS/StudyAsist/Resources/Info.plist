@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>StudyAsist needs camera access to scan questions and answers from your notes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>StudyAsist needs photo library access to import images for OCR text extraction.</string>
+</dict>
+</plist>
