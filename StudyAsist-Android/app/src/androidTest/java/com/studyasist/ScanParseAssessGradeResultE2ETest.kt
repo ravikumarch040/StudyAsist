@@ -131,9 +131,9 @@ class ScanParseAssessGradeResultE2ETest {
 
         // User answers: Paris (correct), False (correct), 4 (correct)
         val questions = database.assessmentQuestionDao().getByAssessmentId(assessmentId)
-        val answers = listOf("Paris", "False", "4")
+        val userAnswers = listOf("Paris", "False", "4")
         questions.forEachIndexed { i, aq ->
-            val answerText = if (i < answers.size) answers[i] else ""
+            val answerText = if (i < userAnswers.size) userAnswers[i] else ""
             database.attemptAnswerDao().insert(
                 AttemptAnswer(
                     id = 0,
@@ -148,11 +148,11 @@ class ScanParseAssessGradeResultE2ETest {
         }
 
         // 5. GRADE: Compute result
-        val answers = database.attemptAnswerDao().getByAttemptId(attemptId).map { aa ->
+        val answerPairs = database.attemptAnswerDao().getByAttemptId(attemptId).map { aa ->
             aa.qaId to aa.answerText
         }
-        val qaMap = database.qaDao().getByIds(answers.map { it.first }).associateBy { it.id }
-        val result = gradingService.grade(answers, qaMap)
+        val qaMap = database.qaDao().getByIds(answerPairs.map { it.first }).associateBy { it.id }
+        val result = gradingService.grade(answerPairs, qaMap)
         database.resultDao().insert(
             Result(
                 id = 0,

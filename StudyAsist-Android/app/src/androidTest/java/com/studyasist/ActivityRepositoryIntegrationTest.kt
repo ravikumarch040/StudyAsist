@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -20,7 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import javax.inject.Inject
 
 /**
- * Integration tests for ActivityRepository (TC-AC03, TC-AC04, TC-AC05).
+ * Integration tests for ActivityRepository (TC-AC01 to TC-AC07).
  */
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -49,6 +50,35 @@ class ActivityRepositoryIntegrationTest {
     @After
     fun teardown() {
         database.close()
+    }
+
+    @Test
+    fun insertActivity_returnsId() = runBlocking {
+        val id = activityRepository.insertActivity(activity(1, 540, 600))
+        assertTrue(id > 0)
+    }
+
+    @Test
+    fun getActivitiesForDay_returnsList() = runBlocking {
+        activityRepository.insertActivity(activity(1, 540, 600))
+        activityRepository.insertActivity(activity(1, 600, 660))
+        val acts = activityRepository.getActivitiesForDay(timetableId, 1)
+        assertEquals(2, acts.size)
+    }
+
+    @Test
+    fun updateActivity_persisted() = runBlocking {
+        val id = activityRepository.insertActivity(activity(1, 540, 600))
+        val act = activityRepository.getActivity(id)!!
+        activityRepository.updateActivity(act.copy(title = "Updated"))
+        assertEquals("Updated", activityRepository.getActivity(id)!!.title)
+    }
+
+    @Test
+    fun deleteActivity_removed() = runBlocking {
+        val id = activityRepository.insertActivity(activity(1, 540, 600))
+        activityRepository.deleteActivity(id)
+        assertNull(activityRepository.getActivity(id))
     }
 
     private fun activity(day: Int, startMin: Int, endMin: Int) = ActivityEntity(

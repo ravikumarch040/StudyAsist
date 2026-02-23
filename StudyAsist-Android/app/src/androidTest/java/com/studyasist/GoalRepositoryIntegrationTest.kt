@@ -8,6 +8,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -67,6 +68,30 @@ class GoalRepositoryIntegrationTest {
         assertTrue(active.size >= 2)
         assertTrue(active.any { it.name == "Goal1" })
         assertTrue(active.any { it.name == "Goal2" })
+    }
+
+    @Test
+    fun updateGoal_persisted() = runBlocking {
+        val goalId = goalRepository.createGoal("G", "", System.currentTimeMillis() + 86400000, emptyList())
+        val goal = goalRepository.getGoal(goalId)!!
+        goalRepository.updateGoal(goal.copy(name = "Updated"))
+        assertEquals("Updated", goalRepository.getGoal(goalId)!!.name)
+    }
+
+    @Test
+    fun updateGoalItems_replaced() = runBlocking {
+        val goalId = goalRepository.createGoal("G", "", System.currentTimeMillis() + 86400000, listOf(GoalItemInput("Math", "Ch1", null)))
+        goalRepository.updateGoalItems(goalId, listOf(GoalItemInput("Physics", "Ch2", 5)))
+        val items = goalRepository.getGoalItems(goalId)
+        assertEquals(1, items.size)
+        assertEquals("Physics", items[0].subject)
+    }
+
+    @Test
+    fun deleteGoal_removed() = runBlocking {
+        val goalId = goalRepository.createGoal("ToDelete", "", System.currentTimeMillis() + 86400000, emptyList())
+        goalRepository.deleteGoal(goalId)
+        assertNull(goalRepository.getGoal(goalId))
     }
 
     @Test

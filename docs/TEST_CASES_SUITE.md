@@ -603,6 +603,32 @@ Comprehensive test case list covering every feature and sub-feature. Use this fo
 
 ---
 
+## Test Coverage Mapping
+
+| Test Class | Location | Covers |
+|------------|----------|--------|
+| TimeUtilsTest | test/java/.../util/ | TC-U01–TC-U16 |
+| SM2AlgorithmTest | test/java/.../data/srs/ | TC-SM01–TC-SM08 |
+| ObjectiveGradingServiceTest | test/java/.../data/grading/ | TC-G01–TC-G12 |
+| HeuristicQaParserTest | test/java/.../data/qa/ | TC-QP01–TC-QP06 |
+| FocusGuardHelperTest | test/java/.../notification/ | TC-FG01–TC-FG06 |
+| ShareCodeDecoderTest | test/java/.../data/repository/ | TC-SH04, TC-SH05 |
+| TimetableTemplatesTest | test/java/.../data/templates/ | TC-TM01–TC-TM04 |
+| LicenseRepositoryTest | test/java/.../data/repository/ | TC-LC01–TC-LC03 |
+| BackupRestoreIntegrationTest | androidTest/.../ | TC-BK01, TC-BK02, TC-BK07, TC-BK08 |
+| TimetableRepositoryIntegrationTest | androidTest/.../ | TC-TT01–TC-TT07 |
+| ActivityRepositoryIntegrationTest | androidTest/.../ | TC-AC01–TC-AC07 |
+| GoalRepositoryIntegrationTest | androidTest/.../ | TC-GR01–TC-GR07 |
+| QABankRepositoryIntegrationTest | androidTest/.../ | TC-QA01–TC-QA06, TC-QA08 |
+| AssessmentRepositoryIntegrationTest | androidTest/.../ | TC-AS01–TC-AS07 |
+| AttemptRepositoryIntegrationTest | androidTest/.../ | TC-AT01–TC-AT06 |
+| ResultRepositoryIntegrationTest | androidTest/.../ | TC-RS01–TC-RS07 |
+| ScanParseAssessGradeResultE2ETest | androidTest/.../ | E2E scan→parse→assess→grade→result |
+
+**Still pending:** TC-BK03–BK06, TC-SH01–SH03/SH06–SH07, TC-TT08–TT10, TC-QA07/QA09/QA10, TC-ST01–TC-ST12, TC-SR01–TC-SR06, TC-SB01–TC-SB06, TC-SY01–TC-SY04, TC-LB01–TC-LB04, all UI tests (TC-UI*, TC-OB*, TC-TS*, etc.), TC-DB01–TC-DB05, TC-ER*.
+
+---
+
 ## Summary Counts
 
 | Category | Unit | Integration | UI | Total |
